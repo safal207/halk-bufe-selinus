@@ -1,4 +1,4 @@
-import {menu} from './menu.js';
+import {menu} from './menu.js?v=photos-44';
 
 export const byId = new Map(menu.map(item => [item.id,item]));
 export const languages = ['tr','ru','en','de'];
