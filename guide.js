@@ -7,6 +7,7 @@ const routes = [
 ];
 const guideCopy = {
   tr: {
+    language:'Dil',
     kicker:'SELİNUS REHBERİ', title:'Kendi tepsini hazırla.', intro:'Bir rota seç, yemeğini bul ve kasaya hazır ol.',
     menu:'Menü', steps:['Rota','Yemek','Tepsi'], question:['Nasıl bir mola?', 'Ana yemeğini seç', 'Tepsin hazır'],
     note:['Bir rota seçerek başla.', 'Fiyatları karşılaştırıp bir yemek seç.', 'İstersen yanına bir ürün ekle. Fiyatı hemen gör.'],
@@ -16,6 +17,7 @@ const guideCopy = {
     limit:'Sepetinde bu üründen en fazla 99 adet olabilir.', failed:'Sepet kaydedilemedi. Tarayıcı depolama ayarlarını kontrol et.',
   },
   ru: {
+    language:'Язык',
     kicker:'ГИД ПО МЕНЮ СЕЛИНУСА', title:'Соберите свой поднос.', intro:'Выберите маршрут, найдите блюдо и приготовьте заказ для кассы.',
     menu:'Меню', steps:['Маршрут','Блюдо','Поднос'], question:['Чего хочется?', 'Выберите блюдо', 'Ваш поднос готов'],
     note:['Выберите, с чего начать.', 'Сравните варианты и выберите один.', 'Добавьте что-нибудь к блюду, если хочется. Сумма обновится сразу.'],
@@ -25,6 +27,7 @@ const guideCopy = {
     limit:'В корзине может быть до 99 штук на позицию.', failed:'Корзина не сохранилась. Проверьте настройки хранилища браузера.',
   },
   en: {
+    language:'Language',
     kicker:'SELİNUS MENU GUIDE', title:'Build your tray.', intro:'Pick a route, find your dish and get your order ready for the counter.',
     menu:'Menu', steps:['Route','Dish','Tray'], question:['What are you in the mood for?', 'Pick your main', 'Your tray is ready'],
     note:['Pick a route to get started.', 'Compare the options and choose one.', 'Add a side if you like. The total updates right away.'],
@@ -32,6 +35,16 @@ const guideCopy = {
     routeNotes:['Gözleme with your choice of filling','Toast with your choice of filling','Choose a burger'],
     next:'Continue', back:'Back', add:'Add and open basket', total:'Tray total',
     limit:'Your basket can hold up to 99 per item.', failed:'Could not save the basket. Check your browser’s storage settings.',
+  },
+  de: {
+    language:'Sprache',
+    kicker:'SELİNUS-MENÜGUIDE', title:'Stell dein Tablett zusammen.', intro:'Wähle, worauf du Lust hast, und bereite deine Bestellung für die Kasse vor.',
+    menu:'Menü', steps:['Auswahl','Gericht','Tablett'], question:['Worauf hast du Lust?', 'Wähle dein Hauptgericht', 'Dein Tablett ist bereit'],
+    note:['Wähle eine Kategorie.', 'Vergleiche die Gerichte und wähle eins aus.', 'Du kannst etwas dazubestellen. Der Gesamtpreis wird sofort aktualisiert.'],
+    routeNames:['Selinus-Klassiker','Ein schneller Snack','Eine herzhafte Mahlzeit'],
+    routeNotes:['Gözleme mit verschiedenen Füllungen','Toast mit verschiedenen Füllungen','Burger zur Auswahl'],
+    next:'Weiter', back:'Zurück', add:'In den Warenkorb', total:'Gesamtpreis',
+    limit:'Pro Artikel passen bis zu 99 Stück in den Warenkorb.', failed:'Der Warenkorb konnte nicht gespeichert werden. Prüfe die Speichereinstellungen deines Browsers.',
   }
 };
 const $ = id => document.getElementById(id);
@@ -47,6 +60,7 @@ function render() {
   document.documentElement.lang = lang;
   document.title = `Halk Büfe Selinus · ${t('kicker')}`;
   $('language').value = lang;
+  $('language').setAttribute('aria-label',t('language'));
   $('brand-link').href = `./?lang=${lang}`;
   $('menu-link').href = `./?lang=${lang}#menu`;
   $('menu-link').textContent = t('menu');
@@ -109,7 +123,9 @@ function addTray() {
 $('language').addEventListener('change',() => {
   lang = $('language').value;
   save('lang',lang);
-  history.replaceState(null,'',`?lang=${lang}`);
+  const url = new URL(location.href);
+  url.searchParams.set('lang',lang);
+  history.replaceState(null,'',url);
   render();
 });
 $('quest-content').addEventListener('click',event => {

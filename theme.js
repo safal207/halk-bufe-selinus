@@ -2,7 +2,7 @@
   const root = document.documentElement;
   const key = 'halk-bufe-selinus:v1:theme';
   const valid = value => value === 'light' || value === 'dark';
-  const labels = {tr:'Koyu tema', ru:'Тёмная тема', en:'Dark theme'};
+  const labels = {tr:'Koyu tema', ru:'Тёмная тема', en:'Dark theme', de:'Dunkles Design'};
   const colors = {light:'#f8f5ed', dark:'#141d19'};
   const url = new URL(location.href);
   const requested = url.searchParams.get('theme');

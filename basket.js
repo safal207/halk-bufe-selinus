@@ -1,7 +1,7 @@
 import {menu} from './menu.js';
 
 export const byId = new Map(menu.map(item => [item.id,item]));
-export const languages = ['tr','ru','en'];
+export const languages = ['tr','ru','en','de'];
 const namespace = 'halk-bufe-selinus:v1';
 export const basketKey = `${namespace}:basket`;
 

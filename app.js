@@ -1,6 +1,6 @@
 import {categories, featured, menu} from './menu.js';
 import {copy} from './copy.js';
-import {basketKey, byId, getLanguage, languages, read, readBasket, save} from './basket.js';
+import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js';
 
 const icons = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
@@ -37,8 +37,7 @@ let toastTimeout;
 let cashierView = false;
 const t = key => copy[lang][key];
 const money = n => `${n} ₺`;
-const label = row => row[languages.indexOf(lang)+1];
-const normalize = str => str.toLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ı','i');
+const normalize = str => str.toLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ı','i').replaceAll('ß','ss');
 const moneyOrAsk = item => item.price === null ? t('ask') : money(item.price);
 const getLines = () => Object.entries(basket).map(([id,qty]) => ({item:byId.get(id),qty}));
 const total = () => getLines().reduce((sum,{item,qty}) => sum + item.price * qty,0);
@@ -65,8 +64,9 @@ function featureHtml(item) {
 }
 function renderCategories() {
   $('categories').setAttribute('aria-label',t('categories'));
-  $('categories').innerHTML = [['all',t('all'),t('all'),t('all'),'grid'],...categories].map(row =>
-    `<button class="category" data-category="${row[0]}" aria-pressed="${row[0] === category}" type="button">${icon(row[4])}${label(row)}</button>`).join('');
+  const all = {id:'all', name:{[lang]:t('all')}, icon:'grid'};
+  $('categories').innerHTML = [all,...categories].map(row =>
+    `<button class="category" data-category="${row.id}" aria-pressed="${row.id === category}" type="button">${icon(row.icon)}${row.name[lang]}</button>`).join('');
 }
 function renderMenu() {
   const query = normalize($('search').value.trim());
@@ -82,14 +82,16 @@ function renderMenu() {
   const picks = !query && category === 'all'
     ? `<section class="group"><h3 class="group-title">${icon('star')}${t('featured')}</h3><div class="featured">${featured.map(id => featureHtml(byId.get(id))).join('')}</div></section>` : '';
   const groups = categories.map(row => {
-    const items = matching.filter(item => item.category === row[0]);
-    return items.length ? `<section class="group"><h3 class="group-title">${icon(row[4])}${label(row)} <small>${items.length}</small></h3><ul class="menu-list">${items.map(rowHtml).join('')}</ul></section>` : '';
+    const items = matching.filter(item => item.category === row.id);
+    return items.length ? `<section class="group"><h3 class="group-title">${icon(row.icon)}${row.name[lang]} <small>${items.length}</small></h3><ul class="menu-list">${items.map(rowHtml).join('')}</ul></section>` : '';
   }).join('');
   $('results').innerHTML = picks + (groups || `<p class="empty" role="status">${t('noResults')}</p>`);
 }
 function renderLanguage() {
   document.documentElement.lang = lang;
+  document.title = `Halk Büfe Selinus · ${t('menuTitle')}`;
   $('language').value = lang;
+  $('language').setAttribute('aria-label',t('language'));
   for (const [id,key] of Object.entries({
     'hero-title':'heroTitle','hero-text':'heroText','hero-caption':'heroCaption','menu-kicker':'menuKicker',
     'menu-title':'menuTitle','footer-text':'footer',
@@ -228,7 +230,7 @@ function openItem(id) {
   if (!item) return;
   itemOpen = item;
   shareCard = null;
-  $('item-category').textContent = label(categories.find(row => row[0] === item.category));
+  $('item-category').textContent = categories.find(row => row.id === item.category).name[lang];
   $('item-title').textContent = item.name[lang];
   $('item-body').innerHTML = `${item.photo ? `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>` : ''}
     ${lang === 'tr' ? '' : `<p class="detail-text" lang="tr">${item.name.tr}</p>`}

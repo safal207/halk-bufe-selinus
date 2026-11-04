@@ -1,5 +1,6 @@
 export const copy = {
   tr: {
+    language: 'Dil',
     heroKicker: 'SELİNUS SAHİLİ · GAZİPAŞA', heroTitle: 'Selinus’ta lezzet molası.',
     heroText: 'Sıcak gözleme, bir bardak çay, sahilde güzel bir mola. Menüyü keşfet ve sepetini hazırla.',
     guide: 'Ne yesem?', heroCaption: 'Temsili görsel', heroCta: 'Menüyü keşfet', menuKicker: 'HALK BÜFE · DİJİTAL MENÜ',
@@ -18,6 +19,7 @@ export const copy = {
     qrAlt: 'Kasaya gösterilecek sipariş QR kodu', qtyLimit: 'Ürün başına en fazla 99 adet.',
   },
   ru: {
+    language: 'Язык',
     heroKicker: 'ПЛЯЖ СЕЛИНУС · ГАЗИПАША', heroTitle: 'Вкусная пауза в Селинусе.',
     heroText: 'Горячие гёзлеме, стакан турецкого чая и отдых у моря. Выберите блюда и соберите заказ.',
     guide: 'Помогите выбрать', heroCaption: 'Иллюстрация', heroCta: 'Смотреть меню', menuKicker: 'HALK BÜFE · ЦИФРОВОЕ МЕНЮ',
@@ -36,6 +38,7 @@ export const copy = {
     qrAlt: 'QR-код заказа для кассира', qtyLimit: 'До 99 штук на позицию.',
   },
   en: {
+    language: 'Language',
     heroKicker: 'SELİNUS BEACH · GAZİPAŞA', heroTitle: 'A bite by the sea.',
     heroText: 'Warm gözleme, a glass of Turkish tea and a break by the sea. Browse the menu and build your order.',
     guide: 'Help me choose', heroCaption: 'Illustration', heroCta: 'Explore the menu', menuKicker: 'HALK BÜFE · DIGITAL MENU',
@@ -52,5 +55,27 @@ export const copy = {
     footer: 'Selinus Beach, Gazipaşa · Demo based on the printed menu. Confirm current prices and availability at the counter.',
     map: 'Open map', mode: 'Serving preference', here: 'Here', takeaway: 'To go',
     qrAlt: 'Order QR code for the counter', qtyLimit: 'Up to 99 per item.',
+  },
+  de: {
+    language: 'Sprache',
+    heroKicker: 'SELİNUS-STRAND · GAZİPAŞA', heroTitle: 'Eine Pause am Meer.',
+    heroText: 'Warme Gözleme, ein Glas türkischer Tee und eine Pause am Meer. Entdecke die Speisekarte und stell deine Bestellung zusammen.',
+    guide: 'Hilfe bei der Auswahl', heroCaption: 'Illustration', heroCta: 'Zur Speisekarte', menuKicker: 'HALK BÜFE · DIGITALE SPEISEKARTE',
+    menuTitle: 'Speisekarte', listView: 'Liste', photoView: 'Fotos', view: 'Ansicht der Speisekarte',
+    noPhotos: 'Für diese Auswahl sind keine Fotos verfügbar. In der Listenansicht findest du alle Gerichte.',
+    search: 'Speisekarte durchsuchen', categories: 'Kategorien der Speisekarte', all: 'Alle', featured: 'Aus unserer Speisekarte',
+    noResults: 'Keine passenden Gerichte gefunden.', ask: 'Preis an der Kasse erfragen', cart: 'Warenkorb', added: 'Zum Warenkorb hinzugefügt',
+    close: 'Schließen', add: 'Hinzufügen', reduce: 'Menge um eins verringern', increase: 'Menge um eins erhöhen', emptyCart: 'Dein Warenkorb ist leer.',
+    returnMenu: 'Zurück zur Speisekarte', cartKicker: 'BESTELLUNG ZUSAMMENSTELLEN', subtotal: 'Gesamt',
+    offer: 'Passt gut zu deiner Bestellung', cashier: 'An der Kasse zeigen', cashierTitle: 'Deine Bestellung', cashierKicker: 'FÜR DIE KASSE',
+    cashierNote: 'Zeig den QR-Code oder die Liste an der Kasse.', checkoutNote: 'Demo · Bestellen und bezahlen an der Kasse.', edit: 'Zurück zum Warenkorb',
+    copy: 'Bestellung kopieren', copied: 'Kopiert', selectCopy: 'Markiere den Text, um ihn zu kopieren.',
+    priceNote: 'Auf der abfotografierten Speisekarte steht kein Preis für dieses Gericht. Bitte frag an der Kasse nach.',
+    photoNote: 'KI-generierte Illustration. Die tatsächliche Anrichtung kann abweichen.', offerAdd: 'Hinzufügen für',
+    share: 'Teilen', download: 'Gerichtskarte herunterladen', copyLink: 'Link zum Gericht kopieren',
+    fallback: 'Kopiere den Link oder lade die Karte mit Bild herunter.',
+    footer: 'Selinus-Strand, Gazipaşa · Demo auf Basis der Speisekarte vor Ort. Aktuelle Preise und Verfügbarkeit bitte an der Kasse erfragen.',
+    map: 'Auf der Karte öffnen', mode: 'Wie möchtest du bestellen?', here: 'Vor Ort', takeaway: 'Zum Mitnehmen',
+    qrAlt: 'QR-Code für die Bestellung an der Kasse', qtyLimit: 'Bis zu 99 Stück pro Artikel.',
   }
 };
