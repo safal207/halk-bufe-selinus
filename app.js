@@ -1,9 +1,13 @@
 import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=kids-meal-1';
-import {copy} from './copy.js?v=simple-menu-1';
+import {copy} from './copy.js?v=mobile-social-1';
+import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=kids-meal-1';
 
+const social = createSocialStore(menu.map(item => item.id));
 const icons = {
+  heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
   toast: '<path d="M6 20V9C2 8 4 4 8 4h8c4 0 6 4 2 5v11z"/><path d="M9 12l6 4m0-4-6 4"/>',
   burger: '<path d="M3 10a9 6 0 0 1 18 0zM3 14h18M4 17h16l-1 3H5z"/>',
@@ -61,33 +65,45 @@ function titleButton(item, thumbnail = false) {
     <span>${name}${item.description ? `<small class="serving-note">${item.description[lang]}</small>` : ''}<span class="row-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span></span>` : name;
   return `<button class="item-open" type="button" data-item="${item.id}">${content}</button>`;
 }
+function likeButton(item) {
+  return `<button class="social-like" type="button" data-like="${item.id}" aria-pressed="${social.liked(item.id)}" aria-label="${t(social.liked(item.id) ? 'unlike' : 'like')} · ${item.name[lang]}" title="${t(social.liked(item.id) ? 'liked' : 'like')}">${icon('heart')}</button>`;
+}
+function viewCount(item, compact = false) {
+  return `<span class="social-views" title="${t('viewHelp')}" aria-label="${t('myViews')}: ${social.views(item.id)}" data-view-label="${item.id}">${icon('eye')}<span class="views-label">${t(compact ? 'mine' : 'myViews')}</span><b data-view-count="${item.id}">${social.views(item.id)}</b></span>`;
+}
+function socialBar(item, compact = false) {
+  return `<div class="social-actions${compact ? ' social-compact' : ''}">${likeButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
+}
 function rowHtml(item) {
-  return `<li class="menu-row">${titleButton(item,true)}${item.price === null ? '' : addButton(item)}</li>`;
+  return `<li class="menu-row">${titleButton(item,true)}<div class="row-actions">${likeButton(item)}${item.price === null ? '' : addButton(item)}</div></li>`;
 }
 function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
-  return `<article class="feature" data-photo="${item.photo}">
+  return `<article class="feature" data-dish="${item.id}" data-photo="${item.photo}">
     <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
-    <button class="icon-button dish-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}">${icon('share')}</button>
-    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
+    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div>${socialBar(item,!inFeed)}</div></article>`;
 }
 function renderCategories() {
   $('categories').setAttribute('aria-label',t('categories'));
   const all = {id:'all', name:{[lang]:t('all')}, icon:'grid'};
-  $('categories').innerHTML = [all,...categories].map(row =>
-    `<button class="category" data-category="${row.id}" aria-pressed="${row.id === category}" type="button">${icon(row.icon)}${row.name[lang]}</button>`).join('');
+  const liked = {id:'liked',name:{[lang]:t('likedFilter')},icon:'heart'};
+  $('categories').innerHTML = [all,liked,...categories].map(row =>
+    `<button class="category" data-category="${row.id}" aria-pressed="${row.id === category}" type="button">${icon(row.icon)}${row.name[lang]}${row.id === 'liked' ? `<span class="category-count">${social.likedCount()}</span>` : ''}</button>`).join('');
 }
 function renderMenu() {
+  $('menu-social-note').hidden = category !== 'liked';
+  stopViewObservation();
   const query = normalize($('search').value.trim());
   const matching = categories.flatMap(group => menu.filter(item => item.category === group.id))
-    .filter(item => (category === 'all' || item.category === category)
+    .filter(item => (category === 'all' || (category === 'liked' ? social.liked(item.id) : item.category === category))
       && (!query || [...Object.values(item.name),...Object.values(item.description ?? {})].some(text => normalize(text).includes(query))));
-  const empty = `<div class="empty" role="status"><p>${t('noResults')}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
+  const empty = `<div class="empty" role="status"><p>${t(category === 'liked' && !query ? 'noLikes' : 'noResults')}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
   if (view !== 'list') {
     const inFeed = view === 'feed';
     $('results').innerHTML = matching.length
       ? `<div class="${inFeed ? 'menu-feed' : 'featured'}">${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
       : empty;
+    observeVisibleDishes();
     return;
   }
   const groups = categories.map(row => {
@@ -121,6 +137,7 @@ function renderLanguage() {
   $('menu-view').setAttribute('aria-label',t('view'));
   $('menu-view').setAttribute('role','group');
   $('menu-view').innerHTML = Object.entries(viewLabels).map(([option,label]) => `<button type="button" data-view="${option}" aria-pressed="${option === view}">${t(label)}</button>`).join('');
+  $('menu-social-note').textContent = t('socialNote');
   $('search-toggle').innerHTML = icon('search');
   $('search-toggle').setAttribute('aria-label',t('search'));
   $('search-clear').innerHTML = icon('close');
@@ -281,6 +298,7 @@ function renderCashier() {
     <button type="button" class="primary" data-action="edit">${t('edit')}</button>`;
 }
 function openCart() {
+  pauseViewTimers();
   refreshBasket();
   cashierView = false;
   renderCart();
@@ -289,16 +307,18 @@ function openCart() {
 function openItem(id) {
   const item = byId.get(id);
   if (!item) return;
+  pauseViewTimers();
+  if (social.recordView(id)) refreshSocial();
   itemOpen = item;
   $('item-category').textContent = categories.find(row => row.id === item.category).name[lang];
   $('item-title').textContent = item.name[lang];
   $('item-body').innerHTML = `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>
     ${lang === 'tr' ? '' : `<p class="detail-text" lang="tr">${item.name.tr}</p>`}
     ${item.description ? `<p class="detail-text dish-description">${item.description[lang]}</p>` : ''}
-    <span class="detail-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>
+    ${item.price === null ? `<span class="detail-price unknown">${t('ask')}</span>` : ''}
     ${item.price === null ? `<p class="detail-text">${t('priceNote')}</p>` : ''}
     `;
-  $('item-footer').innerHTML = `<button type="button" class="secondary" data-action="share">${icon('share')}${t('share')}</button>
+  $('item-footer').innerHTML = `${socialBar(item)}
     ${item.price === null ? '' : `<button type="button" class="primary" data-add="${item.id}" data-detail>${icon('plus')}${t('add')} · ${money(item.price)}</button>`}`;
   if (!$('item-dialog').open) $('item-dialog').showModal();
 }
@@ -324,6 +344,58 @@ function showDishFromHash() {
   if (location.hash.startsWith('#dish-')) openItem(location.hash.slice(6));
 }
 
+function refreshSocial() {
+  for (const button of document.querySelectorAll('[data-like]')) {
+    const item = byId.get(button.dataset.like);
+    button.setAttribute('aria-pressed',social.liked(item.id));
+    button.setAttribute('aria-label',`${t(social.liked(item.id) ? 'unlike' : 'like')} · ${item.name[lang]}`);
+    button.title = t(social.liked(item.id) ? 'liked' : 'like');
+  }
+  for (const counter of document.querySelectorAll('[data-view-count]')) counter.textContent = social.views(counter.dataset.viewCount);
+  for (const label of document.querySelectorAll('[data-view-label]')) label.setAttribute('aria-label',`${t('myViews')}: ${social.views(label.dataset.viewLabel)}`);
+  const likedCount = $('categories').querySelector('[data-category="liked"] .category-count');
+  if (likedCount) likedCount.textContent = social.likedCount();
+}
+let viewObserver;
+const visibleDishes = new Map();
+const viewTimers = new Map();
+function pauseViewTimers() {
+  for (const timer of viewTimers.values()) clearTimeout(timer);
+  viewTimers.clear();
+}
+function stopViewObservation() {
+  pauseViewTimers();
+  viewObserver?.disconnect();
+  visibleDishes.clear();
+}
+function scheduleVisibleViews() {
+  if (document.hidden || document.querySelector('dialog[open]')) return;
+  for (const [id,photo] of visibleDishes) {
+    if (viewTimers.has(id) || !photo.complete || !photo.naturalWidth) continue;
+    viewTimers.set(id,setTimeout(() => {
+      viewTimers.delete(id);
+      if (visibleDishes.has(id) && !document.hidden && !document.querySelector('dialog[open]') && social.recordView(id)) refreshSocial();
+    },1000));
+  }
+}
+function observeVisibleDishes() {
+  if (!('IntersectionObserver' in window)) return;
+  viewObserver ??= new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      const id = entry.target.closest('[data-dish]').dataset.dish;
+      if (entry.isIntersecting && entry.intersectionRatio >= .6) visibleDishes.set(id,entry.target);
+      else {visibleDishes.delete(id);clearTimeout(viewTimers.get(id));viewTimers.delete(id);}
+    }
+    scheduleVisibleViews();
+  },{threshold:[0,.6]});
+  for (const photo of $('results').querySelectorAll('.feature-open img')) {
+    viewObserver.observe(photo);
+    if (!photo.complete) photo.addEventListener('load',scheduleVisibleViews,{once:true});
+  }
+}
+document.addEventListener('visibilitychange',() => document.hidden ? pauseViewTimers() : scheduleVisibleViews());
+for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('close',scheduleVisibleViews);
+
 $('language-icon').innerHTML = icon('globe');
 $('search-icon').innerHTML = icon('search');
 $('language').addEventListener('change', () => {
@@ -335,7 +407,7 @@ $('language').addEventListener('change', () => {
   renderLanguage();
 });
 $('search').addEventListener('input', () => {
-  if (category !== 'all') {
+  if (category !== 'all' && category !== 'liked') {
     category = 'all';
     renderCategories();
   }
@@ -388,6 +460,11 @@ for (const id of ['cart','item-dialog']) $(id).addEventListener('click',event =>
 });
 window.addEventListener('hashchange',showDishFromHash);
 window.addEventListener('storage',event => {
+  if (event.key === socialKey || event.key === null) {
+    social.refresh();
+    refreshSocial();
+    if (category === 'liked') renderMenu();
+  }
   if (event.key === basketKey || event.key === null) {
     basket = readBasket();
     basketSaved = true;
@@ -418,8 +495,19 @@ document.addEventListener('click', async event => {
     renderMenu();
     focusMenu();
   }
+  if (data.like) {
+    const result = social.toggleLike(data.like);
+    if (result) {
+      refreshSocial();
+      if (category === 'liked' && !result.liked) {
+        renderMenu();
+        if (!$('item-dialog').open) ($('results').querySelector('[data-like]') ?? $('categories').querySelector('[data-category="liked"]')).focus({preventScroll:true});
+      }
+      notify(t(!result.saved ? 'localOnly' : result.liked ? 'likedAdded' : 'likedRemoved'));
+    }
+  }
   if (data.item) openItem(data.item);
-  if (data.share) openShare(byId.get(data.share),lang);
+  if (data.share) { pauseViewTimers(); openShare(byId.get(data.share),lang); }
   if (data.close) $(data.close).close();
   const isOffer = 'offer' in data;
   if (data.add && update(data.add,1,isOffer)) {
@@ -468,6 +556,14 @@ document.addEventListener('click', async event => {
 });
 
 renderLanguage();
+const updateLayout = () => document.documentElement.style.setProperty('--menu-stack', `${document.querySelector('.top').offsetHeight + $('menu-toolbar').offsetHeight}px`);
+if ('ResizeObserver' in window) {
+  const layoutObserver = new ResizeObserver(updateLayout);
+  layoutObserver.observe(document.querySelector('.top'));
+  layoutObserver.observe($('menu-toolbar'));
+}
+window.addEventListener('resize',updateLayout);
+updateLayout();
 const landing = new URL(location.href);
 if (landing.searchParams.get('cart') === '1' && count()) {
   landing.searchParams.delete('cart');

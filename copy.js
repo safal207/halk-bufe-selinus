@@ -1,5 +1,6 @@
 export const copy = {
   tr: {
+    like:'Beğen', liked:'Beğenildi', unlike:'Beğeniyi kaldır', likedFilter:'Beğendiklerim', myViews:'Görüntülemelerin', mine:'Sen', viewHelp:'Yalnızca bu tarayıcıdaki görüntülemelerin. Her sekme oturumunda ürün başına bir kez sayılır.', socialNote:'Beğeniler ve görüntülemeler yalnızca bu tarayıcıda saklanır.', noLikes:'Henüz beğendiğin bir ürün yok. Menüdeki kalbe dokun.', likedAdded:'Beğendiklerine eklendi', likedRemoved:'Beğendiklerinden kaldırıldı', localOnly:'Bu oturum için kaydedildi. Tarayıcı kalıcı depolamayı engelliyor.',
     feedView: 'Akış', clearSearch: 'Aramayı temizle', resetSearch: 'Tüm menüyü göster', showQr: 'Siparişin QR kodu',
     offerApplied: 'Sepete eklendi', offerUndo: 'Geri al',
     language: 'Dil',
@@ -22,6 +23,7 @@ export const copy = {
     qrAlt: 'Kasaya gösterilecek sipariş QR kodu', qtyLimit: 'Ürün başına en fazla 99 adet.',
   },
   ru: {
+    like:'Нравится', liked:'Понравилось', unlike:'Убрать из понравившихся', likedFilter:'Понравилось', myViews:'Ваши просмотры', mine:'Вы', viewHelp:'Только ваши просмотры в этом браузере. Не более одного просмотра блюда за сеанс вкладки.', socialNote:'Лайки и просмотры сохраняются только в этом браузере.', noLikes:'Пока ничего не выбрано. Нажмите сердечко у блюда.', likedAdded:'Добавлено в понравившееся', likedRemoved:'Убрано из понравившегося', localOnly:'Сохранено на время открытия. Браузер не разрешает постоянное хранение.',
     feedView: 'Лента', clearSearch: 'Очистить поиск', resetSearch: 'Показать всё меню', showQr: 'QR-код заказа',
     offerApplied: 'Добавлено', offerUndo: 'Отменить',
     language: 'Язык',
@@ -44,6 +46,7 @@ export const copy = {
     qrAlt: 'QR-код заказа для кассира', qtyLimit: 'До 99 штук на позицию.',
   },
   en: {
+    like:'Like', liked:'Liked', unlike:'Unlike', likedFilter:'Liked', myViews:'Your views', mine:'You', viewHelp:'Your views in this browser only. Each dish is counted once per tab session.', socialNote:'Likes and views are saved in this browser only.', noLikes:'No liked dishes yet. Tap a heart in the menu.', likedAdded:'Added to your likes', likedRemoved:'Removed from your likes', localOnly:'Saved for this visit. Your browser blocks persistent storage.',
     feedView: 'Feed', clearSearch: 'Clear search', resetSearch: 'Show the full menu', showQr: 'Order QR code',
     offerApplied: 'Added', offerUndo: 'Undo',
     language: 'Language',
@@ -66,6 +69,7 @@ export const copy = {
     qrAlt: 'Order QR code for the counter', qtyLimit: 'Up to 99 per item.',
   },
   de: {
+    like:'Gefällt mir', liked:'Gefällt dir', unlike:'Gefällt mir zurücknehmen', likedFilter:'Favoriten', myViews:'Deine Aufrufe', mine:'Du', viewHelp:'Nur deine Aufrufe in diesem Browser. Jedes Gericht zählt einmal pro Tab-Sitzung.', socialNote:'Likes und Aufrufe werden nur in diesem Browser gespeichert.', noLikes:'Noch keine Favoriten. Tippe auf ein Herz in der Speisekarte.', likedAdded:'Zu deinen Favoriten hinzugefügt', likedRemoved:'Aus deinen Favoriten entfernt', localOnly:'Für diesen Besuch gespeichert. Dein Browser blockiert dauerhaften Speicher.',
     feedView: 'Feed', clearSearch: 'Suche löschen', resetSearch: 'Alle Gerichte anzeigen', showQr: 'QR-Code der Bestellung',
     offerApplied: 'Hinzugefügt', offerUndo: 'Rückgängig',
     language: 'Sprache',
