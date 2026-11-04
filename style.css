@@ -105,6 +105,7 @@ h2 { font-size: clamp(31px, 4.2vw, 52px); line-height: 1; letter-spacing: -.04em
 .catalog { margin-top: 39px; padding-bottom: 39px; scroll-margin-top: 83px; }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; }
 .section-head .eyebrow { margin-bottom: 8px; }
+.menu-photo-note { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
 .search { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; border: 1px solid var(--line); background: var(--white); border-radius: 14px; color: var(--pine); }
 .search:focus-within { outline: 2px solid var(--focus); outline-offset: 1px; }
 .search input { border: 0; outline: none; color: var(--ink); background: transparent; min-width: 0; width: min(205px, 100%); font-size: 16px; }
@@ -134,7 +135,10 @@ h2 { font-size: clamp(31px, 4.2vw, 52px); line-height: 1; letter-spacing: -.04em
 .add .icon { width: 18px; height: 18px; }
 .menu-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
 .menu-row { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 62px; padding: 8px 9px 8px 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); }
-.menu-row .item-open { flex: 1; }
+.dish-thumb { display: block; border-radius: 9px; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; background: var(--image-bg); }
+.menu-row .item-open { flex: 1; display: grid; grid-template-columns: 58px minmax(0, 1fr); align-items: center; gap: 9px; min-width: 0; overflow-wrap: anywhere; }
+.row-price { display: block; margin-top: 4px; }
+.row-price.unknown { text-align: left; }
 .unknown { color: var(--warm-ink); font-weight: 700; font-size: 12px; line-height: 1.2; text-align: right; }
 .empty { background: var(--white); border: 1px dashed var(--line); border-radius: 16px; color: var(--muted); padding: 22px; text-align: center; }
 .site-footer { border-top: 1px solid var(--line); background: var(--footer-bg); }
@@ -156,6 +160,7 @@ dialog::backdrop { background: #091d18aa; }
 .drawer-footer .primary, .drawer-footer .secondary { width: 100%; }
 .cart-list { list-style: none; margin: 0; padding: 0; }
 .cart-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.cart-item { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
 .cart-line b { display: block; line-height: 1.25; }
 .cart-line small { display: block; color: var(--muted); margin-top: 3px; }
 .quantity { display: flex; align-items: center; gap: 6px; }
@@ -172,11 +177,11 @@ dialog::backdrop { background: #091d18aa; }
 .offer-add:hover { background: #77231c; }
 .total { display: flex; justify-content: space-between; gap: 8px; font-weight: 800; color: var(--pine); font-size: 19px; }
 .handoff-note { margin: 0; color: var(--muted); font-size: 12px; text-align: center; }
-.cashier-list .cart-line { grid-template-columns: 1fr auto; }
+.cashier-list .cart-line { grid-template-columns: minmax(0, 1fr) auto; }
 .qr { display: grid; place-items: center; text-align: center; gap: 6px; }
 .qr canvas { display: block; width: min(280px, 100%); height: auto; image-rendering: pixelated; }
 .qr p, .detail-text { color: var(--muted); font-size: 14px; margin: 5px 0 10px; }
-.detail-photo { display: block; width: 100%; height: min(34vh, 250px); object-fit: cover; border-radius: 16px; background: var(--image-bg); }
+.detail-photo { display: block; width: 100%; height: min(38vh, 320px); object-fit: contain; border-radius: 16px; background: var(--image-bg); }
 .photo-note { display: block; margin: 6px 0; color: var(--muted); font-size: 12px; }
 .detail-price { display: block; margin: 8px 0; font-size: 24px; }
 .detail-price.unknown { text-align: left; font-size: 15px; }
@@ -239,6 +244,7 @@ dialog::backdrop { background: #091d18aa; }
 }
 @media (max-width: 350px) {
   .menu-tools .search { flex-basis: 100%; }
+  .cart-item { grid-template-columns: 42px minmax(0, 1fr); }
 }
 @media (max-width: 365px) {
   .top-inner { width: calc(100% - 24px); gap: 8px; }

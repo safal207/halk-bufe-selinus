@@ -80,12 +80,15 @@ function render() {
         <span class="quest-card-copy"><b>${t('routeNames')[index]}</b><small>${t('routeNotes')[index]}</small></span>
       </button>`).join('')}</div>`;
   } else if (step === 1) {
-    $('quest-content').innerHTML = `<div class="quest-grid">${route.meals.map(id => `
-      <button type="button" class="quest-card" data-dish="${id}" aria-pressed="${id === dish}">
-        <span class="quest-card-copy"><b>${byId.get(id).name[lang]}</b><small>${price(id)}</small></span>
-      </button>`).join('')}</div>`;
+    $('quest-content').innerHTML = `<div class="quest-grid">${route.meals.map(id => {
+      const item = byId.get(id);
+      return `<button type="button" class="quest-card" data-dish="${id}" aria-pressed="${id === dish}">
+        <img alt="" src="assets/${item.photo}.webp" width="230" height="105">
+        <span class="quest-card-copy"><b>${item.name[lang]}</b><small>${price(id)}</small></span>
+      </button>`;
+    }).join('')}</div>`;
   } else {
-    $('quest-content').innerHTML = `<ul class="quest-summary"><li><b>${byId.get(dish).name[lang]}</b><span class="price">${price(dish)}</span></li></ul>
+    $('quest-content').innerHTML = `<ul class="quest-summary"><li><span class="tray-dish"><img class="dish-thumb" src="assets/${byId.get(dish).photo}.webp" width="52" height="52" alt=""><b>${byId.get(dish).name[lang]}</b></span><span class="price">${price(dish)}</span></li></ul>
       <label class="quest-extra"><span><img src="assets/${byId.get(route.extra).photo}.webp" width="64" height="56" alt=""><input type="checkbox" id="quest-extra" ${extra ? 'checked' : ''}>${byId.get(route.extra).name[lang]}</span>
         <span class="price">+ ${price(route.extra)}</span></label>
       <div class="quest-total"><span>${t('total')}</span><output id="quest-total"></output></div>`;

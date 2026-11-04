@@ -33,6 +33,7 @@ let basket = readBasket();
 let mode = read('mode') === 'takeaway' ? 'takeaway' : 'here';
 let itemOpen = null;
 let shareCard = null;
+let sharePreparation = null;
 let toastTimeout;
 let cashierView = false;
 const t = key => copy[lang][key];
@@ -51,11 +52,14 @@ function notify(message) {
 function addButton(item) {
   return `<button class="icon-button add" type="button" data-add="${item.id}" aria-label="${t('add')} · ${item.name[lang]}">${icon('plus')}</button>`;
 }
-function titleButton(item) {
-  return `<button class="item-open" type="button" data-item="${item.id}">${item.name[lang]}${lang === 'tr' ? '' : `<small lang="tr">${item.name.tr}</small>`}</button>`;
+function titleButton(item, thumbnail = false) {
+  const name = `${item.name[lang]}${lang === 'tr' ? '' : `<small lang="tr">${item.name.tr}</small>`}`;
+  const content = thumbnail ? `<img class="dish-thumb" src="assets/${item.photo}.webp" loading="lazy" width="58" height="58" alt="">
+    <span>${name}<span class="row-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span></span>` : name;
+  return `<button class="item-open" type="button" data-item="${item.id}">${content}</button>`;
 }
 function rowHtml(item) {
-  return `<li class="menu-row">${titleButton(item)}<span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item)}</li>`;
+  return `<li class="menu-row">${titleButton(item,true)}${item.price === null ? '' : addButton(item)}</li>`;
 }
 function featureHtml(item) {
   return `<article class="feature" data-photo="${item.photo}">
@@ -73,10 +77,9 @@ function renderMenu() {
   const matching = menu.filter(item => (category === 'all' || item.category === category)
     && (!query || Object.values(item.name).some(name => normalize(name).includes(query))));
   if (view === 'photos') {
-    const photos = matching.filter(item => item.photo);
-    $('results').innerHTML = photos.length
-      ? `<div class="featured">${photos.map(featureHtml).join('')}</div>`
-      : `<p class="empty" role="status">${t('noPhotos')}</p>`;
+    $('results').innerHTML = matching.length
+      ? `<div class="featured">${matching.map(featureHtml).join('')}</div>`
+      : `<p class="empty" role="status">${t('noResults')}</p>`;
     return;
   }
   const picks = !query && category === 'all'
@@ -94,7 +97,7 @@ function renderLanguage() {
   $('language').setAttribute('aria-label',t('language'));
   for (const [id,key] of Object.entries({
     'hero-title':'heroTitle','hero-text':'heroText','hero-caption':'heroCaption','menu-kicker':'menuKicker',
-    'menu-title':'menuTitle','footer-text':'footer',
+    'menu-title':'menuTitle','menu-photo-note':'photoNote','footer-text':'footer',
   })) $(id).textContent = t(key);
   $('hero-kicker').innerHTML = icon('pin') + t('heroKicker');
   $('hero-cta').innerHTML = t('heroCta') + icon('arrow');
@@ -146,6 +149,9 @@ function cartControls(item, qty) {
     <button class="step-button" type="button" data-step="1" data-id="${item.id}" aria-label="${t('increase')} · ${item.name[lang]}" ${qty >= 99 ? 'disabled' : ''}>${icon('plus')}</button>
   </div>`;
 }
+function cartThumb(item) {
+  return `<img class="dish-thumb" src="assets/${item.photo}.webp" loading="lazy" width="52" height="52" alt="">`;
+}
 function renderCart() {
   const qty = count();
   $('header-cart').setAttribute('aria-label',`${t('cart')} · ${qty}`);
@@ -165,7 +171,7 @@ function renderCart() {
   }
   const extra = recommend();
   const lines = getLines().map(({item,qty}) =>
-    `<li class="cart-line"><div><b>${item.name[lang]}</b><small>${money(item.price)} × ${qty} · ${money(item.price * qty)}</small></div>${cartControls(item,qty)}</li>`).join('');
+    `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<div><b>${item.name[lang]}</b><small>${money(item.price)} × ${qty} · ${money(item.price * qty)}</small></div></div>${cartControls(item,qty)}</li>`).join('');
   const offer = extra ? `<section class="offer">
     <img class="offer-photo" src="assets/${extra.photo}.webp" width="144" height="144" alt="">
     <div class="offer-copy"><div class="eyebrow">${icon('star')}${t('offer')}</div>
@@ -203,7 +209,7 @@ function renderCashier() {
   $('cart-body').innerHTML = `<div class="qr"><p>${t('cashierNote')}</p><canvas id="order-qr" role="img" aria-label="${t('qrAlt')}" hidden></canvas></div>
     <p class="serve-summary" lang="tr">${mode === 'takeaway' ? 'Paket' : 'Burada'}</p>
     <ul class="cart-list cashier-list" lang="tr">${getLines().map(({item,qty}) =>
-      `<li class="cart-line"><b>${qty} × ${item.name.tr}</b><span class="price">${money(item.price * qty)}</span></li>`).join('')}</ul>`;
+      `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<b>${qty} × ${item.name.tr}</b></div><span class="price">${money(item.price * qty)}</span></li>`).join('')}</ul>`;
   try {
     drawQR($('order-qr'),orderText());
     $('order-qr').hidden = false;
@@ -232,7 +238,7 @@ function openItem(id) {
   shareCard = null;
   $('item-category').textContent = categories.find(row => row.id === item.category).name[lang];
   $('item-title').textContent = item.name[lang];
-  $('item-body').innerHTML = `${item.photo ? `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>` : ''}
+  $('item-body').innerHTML = `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>
     ${lang === 'tr' ? '' : `<p class="detail-text" lang="tr">${item.name.tr}</p>`}
     <span class="detail-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>
     ${item.price === null ? `<p class="detail-text">${t('priceNote')}</p>` : ''}
@@ -240,36 +246,23 @@ function openItem(id) {
   $('item-footer').innerHTML = `<button type="button" class="secondary" data-action="share">${icon('share')}${t('share')}</button>
     ${item.price === null ? '' : `<button type="button" class="primary" data-add="${item.id}" data-detail>${icon('plus')}${t('add')} · ${money(item.price)}</button>`}`;
   if (!$('item-dialog').open) $('item-dialog').showModal();
-  prepareShareCard(item,$('detail-photo')).then(file => {
-    if (itemOpen === item) shareCard = file;
-  }).catch(() => {});
-}
-function drawCover(context,image,y,height) {
-  const scale = Math.max(800 / image.naturalWidth, height / image.naturalHeight);
-  const w = image.naturalWidth * scale;
-  const h = image.naturalHeight * scale;
-  context.save();
-  context.beginPath();
-  context.rect(0,y,800,height);
-  context.clip();
-  context.drawImage(image,(800-w)/2,y+(height-h)/2,w,h);
-  context.restore();
+  const preparation = prepareShareCard(item,$('detail-photo')).catch(() => null);
+  sharePreparation = preparation;
+  preparation.then(file => {
+    if (sharePreparation === preparation) shareCard = file;
+  });
 }
 async function prepareShareCard(item,image) {
+  await image.decode();
   const canvas = document.createElement('canvas');
   canvas.width = 800;
-  canvas.height = 640;
+  const photoHeight = Math.round(image.naturalHeight * canvas.width / image.naturalWidth);
+  canvas.height = photoHeight + 310;
   const context = canvas.getContext('2d');
   context.fillStyle = '#113d37';
-  context.fillRect(0,0,800,640);
-  let bottom = 160;
-  if (image) {
-    try {
-      await image.decode();
-      drawCover(context,image,82,330);
-      bottom = 450;
-    } catch {}
-  }
+  context.fillRect(0,0,canvas.width,canvas.height);
+  context.drawImage(image,0,82,canvas.width,photoHeight);
+  let bottom = photoHeight + 130;
   context.fillStyle = '#f2c47a';
   context.font = 'bold 28px system-ui';
   context.fillText('HALK BÜFE SELİNUS · GAZİPAŞA',32,52,730);
@@ -315,17 +308,12 @@ async function shareItem() {
   if (!item) return;
   const title = item.name[lang];
   const url = shareUrl(item);
-  if (navigator.share) {
-    const payload = {title, text:`${title} · ${moneyOrAsk(item)}\n${url}`};
-    if (shareCard && navigator.canShare?.({files:[shareCard]})) payload.files = [shareCard];
-    else if (!shareCard) payload.url = url;
-    if (payload.files || payload.url) {
-      try {
-        await navigator.share(payload);
-        return;
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-      }
+  if (navigator.share && shareCard && navigator.canShare?.({files:[shareCard]})) {
+    try {
+      await navigator.share({title, text:`${title} · ${moneyOrAsk(item)}\n${url}`, files:[shareCard]});
+      return;
+    } catch (error) {
+      if (error.name === 'AbortError') return;
     }
   }
   const fallback = $('share-fallback');
@@ -424,8 +412,13 @@ document.addEventListener('click', async event => {
     case 'copy-link': if (itemOpen) await copyText(shareUrl(itemOpen),$('share-fallback')); break;
     case 'download': {
       if (!itemOpen) break;
-      const file = shareCard ?? await prepareShareCard(itemOpen,$('detail-photo'));
-      if (!file) break;
+      const preparation = sharePreparation;
+      const file = shareCard ?? await preparation;
+      if (preparation !== sharePreparation || !$('item-dialog').open) break;
+      if (!file) {
+        $('share-fallback').querySelector('small').textContent = t('sharePhotoUnavailable');
+        break;
+      }
       const link = document.createElement('a');
       link.href = URL.createObjectURL(file);
       link.download = file.name;
