@@ -1,6 +1,6 @@
-import {categories, featured, menu} from './menu.js?v=brand-cups-1';
-import {copy} from './copy.js?v=menu-feed-1';
-import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=brand-cups-1';
+import {categories, featured, menu} from './menu.js?v=family-meal-1';
+import {copy} from './copy.js?v=family-meal-1';
+import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=family-meal-1';
 
 const icons = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
@@ -66,7 +66,7 @@ function addButton(item, inFeed = false) {
 function titleButton(item, thumbnail = false) {
   const name = `${item.name[lang]}${lang === 'tr' ? '' : `<small lang="tr">${item.name.tr}</small>`}`;
   const content = thumbnail ? `<img class="dish-thumb" src="assets/${item.photo}.webp" loading="lazy" width="58" height="58" alt="">
-    <span>${name}<span class="row-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span></span>` : name;
+    <span>${name}${item.description ? `<small class="serving-note">${item.description[lang]}</small>` : ''}<span class="row-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span></span>` : name;
   return `<button class="item-open" type="button" data-item="${item.id}">${content}</button>`;
 }
 function rowHtml(item) {
@@ -76,7 +76,7 @@ function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
   return `<article class="feature" data-photo="${item.photo}">
     <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
-    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
+    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
 }
 function renderCategories() {
   $('categories').setAttribute('aria-label',t('categories'));
@@ -109,10 +109,18 @@ function renderLanguage() {
   $('language').value = lang;
   $('language').setAttribute('aria-label',t('language'));
   for (const [id,key] of Object.entries({
-    'hero-title':'heroTitle','hero-text':'heroText','hero-caption':'heroCaption','menu-kicker':'menuKicker',
+    'hero-title':'heroTitle','hero-caption':'heroCaption','hero-portion':'heroPortion','menu-kicker':'menuKicker',
     'menu-title':'menuTitle','menu-photo-note':'photoNote','footer-text':'footer',
   })) $(id).textContent = t(key);
   $('hero-kicker').innerHTML = icon('pin') + t('heroKicker');
+  const heroMeal = byId.get('tavuk-sis');
+  $('hero-dish').textContent = heroMeal.name[lang];
+  $('hero-text').textContent = heroMeal.description[lang];
+  $('hero-price').textContent = money(heroMeal.price);
+  $('hero-photo').alt = `${heroMeal.name[lang]}. ${heroMeal.description[lang]}`;
+  $('hero-order').innerHTML = icon('plus') + t('heroAdd');
+  $('hero-order').setAttribute('aria-label', `${t('add')} · ${heroMeal.name[lang]} · ${money(heroMeal.price)}`);
+  $('hero-kids').innerHTML = icon('star') + t('heroKids') + icon('arrow');
   $('hero-cta').innerHTML = t('heroCta') + icon('arrow');
   $('guide-link').textContent = t('guide');
   $('guide-link').href = `guide.html?lang=${lang}`;
@@ -323,6 +331,7 @@ function openItem(id) {
   $('item-title').textContent = item.name[lang];
   $('item-body').innerHTML = `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>
     ${lang === 'tr' ? '' : `<p class="detail-text" lang="tr">${item.name.tr}</p>`}
+    ${item.description ? `<p class="detail-text dish-description">${item.description[lang]}</p>` : ''}
     <span class="detail-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>
     ${item.price === null ? `<p class="detail-text">${t('priceNote')}</p>` : ''}
     <div class="share-fallback" id="share-fallback" hidden></div>`;
@@ -434,6 +443,10 @@ $('header-cart').addEventListener('click',openCart);
 $('mobile-cart-button').addEventListener('click',openCart);
 $('hero-cta').addEventListener('click',event => {
   event.preventDefault();
+  category = 'all';
+  $('search').value = '';
+  renderCategories();
+  renderMenu();
   showMenuStart();
 });
 $('cart').addEventListener('change',event => {
@@ -501,6 +514,14 @@ document.addEventListener('click', async event => {
     focus?.focus({preventScroll:true});
   }
   switch (data.action) {
+    case 'kids-menu':
+      category = 'kids';
+      $('search').value = '';
+      renderCategories();
+      renderMenu();
+      focusMenu();
+      $('categories').querySelector('[data-category="kids"]').focus({preventScroll:true});
+      break;
     case 'quick-add': addQuickSet(); break;
     case 'offer-skip':
       offerSkipped = true;

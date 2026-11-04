@@ -1,4 +1,4 @@
-import {menu} from './menu.js?v=brand-cups-1';
+import {menu} from './menu.js?v=family-meal-1';
 
 export const byId = new Map(menu.map(item => [item.id,item]));
 export const languages = ['tr','ru','en','de'];

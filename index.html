@@ -7,12 +7,12 @@
   <meta name="description" content="Halk Büfe Selinus, Gazipaşa için dört dilli dijital menü demosu. Menüyü keşfedin ve kasada göstermek için sepetinizi hazırlayın.">
   <meta property="og:title" content="Halk Büfe Selinus · Dijital Menü">
   <meta property="og:description" content="Gazipaşa, Selinus Sahili · Türkçe / Русский / English / Deutsch">
-  <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/hero.webp">
+  <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/hero-family.webp">
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css?v=brand-cups-1">
+  <link rel="stylesheet" href="style.css?v=family-meal-1">
   <script src="assets/qr.js" defer></script>
-  <script type="module" src="app.js?v=view-order-1"></script>
+  <script type="module" src="app.js?v=family-meal-1"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -39,13 +39,16 @@
       <div class="hero-copy">
         <div class="eyebrow hero-kicker" id="hero-kicker"></div>
         <h1 id="hero-title"></h1>
+        <p class="hero-dish" id="hero-dish"></p>
         <p id="hero-text"></p>
+        <div class="hero-price"><strong id="hero-price"></strong><span id="hero-portion"></span></div>
         <div class="hero-actions">
-          <a href="#menu" class="primary hero-cta" id="hero-cta"></a>
-          <a href="guide.html" class="guide-link" id="guide-link"></a>
+          <button type="button" class="primary hero-order" id="hero-order" data-add="tavuk-sis"></button>
+          <a href="#menu" class="hero-cta" id="hero-cta"></a>
         </div>
+        <button type="button" class="hero-kids" id="hero-kids" data-action="kids-menu"></button>
       </div>
-      <div class="hero-media"><img src="assets/hero.webp" width="1050" height="700" fetchpriority="high" alt="">
+      <div class="hero-media"><img id="hero-photo" src="assets/hero-family.webp" srcset="assets/hero-family-640.webp 640w, assets/hero-family.webp 1280w" sizes="(max-width: 620px) calc(100vw - 32px), (max-width: 1244px) 55vw, 650px" width="1280" height="853" fetchpriority="high" alt="">
         <span class="hero-caption" id="hero-caption"></span>
       </div>
     </section>
@@ -54,6 +57,7 @@
     <section class="catalog" id="menu" aria-labelledby="menu-title">
       <div class="section-head">
         <div><div class="eyebrow" id="menu-kicker"></div><h2 id="menu-title" tabindex="-1"></h2></div>
+        <a href="guide.html" class="guide-link" id="guide-link"></a>
       </div>
       <section class="quick-choice" aria-labelledby="quick-title">
         <h3 id="quick-title"></h3>

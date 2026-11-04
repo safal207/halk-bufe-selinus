@@ -27,7 +27,7 @@ const rows = [
   ['mevsim-salata','salad',150,'Mevsim salata','Сезонный салат','Seasonal salad','Saisonaler Salat','catalog/mevsim-salata'],
   ['kremali-makarna','mains',null,'Kremalı makarna','Паста в сливочном соусе','Creamy pasta','Pasta in Sahnesoße','campaign/creamy-pasta'],
   ['tavuklu-makarna','mains',275,'Kremalı tavuklu makarna','Сливочная паста с курицей','Creamy chicken pasta','Pasta in Sahnesoße mit Hähnchen','catalog/tavuklu-makarna'],
-  ['tavuk-sis','mains',290,'Tavuk şiş','Куриный шашлык','Chicken skewers','Hähnchenspieße','catalog/tavuk-sis'],
+  ['tavuk-sis','mains',290,'Tavuk şiş','Куриный шашлык','Chicken skewers','Hähnchenspieße','campaign/tavuk-sis-meal'],
   ['tavuk-izgara','mains',320,'Tavuk ızgara','Курица на гриле','Grilled chicken','Gegrilltes Hähnchen','catalog/tavuk-izgara'],
   ['kori-tavuk','mains',330,'Köri soslu tavuk','Курица в соусе карри','Chicken with curry sauce','Hähnchen in Currysoße','catalog/kori-tavuk'],
   ['citir-tavuk','mains',250,'Çıtır tavuk','Хрустящая курица','Crispy chicken','Knuspriges Hähnchen','catalog/citir-tavuk'],
@@ -58,6 +58,15 @@ const rows = [
   ['nescafe','drinks',50,'Nescafe','Нескафе','Nescafe','Nescafé','branding/nescafe'],
 ];
 
+// Serving details supplied by the site owner, separate from the photographed price list.
+const descriptions = {
+  'tavuk-sis': {
+    tr: 'Pirinç pilavı, patates kızartması ve kırmızı lahana ile.',
+    ru: 'С рисом, картофелем фри и красной капустой.',
+    en: 'With rice pilaf, French fries and red cabbage.',
+    de: 'Mit Reis, Pommes frites und Rotkohl.',
+  },
+};
 export const menu = rows.map(([id, category, price, tr, ru, en, de, photo]) =>
-  ({ id, category, price, name: {tr, ru, en, de}, photo }));
-export const featured = ['ispanakli','cheeseburger','karisik-tost','cay'];
+  ({ id, category, price, name: {tr, ru, en, de}, photo, description: descriptions[id] }));
+export const featured = ['tavuk-sis','cheeseburger','tavuk-cocuk','ispanakli'];
