@@ -32,10 +32,10 @@ const rows = [
   ['kremali-makarna','mains',null,'Kremalı makarna','Паста в сливочном соусе','Creamy pasta','Pasta in Sahnesoße','campaign/creamy-pasta'],
   ['tavuklu-makarna','mains',275,'Kremalı tavuklu makarna','Сливочная паста с курицей','Creamy chicken pasta','Pasta in Sahnesoße mit Hähnchen','catalog/tavuklu-makarna'],
   ['tavuk-ekmek','mains',220,'Tavuk şiş ekmek arası','Сэндвич с куриным шашлыком','Chicken skewer sandwich','Sandwich mit Hähnchenspieß','catalog/tavuk-ekmek'],
-  ['tavuk-cocuk','kids',240,'Tavuk şiş çocuk menüsü','Детское меню с куриным шашлыком','Kids’ chicken skewer meal','Kindermenü mit Hähnchenspieß','catalog/tavuk-cocuk'],
+  ['tavuk-cocuk','kids',240,'Tavuk şiş çocuk menüsü','Детское меню с куриным шашлыком','Kids’ chicken skewer meal','Kindermenü mit Hähnchenspieß','campaign/tavuk-cocuk-meal'],
   ['kofte','mains',330,'Köfte','Кёфте','Köfte meatballs','Köfte (türkische Hackfleischbällchen)','campaign/grilled-kofte'],
   ['kofte-ekmek','mains',260,'Köfte ekmek arası','Сэндвич с кёфте','Köfte sandwich','Köfte-Sandwich','catalog/kofte-ekmek'],
-  ['kofte-cocuk','kids',250,'Köfte çocuk menüsü','Детское меню с кёфте','Kids’ köfte meal','Kindermenü mit Köfte','catalog/kofte-cocuk'],
+  ['kofte-cocuk','kids',250,'Köfte çocuk menüsü','Детское меню с кёфте','Kids’ köfte meal','Kindermenü mit Köfte','campaign/kofte-cocuk-meal'],
   ['atistirma','mains',230,'Atıştırma tabağı','Тарелка закусок','Snack platter','Snackteller','catalog/atistirma'],
   ['sigara-boregi','mains',150,'Sigara böreği','Хрустящие рулетики бёрек','Sigara böreği rolls','Knusprige Börek-Röllchen','catalog/sigara-boregi'],
   ['sade-sepit','gozleme',75,'Sade şepit','Лепёшка шепит','Plain şepit flatbread','Şepit-Fladenbrot natur','catalog/sade-sepit'],
@@ -66,5 +66,11 @@ const chickenSides = {
     en: 'With rice pilaf, French fries and red cabbage.',
     de: 'Mit Reis, Pommes frites und Rotkohl.',
 };
+const kidsSides = {
+  tr:'Pirinç pilavı, patates kızartması, kırmızı lahana ve salatalık ile.',
+  ru:'С рисом, картофелем фри, красной капустой и огурцами.',
+  en:'With rice pilaf, French fries, red cabbage and cucumber.',
+  de:'Mit Reis, Pommes frites, Rotkohl und Gurke.'
+};
 export const menu = rows.map(([id, category, price, tr, ru, en, de, photo]) =>
-  ({ id, category, price, name: {tr, ru, en, de}, photo, description: platedChicken.has(id) ? chickenSides : undefined }));
+  ({ id, category, price, name: {tr, ru, en, de}, photo, description: category === 'kids' ? kidsSides : platedChicken.has(id) ? chickenSides : undefined }));
