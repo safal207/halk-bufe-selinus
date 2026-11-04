@@ -1,6 +1,6 @@
-import {categories, featured, menu} from './menu.js?v=photos-44';
+import {categories, featured, menu} from './menu.js?v=brand-cups-1';
 import {copy} from './copy.js?v=menu-feed-1';
-import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=photos-44';
+import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=brand-cups-1';
 
 const icons = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
@@ -346,9 +346,14 @@ async function prepareShareCard(item,image) {
   context.fillRect(0,0,canvas.width,canvas.height);
   context.drawImage(image,0,82,canvas.width,photoHeight);
   let bottom = photoHeight + 130;
-  context.fillStyle = '#f2c47a';
-  context.font = 'bold 28px system-ui';
-  context.fillText('HALK BÜFE SELİNUS · GAZİPAŞA',32,52,730);
+  const brand = document.querySelector('.brand img');
+  if (brand?.naturalWidth) {
+    context.drawImage(brand,32,12,180,180 * brand.naturalHeight / brand.naturalWidth);
+  } else {
+    context.fillStyle = '#f2c47a';
+    context.font = 'bold 28px system-ui';
+    context.fillText('HALK BÜFE SELİNUS · GAZİPAŞA',32,52,730);
+  }
   context.fillStyle = '#fffdf7';
   context.font = 'bold 43px system-ui';
   const words = item.name[lang].split(' ');

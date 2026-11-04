@@ -269,6 +269,7 @@ dialog::backdrop { background: #091d18aa; }
 .quick-add { flex-shrink: 0; min-height: 44px; font-size: 14px; }
 .menu-feed { display: grid; width: min(100%,580px); margin-inline: auto; gap: 15px; }
 .menu-feed .feature-open { height: auto; aspect-ratio: 4 / 3; }
+.menu-feed .feature[data-photo^="branding/"] .feature-open { aspect-ratio: 1; }
 .menu-feed .feature-info { padding: 12px 14px; }
 .menu-feed .item-open { font-size: 20px; }
 .menu-feed .feature-bottom { margin-top: 7px; }

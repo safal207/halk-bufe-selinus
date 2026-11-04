@@ -52,10 +52,10 @@ const rows = [
   ['kabak','dessert',170,'Kabak tatlısı','Тыквенный десерт','Pumpkin dessert','Kürbisdessert','campaign/pumpkin-dessert'],
   ['revani','dessert',125,'Revani tatlısı','Ревани','Revani semolina cake','Revani (Grießkuchen)','campaign/revani'],
   ['gunun-tatlisi','dessert',null,'Günün tatlısı','Десерт дня','Dessert of the day','Dessert des Tages','catalog/gunun-tatlisi'],
-  ['cay','drinks',10,'Çay','Турецкий чай','Turkish tea','Türkischer Tee','campaign/turkish-tea'],
-  ['bitki-cayi','drinks',20,'Bitki çayı','Травяной чай','Herbal tea','Kräutertee','catalog/bitki-cayi'],
-  ['turk-kahvesi','drinks',50,'Türk kahvesi','Турецкий кофе','Turkish coffee','Türkischer Kaffee','catalog/turk-kahvesi'],
-  ['nescafe','drinks',50,'Nescafe','Нескафе','Nescafe','Nescafé','catalog/nescafe'],
+  ['cay','drinks',10,'Çay','Турецкий чай','Turkish tea','Türkischer Tee','branding/turkish-tea'],
+  ['bitki-cayi','drinks',20,'Bitki çayı','Травяной чай','Herbal tea','Kräutertee','branding/herbal-tea'],
+  ['turk-kahvesi','drinks',50,'Türk kahvesi','Турецкий кофе','Turkish coffee','Türkischer Kaffee','branding/turkish-coffee'],
+  ['nescafe','drinks',50,'Nescafe','Нескафе','Nescafe','Nescafé','branding/nescafe'],
 ];
 
 export const menu = rows.map(([id, category, price, tr, ru, en, de, photo]) =>

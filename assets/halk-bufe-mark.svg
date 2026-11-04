@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" width="104" height="104" role="img" aria-labelledby="title">
+  <title id="title">Halk Büfe Selinus</title>
+  <rect width="104" height="104" rx="20" fill="#fff9ee"/>
+  <g transform="translate(2 0)">
+    <path d="M50 89 15 57C2 45 5 24 18 17c12-7 24-2 32 8 8-10 20-15 32-8 13 7 16 28 3 40L50 89Z" fill="none" stroke="#a63831" stroke-width="5" stroke-linejoin="round"/>
+    <g fill="none" stroke="#202121" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m34 41 5 6c3 3 7 3 10 0s3-7 0-10l-5-6m-5 5 7 8m2 3 19 20" stroke-width="3.3"/>
+      <path d="M65 31c4 7 0 14-8 23l-5-3-15 17m15-17c1-7 5-14 13-20Z" fill="#fff9ee" stroke-width="3.3"/>
+    </g>
+  </g>
+</svg>
