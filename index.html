@@ -7,12 +7,20 @@
   <meta name="description" content="Halk Büfe Selinus, Gazipaşa için dört dilli dijital menü demosu. Menüyü keşfedin ve kasada göstermek için sepetinizi hazırlayın.">
   <meta property="og:title" content="Halk Büfe Selinus · Dijital Menü">
   <meta property="og:description" content="Gazipaşa, Selinus Sahili · Türkçe / Русский / English / Deutsch">
-  <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/hero-family.webp">
+  <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/share/menu-preview.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://safal207.github.io/halk-bufe-selinus/">
+  <meta property="og:site_name" content="Halk Büfe Selinus">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://safal207.github.io/halk-bufe-selinus/assets/share/menu-preview.jpg">
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css?v=simple-menu-1">
+  <link rel="stylesheet" href="style.css?v=story-share-1">
   <script src="assets/qr.js" defer></script>
-  <script type="module" src="app.js?v=kids-meal-1"></script>
+  <script type="module" src="app.js?v=story-share-1"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -87,6 +95,21 @@
       <header class="drawer-head"><div><div class="eyebrow" id="item-category"></div><h2 id="item-title"></h2></div><button class="icon-button close" type="button" data-close="item-dialog"></button></header>
       <div class="drawer-body" id="item-body"></div>
       <footer class="drawer-footer" id="item-footer"></footer>
+    </div>
+  </dialog>
+  <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-title">
+    <div class="share-handle" aria-hidden="true"></div>
+    <header class="share-head"><h2 id="share-title"></h2><button class="icon-button" id="share-close" type="button"></button></header>
+    <div class="share-body">
+      <div class="story-preview" id="story-stage" aria-busy="true"><img id="story-preview" width="1080" height="1920" hidden alt=""><p id="story-loading" role="status"></p></div>
+      <p class="share-dish-name" id="share-dish-name"></p>
+      <div class="share-actions" id="share-actions">
+        <button type="button" id="share-send" disabled></button>
+        <button type="button" id="share-save" disabled></button>
+        <button type="button" id="share-copy"></button>
+      </div>
+      <p id="share-hint" class="share-hint"></p>
+      <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
     </div>
   </dialog>
 </body>

@@ -1,3 +1,4 @@
+import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=kids-meal-1';
 import {copy} from './copy.js?v=simple-menu-1';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=kids-meal-1';
@@ -21,7 +22,7 @@ const icons = {
   close: '<path d="m6 6 12 12M18 6 6 18"/>',
   arrow: '<path d="M5 12h14m-6-6 6 6-6 6"/>',
   pin: '<path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/>',
-  share: '<path d="M12 15V3m-4 4 4-4 4 4M7 11H5v9h14v-9h-2"/>',
+  share: '<path d="m21 3-7 18-4-7-7-4L21 3ZM10 14 21 3"/>',
   qr: '<path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h3v3h3v3h-6m6-6v1"/>',
 };
 const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
@@ -35,8 +36,6 @@ let basket = readBasket();
 let basketSaved = true;
 let mode = read('mode') === 'takeaway' ? 'takeaway' : 'here';
 let itemOpen = null;
-let shareCard = null;
-let sharePreparation = null;
 let toastTimeout;
 let cashierView = false;
 let appliedOffer = null;
@@ -69,6 +68,7 @@ function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
   return `<article class="feature" data-photo="${item.photo}">
     <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
+    <button class="icon-button dish-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}">${icon('share')}</button>
     <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
 }
 function renderCategories() {
@@ -286,17 +286,10 @@ function openCart() {
   renderCart();
   if (!$('cart').open) $('cart').showModal();
 }
-function shareUrl(item) {
-  const url = new URL(location.pathname, location.origin);
-  url.searchParams.set('lang', lang);
-  url.hash = `dish-${item.id}`;
-  return url.href;
-}
 function openItem(id) {
   const item = byId.get(id);
   if (!item) return;
   itemOpen = item;
-  shareCard = null;
   $('item-category').textContent = categories.find(row => row.id === item.category).name[lang];
   $('item-title').textContent = item.name[lang];
   $('item-body').innerHTML = `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>
@@ -304,53 +297,10 @@ function openItem(id) {
     ${item.description ? `<p class="detail-text dish-description">${item.description[lang]}</p>` : ''}
     <span class="detail-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>
     ${item.price === null ? `<p class="detail-text">${t('priceNote')}</p>` : ''}
-    <div class="share-fallback" id="share-fallback" hidden></div>`;
+    `;
   $('item-footer').innerHTML = `<button type="button" class="secondary" data-action="share">${icon('share')}${t('share')}</button>
     ${item.price === null ? '' : `<button type="button" class="primary" data-add="${item.id}" data-detail>${icon('plus')}${t('add')} · ${money(item.price)}</button>`}`;
   if (!$('item-dialog').open) $('item-dialog').showModal();
-  const preparation = prepareShareCard(item,$('detail-photo')).catch(() => null);
-  sharePreparation = preparation;
-  preparation.then(file => {
-    if (sharePreparation === preparation) shareCard = file;
-  });
-}
-async function prepareShareCard(item,image) {
-  await image.decode();
-  const canvas = document.createElement('canvas');
-  canvas.width = 800;
-  const photoHeight = Math.round(image.naturalHeight * canvas.width / image.naturalWidth);
-  canvas.height = photoHeight + 310;
-  const context = canvas.getContext('2d');
-  context.fillStyle = '#113d37';
-  context.fillRect(0,0,canvas.width,canvas.height);
-  context.drawImage(image,0,82,canvas.width,photoHeight);
-  let bottom = photoHeight + 130;
-  const brand = document.querySelector('.brand img');
-  if (brand?.naturalWidth) {
-    context.drawImage(brand,32,12,180,180 * brand.naturalHeight / brand.naturalWidth);
-  } else {
-    context.fillStyle = '#f2c47a';
-    context.font = 'bold 28px system-ui';
-    context.fillText('HALK BÜFE SELİNUS · GAZİPAŞA',32,52,730);
-  }
-  context.fillStyle = '#fffdf7';
-  context.font = 'bold 43px system-ui';
-  const words = item.name[lang].split(' ');
-  let line = '';
-  for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (context.measureText(candidate).width > 730 && line) {
-      context.fillText(line,32,bottom,730);
-      bottom += 48;
-      line = word;
-    } else line = candidate;
-  }
-  context.fillText(line,32,bottom,730);
-  context.font = 'bold 32px system-ui';
-  context.fillStyle = '#f2c47a';
-  context.fillText(moneyOrAsk(item),32,bottom+51,730);
-  const blob = await new Promise(resolve => canvas.toBlob(resolve,'image/jpeg',.9));
-  return blob && new File([blob],`halk-bufe-${item.id}.jpg`,{type:'image/jpeg'});
 }
 function showCopyFallback(container, value) {
   const field = document.createElement('textarea');
@@ -369,24 +319,6 @@ async function copyText(value, container) {
     const button = container.querySelector('[data-action="copy"],[data-action="copy-link"]');
     if (button) button.textContent = t('copied');
   } catch { showCopyFallback(container,value); }
-}
-async function shareItem() {
-  const item = itemOpen;
-  if (!item) return;
-  const title = item.name[lang];
-  const url = shareUrl(item);
-  if (navigator.share && shareCard && navigator.canShare?.({files:[shareCard]})) {
-    try {
-      await navigator.share({title, text:`${title} · ${moneyOrAsk(item)}\n${url}`, files:[shareCard]});
-      return;
-    } catch (error) {
-      if (error.name === 'AbortError') return;
-    }
-  }
-  const fallback = $('share-fallback');
-  fallback.hidden = false;
-  fallback.innerHTML = `<small>${t('fallback')}</small><button type="button" class="secondary" data-action="copy-link">${t('copyLink')}</button>
-    <button type="button" class="secondary" data-action="download">${t('download')}</button>`;
 }
 function showDishFromHash() {
   if (location.hash.startsWith('#dish-')) openItem(location.hash.slice(6));
@@ -487,6 +419,7 @@ document.addEventListener('click', async event => {
     focusMenu();
   }
   if (data.item) openItem(data.item);
+  if (data.share) openShare(byId.get(data.share),lang);
   if (data.close) $(data.close).close();
   const isOffer = 'offer' in data;
   if (data.add && update(data.add,1,isOffer)) {
@@ -530,24 +463,7 @@ document.addEventListener('click', async event => {
       $('cart').querySelector('.close').focus();
       break;
     case 'copy': await copyText(orderText(),$('cart-footer')); break;
-    case 'share': await shareItem(); break;
-    case 'copy-link': if (itemOpen) await copyText(shareUrl(itemOpen),$('share-fallback')); break;
-    case 'download': {
-      if (!itemOpen) break;
-      const preparation = sharePreparation;
-      const file = shareCard ?? await preparation;
-      if (preparation !== sharePreparation || !$('item-dialog').open) break;
-      if (!file) {
-        $('share-fallback').querySelector('small').textContent = t('sharePhotoUnavailable');
-        break;
-      }
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(file);
-      link.download = file.name;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(link.href),1500);
-      break;
-    }
+    case 'share': if (itemOpen) openShare(itemOpen,lang); break;
   }
 });
 
