@@ -378,7 +378,7 @@ dialog::backdrop { background: #091d18aa; }
   .menu-photo-note { font-size: 11px; margin-block: 6px 8px; }
   #results { padding-bottom: var(--dock-space); }
   .menu-feed { gap: 12px; }
-  .menu-feed .feature { display: flex; flex-direction: column; height: max(340px,calc(100svh - var(--menu-stack) - var(--dock-space) - 16px)); scroll-margin-top: calc(var(--menu-stack) + 8px); }
+  .menu-feed .feature { display: flex; flex-direction: column; height: max(300px,calc(100svh - var(--menu-stack) - var(--dock-space) - 16px)); scroll-margin-top: calc(var(--menu-stack) + 8px); }
   .menu-feed .feature-open, .menu-feed .feature[data-photo^="branding/"] .feature-open { flex: 1; height: 0; min-height: 96px; aspect-ratio: auto; }
   .menu-feed .feature-open img { object-fit: contain; }
   .menu-feed .feature-info { flex: none; padding: 8px 12px 4px; }

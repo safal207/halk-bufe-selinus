@@ -17,12 +17,22 @@ Validation completed in the JavaScript runtime on 2026-11-04:
 
 Run the saved state tests with `node --test tests/social.test.mjs`.
 
-Manual checks still required before a visual pass:
-- 320×568, 360×640, 390×844; 619/620/621 width boundary; short landscape.
-- Russian and long German dish names; light/dark themes.
-- Like/unlike, liked filter and empty state; persistence after reload.
-- Card, detail and share actions visible together; basket dock does not cover them.
-- No horizontal document overflow; keyboard focus and dialog return focus.
-- Real iOS/Android browser chrome, virtual keyboard and native share.
+Manual browser validation completed on 2026-11-04 in Chromium, using viewport-sized frames:
 
-The execution environment disconnected during implementation; visual QA was not recorded as passed.
+| Viewport | Scenario | Result |
+| --- | --- | --- |
+| 320×568, Russian | Hero, feed, kids menu, populated basket dock, dish details, share sheet | Pass; first card is 304px high with basket, ends at y=485.6, dock begins at y=512. |
+| 360×640, Turkish | Feed and two-column photos, child dish names and sides | Pass; actions and prices visible, no document overflow. |
+| 390×844, German | Feed and compact list, child dish names, dark theme | Pass; names wrap, hearts remain reachable, no document overflow. |
+| 619×700, English | Feed at mobile breakpoint | Pass. |
+| 620×700, German | Feed at exact mobile breakpoint | Pass. |
+| 621×700, Russian | Photos immediately above mobile breakpoint | Pass; no document overflow. |
+| 568×320, Russian | Landscape share sheet | Pass; 242px sheet height, all actions visible without internal scrolling. |
+
+Interaction checks passed: like/unlike, liked filter and its empty state, liked state after reload, session-deduplicated view count after repeat opening/reload, cross-tab updates, light/dark theme, category/view switches, basket visibility, details → share → details return. New heart and share targets are 44×44 CSS pixels.
+
+Two visual defects were fixed during QA: the hero menu link left excess heading space above the first card, and the 340px minimum card height overlapped the basket dock on 320×568. The link now aligns the results under the sticky toolbar; the minimum card height is 300px.
+
+`node --test tests/social.test.mjs`: 5 passing behavioral tests. Final JavaScript syntax and `git diff --check` pass. Short landscape uses normal page scrolling; the full catalogue is not forced into one screen.
+
+Not covered by this browser run: real iOS/Android browser chrome and safe areas, virtual keyboard behavior, OS-level native share, screen-reader operation and enlarged text. These are not claimed as passed. Public multi-user counts are deliberately not implemented without a configured backend.

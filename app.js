@@ -167,7 +167,7 @@ function focusMenu() {
 }
 function showMenuStart() {
   $('menu-title').focus({preventScroll:true});
-  $('menu').scrollIntoView({block:'start'});
+  focusMenu();
 }
 function refreshBasket() {
   const saved = read('basket');
