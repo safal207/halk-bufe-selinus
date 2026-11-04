@@ -28,9 +28,9 @@ const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="
 const $ = id => document.getElementById(id);
 let lang = getLanguage();
 let category = 'all';
-const viewLabels = {list:'listView',photos:'photoView',feed:'feedView'};
+const viewLabels = {feed:'feedView',photos:'photoView',list:'listView'};
 const requestedView = new URLSearchParams(location.search).get('view');
-let view = Object.hasOwn(viewLabels, requestedView) ? requestedView : 'list';
+let view = Object.hasOwn(viewLabels, requestedView) ? requestedView : 'feed';
 const quickSets = {
   breakfast:{label:'quickBreakfast', items:['kahvalti','cay']},
   burger:{label:'quickBurger', items:['cheeseburger','patates']},
