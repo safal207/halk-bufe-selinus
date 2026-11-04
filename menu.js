@@ -1,11 +1,11 @@
 export const categories = [
+  ['mains','Yemekler','Горячее','Mains','Warme Gerichte','plate'],
+  ['kids','Çocuk menüsü','Детское','Kids','Kindermenüs','star'],
+  ['burger','Burgerler','Бургеры','Burgers','Burger','burger'],
+  ['gozleme','Gözlemeler','Гёзлеме','Gözleme','Gözleme','fold'],
   ['breakfast','Kahvaltı','Завтраки','Breakfast','Frühstück','sun'],
   ['toast','Tostlar','Тосты','Toast','Toast','toast'],
-  ['burger','Burgerler','Бургеры','Burgers','Burger','burger'],
   ['salad','Salatalar','Салаты','Salads','Salate','leaf'],
-  ['mains','Yemekler','Горячее','Mains','Warme Gerichte','plate'],
-  ['gozleme','Gözlemeler','Гёзлеме','Gözleme','Gözleme','fold'],
-  ['kids','Çocuk menüsü','Детское','Kids','Kindermenüs','star'],
   ['dessert','Tatlılar','Десерты','Desserts','Desserts','cake'],
   ['drinks','Sıcak içecekler','Напитки','Hot drinks','Heiße Getränke','cup']
 ].map(([id, tr, ru, en, de, icon]) => ({id, name:{tr,ru,en,de}, icon}));
@@ -25,12 +25,12 @@ const rows = [
   ['patates','burger',120,'Patates cips','Картофель фри','Fries','Pommes frites','campaign/fries'],
   ['tavuklu-salata','salad',220,'Tavuklu salata','Салат с курицей','Chicken salad','Salat mit Hähnchen','catalog/tavuklu-salata'],
   ['mevsim-salata','salad',150,'Mevsim salata','Сезонный салат','Seasonal salad','Saisonaler Salat','catalog/mevsim-salata'],
+  ['tavuk-sis','mains',290,'Tavuk şiş','Куриный шашлык','Chicken skewers','Hähnchenspieße','campaign/tavuk-sis-meal'],
+  ['tavuk-izgara','mains',320,'Tavuk ızgara','Курица на гриле','Grilled chicken','Gegrilltes Hähnchen','campaign/tavuk-izgara-meal'],
+  ['kori-tavuk','mains',330,'Köri soslu tavuk','Курица в соусе карри','Chicken with curry sauce','Hähnchen in Currysoße','campaign/kori-tavuk-meal'],
+  ['citir-tavuk','mains',250,'Çıtır tavuk','Хрустящая курица','Crispy chicken','Knuspriges Hähnchen','campaign/citir-tavuk-meal'],
   ['kremali-makarna','mains',null,'Kremalı makarna','Паста в сливочном соусе','Creamy pasta','Pasta in Sahnesoße','campaign/creamy-pasta'],
   ['tavuklu-makarna','mains',275,'Kremalı tavuklu makarna','Сливочная паста с курицей','Creamy chicken pasta','Pasta in Sahnesoße mit Hähnchen','catalog/tavuklu-makarna'],
-  ['tavuk-sis','mains',290,'Tavuk şiş','Куриный шашлык','Chicken skewers','Hähnchenspieße','campaign/tavuk-sis-meal'],
-  ['tavuk-izgara','mains',320,'Tavuk ızgara','Курица на гриле','Grilled chicken','Gegrilltes Hähnchen','catalog/tavuk-izgara'],
-  ['kori-tavuk','mains',330,'Köri soslu tavuk','Курица в соусе карри','Chicken with curry sauce','Hähnchen in Currysoße','catalog/kori-tavuk'],
-  ['citir-tavuk','mains',250,'Çıtır tavuk','Хрустящая курица','Crispy chicken','Knuspriges Hähnchen','catalog/citir-tavuk'],
   ['tavuk-ekmek','mains',220,'Tavuk şiş ekmek arası','Сэндвич с куриным шашлыком','Chicken skewer sandwich','Sandwich mit Hähnchenspieß','catalog/tavuk-ekmek'],
   ['tavuk-cocuk','kids',240,'Tavuk şiş çocuk menüsü','Детское меню с куриным шашлыком','Kids’ chicken skewer meal','Kindermenü mit Hähnchenspieß','catalog/tavuk-cocuk'],
   ['kofte','mains',330,'Köfte','Кёфте','Köfte meatballs','Köfte (türkische Hackfleischbällchen)','campaign/grilled-kofte'],
@@ -59,14 +59,12 @@ const rows = [
 ];
 
 // Serving details supplied by the site owner, separate from the photographed price list.
-const descriptions = {
-  'tavuk-sis': {
+const platedChicken = new Set(['tavuk-sis','tavuk-izgara','kori-tavuk','citir-tavuk']);
+const chickenSides = {
     tr: 'Pirinç pilavı, patates kızartması ve kırmızı lahana ile.',
     ru: 'С рисом, картофелем фри и красной капустой.',
     en: 'With rice pilaf, French fries and red cabbage.',
     de: 'Mit Reis, Pommes frites und Rotkohl.',
-  },
 };
 export const menu = rows.map(([id, category, price, tr, ru, en, de, photo]) =>
-  ({ id, category, price, name: {tr, ru, en, de}, photo, description: descriptions[id] }));
-export const featured = ['tavuk-sis','cheeseburger','tavuk-cocuk','ispanakli'];
+  ({ id, category, price, name: {tr, ru, en, de}, photo, description: platedChicken.has(id) ? chickenSides : undefined }));

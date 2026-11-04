@@ -1,6 +1,6 @@
-import {categories, featured, menu} from './menu.js?v=family-meal-1';
-import {copy} from './copy.js?v=family-meal-1';
-import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=family-meal-1';
+import {categories, menu} from './menu.js?v=simple-menu-1';
+import {copy} from './copy.js?v=simple-menu-1';
+import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=simple-menu-1';
 
 const icons = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
@@ -31,12 +31,6 @@ let category = 'all';
 const viewLabels = {feed:'feedView',photos:'photoView',list:'listView'};
 const requestedView = new URLSearchParams(location.search).get('view');
 let view = Object.hasOwn(viewLabels, requestedView) ? requestedView : 'feed';
-const quickSets = {
-  breakfast:{label:'quickBreakfast', items:['kahvalti','cay']},
-  burger:{label:'quickBurger', items:['cheeseburger','patates']},
-  sweet:{label:'quickSweet', items:['cay','revani']},
-};
-let quickPick = null;
 let basket = readBasket();
 let basketSaved = true;
 let mode = read('mode') === 'takeaway' ? 'takeaway' : 'here';
@@ -45,7 +39,6 @@ let shareCard = null;
 let sharePreparation = null;
 let toastTimeout;
 let cashierView = false;
-let offerSkipped = false;
 let appliedOffer = null;
 const t = key => copy[lang][key];
 const money = n => `${n} ₺`;
@@ -86,22 +79,22 @@ function renderCategories() {
 }
 function renderMenu() {
   const query = normalize($('search').value.trim());
-  const matching = menu.filter(item => (category === 'all' || item.category === category)
-    && (!query || Object.values(item.name).some(name => normalize(name).includes(query))));
+  const matching = categories.flatMap(group => menu.filter(item => item.category === group.id))
+    .filter(item => (category === 'all' || item.category === category)
+      && (!query || [...Object.values(item.name),...Object.values(item.description ?? {})].some(text => normalize(text).includes(query))));
+  const empty = `<div class="empty" role="status"><p>${t('noResults')}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
   if (view !== 'list') {
     const inFeed = view === 'feed';
     $('results').innerHTML = matching.length
       ? `<div class="${inFeed ? 'menu-feed' : 'featured'}">${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
-      : `<p class="empty" role="status">${t('noResults')}</p>`;
+      : empty;
     return;
   }
-  const picks = !query && category === 'all'
-    ? `<section class="group"><h3 class="group-title">${icon('star')}${t('featured')}</h3><div class="featured">${featured.map(id => featureHtml(byId.get(id))).join('')}</div></section>` : '';
   const groups = categories.map(row => {
     const items = matching.filter(item => item.category === row.id);
     return items.length ? `<section class="group"><h3 class="group-title">${icon(row.icon)}${row.name[lang]} <small>${items.length}</small></h3><ul class="menu-list">${items.map(rowHtml).join('')}</ul></section>` : '';
   }).join('');
-  $('results').innerHTML = picks + (groups || `<p class="empty" role="status">${t('noResults')}</p>`);
+  $('results').innerHTML = groups || empty;
 }
 function renderLanguage() {
   document.documentElement.lang = lang;
@@ -128,10 +121,10 @@ function renderLanguage() {
   $('menu-view').setAttribute('aria-label',t('view'));
   $('menu-view').setAttribute('role','group');
   $('menu-view').innerHTML = Object.entries(viewLabels).map(([option,label]) => `<button type="button" data-view="${option}" aria-pressed="${option === view}">${t(label)}</button>`).join('');
-  $('quick-title').textContent = t('quickTitle');
-  $('quick-picks').innerHTML = Object.entries(quickSets).map(([id,set]) =>
-    `<button class="category" type="button" data-quick="${id}" aria-pressed="${id === quickPick}" aria-controls="quick-result">${t(set.label)}</button>`).join('');
-  renderQuickPick();
+  $('search-toggle').innerHTML = icon('search');
+  $('search-toggle').setAttribute('aria-label',t('search'));
+  $('search-clear').innerHTML = icon('close');
+  $('search-clear').setAttribute('aria-label',t('clearSearch'));
   $('search').placeholder = t('search');
   $('search').setAttribute('aria-label',t('search'));
   for (const close of document.querySelectorAll('.close')) {
@@ -142,19 +135,10 @@ function renderLanguage() {
   renderMenu();
   renderCart();
 }
-function renderQuickPick() {
-  const result = $('quick-result');
-  result.hidden = !quickPick;
-  if (!quickPick) {
-    result.innerHTML = '';
-    return;
-  }
-  const items = quickSets[quickPick].items.map(id => byId.get(id));
-  const cost = items.reduce((sum,item) => sum + item.price,0);
-  result.innerHTML = `<div class="quick-items">${items.map(item => `<div class="quick-item">
-    <img class="dish-thumb" src="assets/${item.photo}.webp" width="54" height="54" alt="">
-    <span><b>${item.name[lang]}</b><small>${money(item.price)}</small></span>
-  </div>`).join('')}</div><button class="primary quick-add" type="button" data-action="quick-add">${icon('plus')}${t('quickAdd')} · ${money(cost)}</button>`;
+function closeSearch() {
+  $('search').value = '';
+  $('search-box').hidden = true;
+  $('search-toggle').setAttribute('aria-expanded','false');
 }
 function focusMenu() {
   const toolbar = $('menu-toolbar');
@@ -180,13 +164,12 @@ function persistBasket() {
   if (!count()) {
     cashierView = false;
     appliedOffer = null;
-    offerSkipped = false;
   }
   renderCart();
 }
 function update(id, delta, isOffer = false) {
   refreshBasket();
-  if (isOffer && (appliedOffer || offerSkipped || recommend()?.id !== id)) {
+  if (isOffer && (appliedOffer || recommend()?.id !== id)) {
     renderCart();
     return false;
   }
@@ -202,19 +185,6 @@ function update(id, delta, isOffer = false) {
   else if (appliedOffer === id) appliedOffer = null;
   persistBasket();
   return true;
-}
-function addQuickSet() {
-  if (!quickPick) return;
-  refreshBasket();
-  const ids = quickSets[quickPick].items;
-  if (ids.some(id => (basket[id] ?? 0) >= 99)) {
-    notify(t('qtyLimit'));
-    return;
-  }
-  for (const id of ids) basket[id] = (basket[id] ?? 0) + 1;
-  appliedOffer = null;
-  persistBasket();
-  openCart();
 }
 function recommend() {
   const items = getLines().map(({item}) => item);
@@ -235,17 +205,15 @@ function cartThumb(item) {
   return `<img class="dish-thumb" src="assets/${item.photo}.webp" loading="lazy" width="52" height="52" alt="">`;
 }
 function renderOffer() {
-  const extra = appliedOffer ? byId.get(appliedOffer) : offerSkipped ? null : recommend();
+  const extra = appliedOffer ? byId.get(appliedOffer) : recommend();
   if (!extra) return '';
   const controls = appliedOffer
-    ? `<button class="offer-skip" type="button" data-action="offer-undo">${t('offerUndo')}</button>`
-    : `<div class="offer-preview">${t('offerTotal')} <strong>${money(total() + extra.price)}</strong></div>
-      <button class="offer-add" type="button" data-add="${extra.id}" data-offer aria-label="${t('offerAdd')} ${money(extra.price)} · ${extra.name[lang]}">${t('offerAdd')} ${money(extra.price)}</button>
-      <button class="offer-skip" type="button" data-action="offer-skip">${t('offerSkip')}</button>`;
+    ? `<button class="offer-undo" type="button" data-action="offer-undo">${t('offerUndo')}</button>`
+    : `<button class="offer-add" type="button" data-add="${extra.id}" data-offer aria-label="${t('offerAdd')} ${money(extra.price)} · ${extra.name[lang]}">${icon('plus')}${money(extra.price)}</button>`;
   return `<section class="offer">
-    <img class="offer-photo" src="assets/${extra.photo}.webp" width="144" height="144" alt="">
-    <div class="offer-copy"><div class="eyebrow">${icon('star')}${t(appliedOffer ? 'offerApplied' : 'offer')}</div>
-    <b>${extra.name[lang]}</b>${controls}</div></section>`;
+    <img class="offer-photo" src="assets/${extra.photo}.webp" width="76" height="76" alt="">
+    <div class="offer-copy"><div class="eyebrow">${t(appliedOffer ? 'offerApplied' : 'offer')}</div>
+    <b>${extra.name[lang]}</b></div>${controls}</section>`;
 }
 function renderCart() {
   const qty = count();
@@ -296,14 +264,16 @@ function drawQR(canvas, content) {
   }
 }
 function renderCashier() {
-  $('cart-body').innerHTML = `<div class="qr"><p>${t('cashierNote')}</p><canvas id="order-qr" role="img" aria-label="${t('qrAlt')}" hidden></canvas></div>
+  $('cart-body').innerHTML = `<p class="cashier-note">${t('cashierNote')}</p>
     <p class="serve-summary" lang="tr">${mode === 'takeaway' ? 'Paket' : 'Burada'}</p>
     <ul class="cart-list cashier-list" lang="tr">${getLines().map(({item,qty}) =>
-      `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<b>${qty} × ${item.name.tr}</b></div><span class="price">${money(item.price * qty)}</span></li>`).join('')}</ul>`;
+      `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<b>${qty} × ${item.name.tr}</b></div><span class="price">${money(item.price * qty)}</span></li>`).join('')}</ul>
+    <details class="order-code" id="order-code"><summary>${t('showQr')}</summary><div class="qr"><canvas id="order-qr" role="img" aria-label="${t('qrAlt')}" hidden></canvas></div></details>`;
   try {
     drawQR($('order-qr'),orderText());
     $('order-qr').hidden = false;
   } catch (error) {
+    $('order-code').hidden = true;
     console.warn('QR unavailable. The text summary is still available.',error);
   }
   $('cart-footer').innerHTML = `<div class="total"><span>${t('subtotal')}</span><strong>${money(total())}</strong></div>
@@ -439,12 +409,34 @@ $('search').addEventListener('input', () => {
   }
   renderMenu();
 });
+$('search-toggle').addEventListener('click', () => {
+  if ($('search-box').hidden) {
+    $('search-box').hidden = false;
+    $('search-toggle').setAttribute('aria-expanded','true');
+    $('search').focus({preventScroll:true});
+  } else {
+    closeSearch();
+    renderMenu();
+  }
+});
+$('search-clear').addEventListener('click', () => {
+  $('search').value = '';
+  renderMenu();
+  $('search').focus({preventScroll:true});
+});
+$('search').addEventListener('keydown',event => {
+  if (event.key === 'Escape') {
+    closeSearch();
+    renderMenu();
+    $('search-toggle').focus({preventScroll:true});
+  }
+});
 $('header-cart').addEventListener('click',openCart);
 $('mobile-cart-button').addEventListener('click',openCart);
 $('hero-cta').addEventListener('click',event => {
   event.preventDefault();
   category = 'all';
-  $('search').value = '';
+  closeSearch();
   renderCategories();
   renderMenu();
   showMenuStart();
@@ -457,7 +449,6 @@ $('cart').addEventListener('change',event => {
 });
 $('cart').addEventListener('close',() => {
   cashierView = false;
-  offerSkipped = false;
   if (!count() && document.activeElement === document.body) $('header-cart').focus({preventScroll:true});
 });
 for (const id of ['cart','item-dialog']) $(id).addEventListener('click',event => {
@@ -471,7 +462,6 @@ window.addEventListener('storage',event => {
     appliedOffer = null;
     if (!count()) {
       cashierView = false;
-      offerSkipped = false;
     }
     renderCart();
   }
@@ -480,13 +470,9 @@ document.addEventListener('click', async event => {
   const button = event.target.closest('button');
   if (!button) return;
   const data = button.dataset;
-  if (data.quick) {
-    quickPick = quickPick === data.quick ? null : data.quick;
-    for (const option of $('quick-picks').querySelectorAll('button')) option.setAttribute('aria-pressed',option.dataset.quick === quickPick);
-    renderQuickPick();
-  }
   if (data.category) {
     category = data.category;
+    closeSearch();
     for (const chip of $('categories').querySelectorAll('button')) chip.setAttribute('aria-pressed',chip === button);
     renderMenu();
     focusMenu();
@@ -516,17 +502,19 @@ document.addEventListener('click', async event => {
   switch (data.action) {
     case 'kids-menu':
       category = 'kids';
-      $('search').value = '';
+      closeSearch();
       renderCategories();
       renderMenu();
       focusMenu();
       $('categories').querySelector('[data-category="kids"]').focus({preventScroll:true});
       break;
-    case 'quick-add': addQuickSet(); break;
-    case 'offer-skip':
-      offerSkipped = true;
-      renderCart();
-      $('cart-footer').querySelector('[data-action="cashier"]')?.focus({preventScroll:true});
+    case 'reset-menu':
+      category = 'all';
+      closeSearch();
+      renderCategories();
+      renderMenu();
+      focusMenu();
+      $('search-toggle').focus({preventScroll:true});
       break;
     case 'offer-undo':
       refreshBasket();

@@ -1,4 +1,4 @@
-import {byId, getLanguage, readBasket, save} from './basket.js?v=family-meal-1';
+import {byId, getLanguage, readBasket, save} from './basket.js?v=simple-menu-1';
 
 const routes = [
   {id:'selinus', photo:byId.get('ispanakli').photo, meals:['ispanakli','kasarli','patatesli'], extra:'cay'},

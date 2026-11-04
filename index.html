@@ -10,9 +10,9 @@
   <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/hero-family.webp">
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css?v=family-meal-1">
+  <link rel="stylesheet" href="style.css?v=simple-menu-1">
   <script src="assets/qr.js" defer></script>
-  <script type="module" src="app.js?v=family-meal-1"></script>
+  <script type="module" src="app.js?v=simple-menu-1"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -57,15 +57,10 @@
     <section class="catalog" id="menu" aria-labelledby="menu-title">
       <div class="section-head">
         <div><div class="eyebrow" id="menu-kicker"></div><h2 id="menu-title" tabindex="-1"></h2></div>
-        <a href="guide.html" class="guide-link" id="guide-link"></a>
       </div>
-      <section class="quick-choice" aria-labelledby="quick-title">
-        <h3 id="quick-title"></h3>
-        <div class="quick-picks" id="quick-picks" role="group" aria-labelledby="quick-title"></div>
-        <div id="quick-result" class="quick-result" hidden></div>
-      </section>
       <div class="menu-toolbar" id="menu-toolbar">
-        <div class="menu-tools"><div class="menu-view" id="menu-view"></div><label class="search" id="search-box"><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" autocomplete="off"></label></div>
+        <div class="menu-tools"><div class="menu-view" id="menu-view"></div><button class="icon-button search-toggle" id="search-toggle" type="button" aria-controls="search-box" aria-expanded="false"></button></div>
+        <div class="search" id="search-box" hidden><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" autocomplete="off"><button class="icon-button search-clear" id="search-clear" type="button"></button></div>
         <nav class="category-strip" id="categories"></nav>
       </div>
       <p class="menu-photo-note" id="menu-photo-note"></p>
@@ -75,7 +70,7 @@
 
   <footer class="site-footer"><div class="wrap footer-inner">
     <div><strong>Halk Büfe Selinus</strong><p id="footer-text"></p></div>
-    <a id="location" href="https://www.google.com/maps/search/?api=1&amp;query=Halk+B%C3%BCfe+Selinus+Gazipa%C5%9Fa" target="_blank" rel="noopener"></a>
+    <div class="footer-links"><a href="guide.html" class="guide-link" id="guide-link"></a><a id="location" href="https://www.google.com/maps/search/?api=1&amp;query=Halk+B%C3%BCfe+Selinus+Gazipa%C5%9Fa" target="_blank" rel="noopener"></a></div>
   </div></footer>
 
   <aside class="mobile-cart" id="mobile-cart" hidden><button type="button" class="primary" id="mobile-cart-button"></button></aside>
