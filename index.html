@@ -10,9 +10,9 @@
   <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/hero.webp">
   <link rel="icon" href="assets/halk-bufe-icon.png" type="image/png">
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css?v=photos-44">
+  <link rel="stylesheet" href="style.css?v=menu-feed-1">
   <script src="assets/qr.js" defer></script>
-  <script type="module" src="app.js?v=photos-44"></script>
+  <script type="module" src="app.js?v=menu-feed-1"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -54,9 +54,16 @@
     <section class="catalog" id="menu" aria-labelledby="menu-title">
       <div class="section-head">
         <div><div class="eyebrow" id="menu-kicker"></div><h2 id="menu-title" tabindex="-1"></h2></div>
-        <div class="menu-tools"><div class="menu-view" id="menu-view"></div><label class="search" id="search-box"><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" autocomplete="off"></label></div>
       </div>
-      <nav class="category-strip" id="categories"></nav>
+      <section class="quick-choice" aria-labelledby="quick-title">
+        <h3 id="quick-title"></h3>
+        <div class="quick-picks" id="quick-picks" role="group" aria-labelledby="quick-title"></div>
+        <div id="quick-result" class="quick-result" hidden></div>
+      </section>
+      <div class="menu-toolbar" id="menu-toolbar">
+        <div class="menu-tools"><div class="menu-view" id="menu-view"></div><label class="search" id="search-box"><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" autocomplete="off"></label></div>
+        <nav class="category-strip" id="categories"></nav>
+      </div>
       <p class="menu-photo-note" id="menu-photo-note"></p>
       <div id="results" class="results"></div>
     </section>

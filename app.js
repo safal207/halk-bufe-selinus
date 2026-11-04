@@ -1,5 +1,5 @@
 import {categories, featured, menu} from './menu.js?v=photos-44';
-import {copy} from './copy.js?v=photos-44';
+import {copy} from './copy.js?v=menu-feed-1';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=photos-44';
 
 const icons = {
@@ -28,14 +28,25 @@ const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="
 const $ = id => document.getElementById(id);
 let lang = getLanguage();
 let category = 'all';
-let view = 'list';
+const viewLabels = {list:'listView',photos:'photoView',feed:'feedView'};
+const requestedView = new URLSearchParams(location.search).get('view');
+let view = Object.hasOwn(viewLabels, requestedView) ? requestedView : 'list';
+const quickSets = {
+  breakfast:{label:'quickBreakfast', items:['kahvalti','cay']},
+  burger:{label:'quickBurger', items:['cheeseburger','patates']},
+  sweet:{label:'quickSweet', items:['cay','revani']},
+};
+let quickPick = null;
 let basket = readBasket();
+let basketSaved = true;
 let mode = read('mode') === 'takeaway' ? 'takeaway' : 'here';
 let itemOpen = null;
 let shareCard = null;
 let sharePreparation = null;
 let toastTimeout;
 let cashierView = false;
+let offerSkipped = false;
+let appliedOffer = null;
 const t = key => copy[lang][key];
 const money = n => `${n} ₺`;
 const normalize = str => str.toLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ı','i').replaceAll('ß','ss');
@@ -49,8 +60,8 @@ function notify(message) {
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => $('toast-message').textContent = '', 2200);
 }
-function addButton(item) {
-  return `<button class="icon-button add" type="button" data-add="${item.id}" aria-label="${t('add')} · ${item.name[lang]}">${icon('plus')}</button>`;
+function addButton(item, inFeed = false) {
+  return `<button class="${inFeed ? 'primary feed-add' : 'icon-button add'}" type="button" data-add="${item.id}" aria-label="${t('add')} · ${item.name[lang]}">${icon('plus')}${inFeed ? t('add') : ''}</button>`;
 }
 function titleButton(item, thumbnail = false) {
   const name = `${item.name[lang]}${lang === 'tr' ? '' : `<small lang="tr">${item.name.tr}</small>`}`;
@@ -61,10 +72,11 @@ function titleButton(item, thumbnail = false) {
 function rowHtml(item) {
   return `<li class="menu-row">${titleButton(item,true)}${item.price === null ? '' : addButton(item)}</li>`;
 }
-function featureHtml(item) {
+function featureHtml(item, inFeed = false) {
+  const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
   return `<article class="feature" data-photo="${item.photo}">
     <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
-    <div class="feature-info">${titleButton(item)}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item)}</div></div></article>`;
+    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
 }
 function renderCategories() {
   $('categories').setAttribute('aria-label',t('categories'));
@@ -76,9 +88,10 @@ function renderMenu() {
   const query = normalize($('search').value.trim());
   const matching = menu.filter(item => (category === 'all' || item.category === category)
     && (!query || Object.values(item.name).some(name => normalize(name).includes(query))));
-  if (view === 'photos') {
+  if (view !== 'list') {
+    const inFeed = view === 'feed';
     $('results').innerHTML = matching.length
-      ? `<div class="featured">${matching.map(featureHtml).join('')}</div>`
+      ? `<div class="${inFeed ? 'menu-feed' : 'featured'}">${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
       : `<p class="empty" role="status">${t('noResults')}</p>`;
     return;
   }
@@ -106,7 +119,11 @@ function renderLanguage() {
   $('location').innerHTML = icon('pin') + t('map');
   $('menu-view').setAttribute('aria-label',t('view'));
   $('menu-view').setAttribute('role','group');
-  $('menu-view').innerHTML = ['list','photos'].map((option,index) => `<button type="button" data-view="${option}" aria-pressed="${option === view}">${t(index ? 'photoView' : 'listView')}</button>`).join('');
+  $('menu-view').innerHTML = Object.entries(viewLabels).map(([option,label]) => `<button type="button" data-view="${option}" aria-pressed="${option === view}">${t(label)}</button>`).join('');
+  $('quick-title').textContent = t('quickTitle');
+  $('quick-picks').innerHTML = Object.entries(quickSets).map(([id,set]) =>
+    `<button class="category" type="button" data-quick="${id}" aria-pressed="${id === quickPick}" aria-controls="quick-result">${t(set.label)}</button>`).join('');
+  renderQuickPick();
   $('search').placeholder = t('search');
   $('search').setAttribute('aria-label',t('search'));
   for (const close of document.querySelectorAll('.close')) {
@@ -117,10 +134,54 @@ function renderLanguage() {
   renderMenu();
   renderCart();
 }
+function renderQuickPick() {
+  const result = $('quick-result');
+  result.hidden = !quickPick;
+  if (!quickPick) {
+    result.innerHTML = '';
+    return;
+  }
+  const items = quickSets[quickPick].items.map(id => byId.get(id));
+  const cost = items.reduce((sum,item) => sum + item.price,0);
+  result.innerHTML = `<div class="quick-items">${items.map(item => `<div class="quick-item">
+    <img class="dish-thumb" src="assets/${item.photo}.webp" width="54" height="54" alt="">
+    <span><b>${item.name[lang]}</b><small>${money(item.price)}</small></span>
+  </div>`).join('')}</div><button class="primary quick-add" type="button" data-action="quick-add">${icon('plus')}${t('quickAdd')} · ${money(cost)}</button>`;
+}
 function focusMenu() {
+  const toolbar = $('menu-toolbar');
+  const anchor = getComputedStyle(toolbar).position === 'sticky'
+    ? $('results').getBoundingClientRect().top - toolbar.offsetHeight - 8
+    : toolbar.getBoundingClientRect().top;
+  const top = anchor + window.scrollY - document.querySelector('.top').offsetHeight;
+  window.scrollTo({top:Math.max(0,top),behavior:'instant'});
+}
+function showMenuStart() {
+  $('menu-title').focus({preventScroll:true});
   $('menu').scrollIntoView({block:'start'});
 }
-function update(id, delta) {
+function refreshBasket() {
+  const saved = read('basket');
+  if (basketSaved && saved !== null && saved !== JSON.stringify(basket)) {
+    basket = readBasket();
+    appliedOffer = null;
+  }
+}
+function persistBasket() {
+  basketSaved = save('basket', JSON.stringify(basket));
+  if (!count()) {
+    cashierView = false;
+    appliedOffer = null;
+    offerSkipped = false;
+  }
+  renderCart();
+}
+function update(id, delta, isOffer = false) {
+  refreshBasket();
+  if (isOffer && (appliedOffer || offerSkipped || recommend()?.id !== id)) {
+    renderCart();
+    return false;
+  }
   if (byId.get(id)?.price == null) return false;
   const qty = (basket[id] ?? 0) + delta;
   if (qty > 99) {
@@ -129,10 +190,23 @@ function update(id, delta) {
   }
   if (qty > 0) basket[id] = qty;
   else delete basket[id];
-  save('basket', JSON.stringify(basket));
-  if (cashierView && !count()) cashierView = false;
-  renderCart();
+  if (isOffer) appliedOffer = id;
+  else if (appliedOffer === id) appliedOffer = null;
+  persistBasket();
   return true;
+}
+function addQuickSet() {
+  if (!quickPick) return;
+  refreshBasket();
+  const ids = quickSets[quickPick].items;
+  if (ids.some(id => (basket[id] ?? 0) >= 99)) {
+    notify(t('qtyLimit'));
+    return;
+  }
+  for (const id of ids) basket[id] = (basket[id] ?? 0) + 1;
+  appliedOffer = null;
+  persistBasket();
+  openCart();
 }
 function recommend() {
   const items = getLines().map(({item}) => item);
@@ -152,6 +226,19 @@ function cartControls(item, qty) {
 function cartThumb(item) {
   return `<img class="dish-thumb" src="assets/${item.photo}.webp" loading="lazy" width="52" height="52" alt="">`;
 }
+function renderOffer() {
+  const extra = appliedOffer ? byId.get(appliedOffer) : offerSkipped ? null : recommend();
+  if (!extra) return '';
+  const controls = appliedOffer
+    ? `<button class="offer-skip" type="button" data-action="offer-undo">${t('offerUndo')}</button>`
+    : `<div class="offer-preview">${t('offerTotal')} <strong>${money(total() + extra.price)}</strong></div>
+      <button class="offer-add" type="button" data-add="${extra.id}" data-offer aria-label="${t('offerAdd')} ${money(extra.price)} · ${extra.name[lang]}">${t('offerAdd')} ${money(extra.price)}</button>
+      <button class="offer-skip" type="button" data-action="offer-skip">${t('offerSkip')}</button>`;
+  return `<section class="offer">
+    <img class="offer-photo" src="assets/${extra.photo}.webp" width="144" height="144" alt="">
+    <div class="offer-copy"><div class="eyebrow">${icon('star')}${t(appliedOffer ? 'offerApplied' : 'offer')}</div>
+    <b>${extra.name[lang]}</b>${controls}</div></section>`;
+}
 function renderCart() {
   const qty = count();
   $('header-cart').setAttribute('aria-label',`${t('cart')} · ${qty}`);
@@ -169,14 +256,9 @@ function renderCart() {
     $('cart-footer').innerHTML = `<button type="button" class="primary" data-action="menu">${t('returnMenu')}</button>`;
     return;
   }
-  const extra = recommend();
   const lines = getLines().map(({item,qty}) =>
     `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<div><b>${item.name[lang]}</b><small>${money(item.price)} × ${qty} · ${money(item.price * qty)}</small></div></div>${cartControls(item,qty)}</li>`).join('');
-  const offer = extra ? `<section class="offer">
-    <img class="offer-photo" src="assets/${extra.photo}.webp" width="144" height="144" alt="">
-    <div class="offer-copy"><div class="eyebrow">${icon('star')}${t('offer')}</div>
-    <b>${extra.name[lang]}</b><button class="offer-add" type="button" data-add="${extra.id}" data-offer aria-label="${t('offerAdd')} ${money(extra.price)} · ${extra.name[lang]}">${t('offerAdd')} ${money(extra.price)}</button></div></section>` : '';
-  $('cart-body').innerHTML = `<ul class="cart-list">${lines}</ul>${offer}
+  $('cart-body').innerHTML = `<ul class="cart-list">${lines}</ul>${renderOffer()}
     <fieldset class="serve"><legend>${t('mode')}</legend>
       ${['here','takeaway'].map(option => `<label><input type="radio" name="mode" value="${option}" ${mode === option ? 'checked' : ''}><span>${t(option)}</span></label>`).join('')}
     </fieldset>`;
@@ -221,6 +303,7 @@ function renderCashier() {
     <button type="button" class="primary" data-action="edit">${t('edit')}</button>`;
 }
 function openCart() {
+  refreshBasket();
   cashierView = false;
   renderCart();
   if (!$('cart').open) $('cart').showModal();
@@ -346,8 +429,7 @@ $('header-cart').addEventListener('click',openCart);
 $('mobile-cart-button').addEventListener('click',openCart);
 $('hero-cta').addEventListener('click',event => {
   event.preventDefault();
-  $('menu-title').focus({preventScroll:true});
-  focusMenu();
+  showMenuStart();
 });
 $('cart').addEventListener('change',event => {
   if (event.target.name === 'mode') {
@@ -357,6 +439,7 @@ $('cart').addEventListener('change',event => {
 });
 $('cart').addEventListener('close',() => {
   cashierView = false;
+  offerSkipped = false;
   if (!count() && document.activeElement === document.body) $('header-cart').focus({preventScroll:true});
 });
 for (const id of ['cart','item-dialog']) $(id).addEventListener('click',event => {
@@ -366,7 +449,12 @@ window.addEventListener('hashchange',showDishFromHash);
 window.addEventListener('storage',event => {
   if (event.key === basketKey || event.key === null) {
     basket = readBasket();
-    if (!count()) cashierView = false;
+    basketSaved = true;
+    appliedOffer = null;
+    if (!count()) {
+      cashierView = false;
+      offerSkipped = false;
+    }
     renderCart();
   }
 });
@@ -374,6 +462,11 @@ document.addEventListener('click', async event => {
   const button = event.target.closest('button');
   if (!button) return;
   const data = button.dataset;
+  if (data.quick) {
+    quickPick = quickPick === data.quick ? null : data.quick;
+    for (const option of $('quick-picks').querySelectorAll('button')) option.setAttribute('aria-pressed',option.dataset.quick === quickPick);
+    renderQuickPick();
+  }
   if (data.category) {
     category = data.category;
     for (const chip of $('categories').querySelectorAll('button')) chip.setAttribute('aria-pressed',chip === button);
@@ -382,15 +475,19 @@ document.addEventListener('click', async event => {
   }
   if (data.view) {
     view = data.view;
+    const url = new URL(location.href);
+    url.searchParams.set('view',view);
+    history.replaceState(null,'',url);
     for (const option of $('menu-view').querySelectorAll('button')) option.setAttribute('aria-pressed',option === button);
     renderMenu();
     focusMenu();
   }
   if (data.item) openItem(data.item);
   if (data.close) $(data.close).close();
-  if (data.add && update(data.add,1)) {
+  const isOffer = 'offer' in data;
+  if (data.add && update(data.add,1,isOffer)) {
     if ('detail' in data) $('item-dialog').close();
-    if ('offer' in data) $('cart-footer').querySelector('.primary')?.focus();
+    if (isOffer) $('cart-body').querySelector('[data-action="offer-undo"]')?.focus({preventScroll:true});
     notify(t('added'));
   }
   if (data.step && update(data.id, Number(data.step))) {
@@ -399,7 +496,18 @@ document.addEventListener('click', async event => {
     focus?.focus({preventScroll:true});
   }
   switch (data.action) {
-    case 'menu': $('cart').close(); $('menu-title').focus({preventScroll:true}); focusMenu(); break;
+    case 'quick-add': addQuickSet(); break;
+    case 'offer-skip':
+      offerSkipped = true;
+      renderCart();
+      $('cart-footer').querySelector('[data-action="cashier"]')?.focus({preventScroll:true});
+      break;
+    case 'offer-undo':
+      refreshBasket();
+      if (appliedOffer && update(appliedOffer,-1)) $('cart-body').querySelector('[data-offer]')?.focus({preventScroll:true});
+      else renderCart();
+      break;
+    case 'menu': $('cart').close(); showMenuStart(); break;
     case 'cashier':
     case 'edit':
       cashierView = data.action === 'cashier';

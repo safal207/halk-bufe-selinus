@@ -1,5 +1,8 @@
 export const copy = {
   tr: {
+    feedView: 'Akış', quickTitle: 'Canın ne çekiyor?',
+    quickBreakfast: 'Kahvaltı ve çay', quickBurger: 'Burger ve patates', quickSweet: 'Çay ve tatlı', quickAdd: 'İkisini ekle',
+    offerTotal: 'Yeni toplam', offerSkip: 'Ek ürün olmadan', offerApplied: 'Ek ürün sepette', offerUndo: 'Geri al',
     language: 'Dil',
     heroKicker: 'SELİNUS SAHİLİ · GAZİPAŞA', heroTitle: 'Selinus’ta lezzet molası.',
     heroText: 'Sıcak gözleme, bir bardak çay, sahilde güzel bir mola. Menüyü keşfet ve sepetini hazırla.',
@@ -20,6 +23,9 @@ export const copy = {
     qrAlt: 'Kasaya gösterilecek sipariş QR kodu', qtyLimit: 'Ürün başına en fazla 99 adet.',
   },
   ru: {
+    feedView: 'Лента', quickTitle: 'Чего хочется?',
+    quickBreakfast: 'Завтрак с чаем', quickBurger: 'Бургер с фри', quickSweet: 'Чай с десертом', quickAdd: 'Добавить оба',
+    offerTotal: 'Итого с добавкой', offerSkip: 'Без добавки', offerApplied: 'Добавка в корзине', offerUndo: 'Отменить',
     language: 'Язык',
     heroKicker: 'ПЛЯЖ СЕЛИНУС · ГАЗИПАША', heroTitle: 'Вкусная пауза в Селинусе.',
     heroText: 'Горячие гёзлеме, стакан турецкого чая и отдых у моря. Выберите блюда и соберите заказ.',
@@ -40,6 +46,9 @@ export const copy = {
     qrAlt: 'QR-код заказа для кассира', qtyLimit: 'До 99 штук на позицию.',
   },
   en: {
+    feedView: 'Feed', quickTitle: 'What are you in the mood for?',
+    quickBreakfast: 'Breakfast and tea', quickBurger: 'Burger and fries', quickSweet: 'Tea and dessert', quickAdd: 'Add both',
+    offerTotal: 'Total with this extra', offerSkip: 'Skip the extra', offerApplied: 'Extra added', offerUndo: 'Undo',
     language: 'Language',
     heroKicker: 'SELİNUS BEACH · GAZİPAŞA', heroTitle: 'A bite by the sea.',
     heroText: 'Warm gözleme, a glass of Turkish tea and a break by the sea. Browse the menu and build your order.',
@@ -60,6 +69,9 @@ export const copy = {
     qrAlt: 'Order QR code for the counter', qtyLimit: 'Up to 99 per item.',
   },
   de: {
+    feedView: 'Feed', quickTitle: 'Worauf hast du Lust?',
+    quickBreakfast: 'Frühstück mit Tee', quickBurger: 'Burger mit Pommes', quickSweet: 'Tee und Dessert', quickAdd: 'Beides hinzufügen',
+    offerTotal: 'Gesamt mit Extra', offerSkip: 'Ohne Extra', offerApplied: 'Extra im Warenkorb', offerUndo: 'Rückgängig',
     language: 'Sprache',
     heroKicker: 'SELİNUS-STRAND · GAZİPAŞA', heroTitle: 'Eine Pause am Meer.',
     heroText: 'Warme Gözleme, ein Glas türkischer Tee und eine Pause am Meer. Entdecke die Speisekarte und stell deine Bestellung zusammen.',

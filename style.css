@@ -254,3 +254,37 @@ dialog::backdrop { background: #091d18aa; }
   .header-cart { padding-inline: 6px; }
   .header-cart .icon { width: 18px; }
 }
+
+/* Order shortcuts and the three views share a single menu toolbar. */
+.menu-toolbar { position: sticky; top: 70px; z-index: 2; background: var(--paper); border-bottom: 1px solid var(--line); padding-top: 7px; }
+.menu-toolbar .category-strip { margin-top: 7px; margin-bottom: 0; }
+.menu-photo-note { margin-top: 9px; }
+.quick-choice { margin: 16px 0 7px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); }
+.quick-choice h3 { margin: 0 0 9px; font-size: 17px; }
+.quick-picks { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick-result { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+.quick-items { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+.quick-item { display: grid; grid-template-columns: 54px minmax(0,1fr); align-items: center; gap: 7px; font-size: 13px; }
+.quick-item small { display: block; color: var(--muted); }
+.quick-add { flex-shrink: 0; min-height: 44px; font-size: 14px; }
+.menu-feed { display: grid; width: min(100%,580px); margin-inline: auto; gap: 15px; }
+.menu-feed .feature-open { height: auto; aspect-ratio: 4 / 3; }
+.menu-feed .feature-info { padding: 12px 14px; }
+.menu-feed .item-open { font-size: 20px; }
+.menu-feed .feature-bottom { margin-top: 7px; }
+.menu-feed .price { font-size: 18px; }
+.feed-category { margin-bottom: 3px; }
+.feed-add { min-height: 44px; padding-inline: 12px; font-size: 14px; }
+.offer-preview { color: var(--ink); font-size: 13px; }
+.offer-preview strong { white-space: nowrap; }
+.offer-skip { border: 0; background: none; color: var(--pine); min-height: 44px; padding: 0 3px; font-size: 13px; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width:620px) {
+  .menu-toolbar { top: 59px; }
+  .quick-choice { padding: 10px; }
+  .quick-result { align-items: stretch; flex-direction: column; }
+  .quick-items { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+  .quick-item { grid-template-columns: 42px minmax(0,1fr); overflow-wrap: anywhere; }
+}
+@media (max-height:470px) {
+  .menu-toolbar { position: relative; top: auto; }
+}
