@@ -1,0 +1,47 @@
+.guide-page { width: min(980px, 100% - 32px); padding-block: 20px 35px; }
+.guide-menu { min-height: 44px; padding-inline: 11px; display: inline-flex; align-items: center; text-decoration: none; font-weight: 750; color: var(--pine); border: 1px solid var(--line); border-radius: 999px; background: var(--white); font-size: 13px; }
+.guide-banner { background: var(--pine-dark); color: var(--hero-ink); border-radius: 24px; padding: 25px; }
+.guide-banner .eyebrow { color: var(--gold); }
+.guide-banner h1 { margin: 8px 0; max-width: 19ch; font-size: clamp(37px,6vw,65px); }
+.guide-banner p { margin: 8px 0 0; color: #e3e9da; font-size: 15px; }
+.checkpoints { display: flex; position: relative; justify-content: space-between; gap: 6px; margin: 20px 0 0; padding: 0; list-style: none; }
+.checkpoints::before { content: ''; position: absolute; left: 16%; right: 16%; top: 17px; border-top: 2px dashed #80a095; }
+.checkpoints li { position: relative; display: grid; justify-items: center; text-align: center; gap: 4px; width: 33%; font-size: 12px; font-weight: 700; }
+.checkpoints b { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: #285249; border: 2px solid #80a095; color: white; font-size: 15px; }
+.checkpoints [aria-current=step] b { background: var(--gold); border-color: var(--gold); color: var(--pine-dark); }
+.checkpoints .visited b { background: #e4eddc; color: var(--pine-dark); }
+.quest { margin-top: 20px; padding: 20px; background: var(--white); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); }
+.quest-heading h2 { margin-top: 5px; font-size: clamp(29px, 5vw, 45px); }
+.quest-heading p { margin: 6px 0 14px; color: var(--muted); font-size: 14px; }
+.quest-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.quest-card { overflow: hidden; text-align: left; padding: 0; display: grid; grid-template-rows: auto 1fr; min-height: 55px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.quest-card:hover, .quest-card[aria-pressed=true] { background: var(--selected-bg); border-color: #4a745d; }
+.quest-card img { display: block; width: 100%; height: 105px; object-fit: cover; }
+.quest-card-copy { padding: 10px; display: grid; align-content: center; gap: 2px; }
+.quest-card-copy b { line-height: 1.2; }
+.quest-card-copy small { color: var(--muted); }
+.quest-actions { display: flex; justify-content: space-between; align-items: center; gap: 9px; margin-top: 14px; }
+.quest-actions .primary { margin-left: auto; }
+.quest-actions button:disabled { cursor: default; background: var(--disabled-bg); color: var(--disabled-ink); border-color: var(--line); }
+.quest-actions .secondary, .quest-actions .primary { font-size: 14px; }
+.quest-summary { list-style: none; display: grid; gap: 3px; padding: 0; margin: 0 0 12px; }
+.quest-summary li, .quest-total { display: flex; justify-content: space-between; gap: 9px; }
+.quest-total { color: var(--pine); font-weight: 850; padding: 8px 0; margin-top: 8px; border-top: 1px solid var(--line); }
+.quest-extra { display: flex; justify-content: space-between; gap: 8px; align-items: center; border: 1px solid var(--line); background: var(--offer-bg); padding: 8px 10px; border-radius: 12px; cursor: pointer; }
+.quest-extra > span:first-child { display: flex; align-items: center; gap: 7px; min-height: 35px; }
+.quest-extra img { width: 64px; height: 56px; object-fit: cover; border-radius: 8px; }
+.quest-extra input { accent-color: var(--pine); width: 17px; height: 17px; flex: none; }
+.quest-error { color: var(--error-ink); margin: 6px 0 0; font-size: 13px; }
+.quest-error:empty { display: none; }
+@media (max-width:620px) {
+  .guide-page { padding-top: 12px; }
+  .guide-banner { padding: 16px; }
+  .guide-banner p { font-size: 13px; }
+  .quest { padding: 14px; margin-top: 12px; }
+  .quest-grid { grid-template-columns: 1fr; }
+  .quest-card { grid-template: 1fr / 1fr; }
+  .quest-card:has(img) { grid-template: 1fr / 82px minmax(0,1fr); }
+  .quest-card img { height: 66px; }
+  .quest-card-copy { padding: 8px 10px; font-size: 14px; }
+  .guide-menu { font-size: 12px; padding-inline: 8px; }
+}

@@ -1,0 +1,63 @@
+export const categories = [
+  ['breakfast','Kahvaltı','Завтраки','Breakfast','sun'],
+  ['toast','Tostlar','Тосты','Toast','toast'],
+  ['burger','Burgerler','Бургеры','Burgers','burger'],
+  ['salad','Salatalar','Салаты','Salads','leaf'],
+  ['mains','Yemekler','Горячее','Mains','plate'],
+  ['gozleme','Gözlemeler','Гёзлеме','Gözleme','fold'],
+  ['kids','Çocuk menüsü','Детское','Kids','star'],
+  ['dessert','Tatlılar','Десерты','Desserts','cake'],
+  ['drinks','Sıcak içecekler','Напитки','Hot drinks','cup']
+];
+
+// Campaign photos are generated serving illustrations.
+const rows = [
+  ['kahvalti','breakfast',220,'Kahvaltı tabağı','Турецкий завтрак','Turkish breakfast plate'],
+  ['karisik-omlet','breakfast',160,'Karışık omlet','Омлет с добавками','Mixed omelette'],
+  ['sade-omlet','breakfast',120,'Sade omlet','Омлет','Plain omelette'],
+  ['sucuklu-tost','toast',125,'Sucuklu tost','Тост с суджуком','Sucuk toast'],
+  ['kasarli-tost','toast',125,'Kaşarlı tost','Тост с кашаром','Kaşar cheese toast'],
+  ['beyaz-peynirli-tost','toast',125,'Beyaz peynirli tost','Тост с белым сыром','White cheese toast'],
+  ['karisik-tost','toast',150,'Karışık tost','Тост с начинкой','Mixed toast','campaign/mixed-toast'],
+  ['hamburger','burger',250,'Hamburger','Гамбургер','Hamburger'],
+  ['cheeseburger','burger',260,'Cheeseburger','Чизбургер','Cheeseburger','campaign/cheeseburger'],
+  ['tavuk-burger','burger',220,'Tavuk burger','Чикенбургер','Chicken burger'],
+  ['patates','burger',120,'Patates cips','Картофель фри','Fries','campaign/fries'],
+  ['tavuklu-salata','salad',220,'Tavuklu salata','Салат с курицей','Chicken salad'],
+  ['mevsim-salata','salad',150,'Mevsim salata','Сезонный салат','Seasonal salad'],
+  ['kremali-makarna','mains',null,'Kremalı makarna','Паста в сливочном соусе','Creamy pasta','campaign/creamy-pasta'],
+  ['tavuklu-makarna','mains',275,'Kremalı tavuklu makarna','Сливочная паста с курицей','Creamy chicken pasta'],
+  ['tavuk-sis','mains',290,'Tavuk şiş','Куриный шашлык','Chicken skewers'],
+  ['tavuk-izgara','mains',320,'Tavuk ızgara','Курица на гриле','Grilled chicken'],
+  ['kori-tavuk','mains',330,'Köri soslu tavuk','Курица в соусе карри','Chicken with curry sauce'],
+  ['citir-tavuk','mains',250,'Çıtır tavuk','Хрустящая курица','Crispy chicken'],
+  ['tavuk-ekmek','mains',220,'Tavuk şiş ekmek arası','Сэндвич с куриным шашлыком','Chicken skewer sandwich'],
+  ['tavuk-cocuk','kids',240,'Tavuk şiş çocuk menüsü','Детское меню с куриным шашлыком','Kids’ chicken skewer meal'],
+  ['kofte','mains',330,'Köfte','Кёфте','Köfte meatballs','campaign/grilled-kofte'],
+  ['kofte-ekmek','mains',260,'Köfte ekmek arası','Сэндвич с кёфте','Köfte sandwich'],
+  ['kofte-cocuk','kids',250,'Köfte çocuk menüsü','Детское меню с кёфте','Kids’ köfte meal'],
+  ['atistirma','mains',230,'Atıştırma tabağı','Тарелка закусок','Snack platter'],
+  ['sigara-boregi','mains',150,'Sigara böreği','Хрустящие рулетики бёрек','Sigara böreği rolls'],
+  ['sade-sepit','gozleme',75,'Sade şepit','Лепёшка шепит','Plain şepit flatbread'],
+  ['kasarli-sepit','gozleme',110,'Yağlı kaşar peynirli şepit','Шепит с кашаром','Buttered şepit with kaşar'],
+  ['lorlu-sepit','gozleme',100,'Yağlı lor peynirli şepit','Шепит с сыром лор','Buttered şepit with lor cheese'],
+  ['ispanakli','gozleme',120,'Ispanaklı gözleme','Гёзлеме со шпинатом','Spinach gözleme','campaign/spinach-gozleme'],
+  ['ispanakli-kasarli','gozleme',130,'Ispanaklı kaşarlı gözleme','Гёзлеме со шпинатом и кашаром','Spinach and kaşar gözleme'],
+  ['lorlu','gozleme',120,'Lor peynirli gözleme','Гёзлеме с сыром лор','Lor cheese gözleme'],
+  ['patatesli','gozleme',120,'Patatesli gözleme','Гёзлеме с картофелем','Potato gözleme'],
+  ['kasarli','gozleme',130,'Kaşarlı gözleme','Гёзлеме с кашаром','Kaşar cheese gözleme'],
+  ['ispanakli-peynirli','gozleme',140,'Ispanaklı peynirli gözleme','Гёзлеме со шпинатом и сыром лор','Spinach and lor cheese gözleme'],
+  ['patatesli-kasarli','gozleme',130,'Patatesli kaşarlı gözleme','Гёзлеме с картофелем и кашаром','Potato and kaşar gözleme'],
+  ['patatesli-kasarli-ispanakli','gozleme',150,'Patatesli kaşarlı ıspanaklı gözleme','Гёзлеме с картофелем, кашаром и шпинатом','Potato, kaşar and spinach gözleme'],
+  ['kabak','dessert',170,'Kabak tatlısı','Тыквенный десерт','Pumpkin dessert','campaign/pumpkin-dessert'],
+  ['revani','dessert',125,'Revani tatlısı','Ревани','Revani semolina cake','campaign/revani'],
+  ['gunun-tatlisi','dessert',null,'Günün tatlısı','Десерт дня','Dessert of the day'],
+  ['cay','drinks',10,'Çay','Турецкий чай','Turkish tea','campaign/turkish-tea'],
+  ['bitki-cayi','drinks',20,'Bitki çayı','Травяной чай','Herbal tea'],
+  ['turk-kahvesi','drinks',50,'Türk kahvesi','Турецкий кофе','Turkish coffee'],
+  ['nescafe','drinks',50,'Nescafe','Нескафе','Nescafe'],
+];
+
+export const menu = rows.map(([id, category, price, tr, ru, en, photo]) =>
+  ({ id, category, price, name: {tr, ru, en}, photo }));
+export const featured = ['ispanakli','cheeseburger','karisik-tost','cay'];

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f5ed">
+  <meta name="description" content="Halk Büfe Selinus, Gazipaşa için üç dilli dijital menü demosu. Menüyü keşfedin ve kasada göstermek için sepetinizi hazırlayın.">
+  <meta property="og:title" content="Halk Büfe Selinus · Dijital Menü">
+  <meta property="og:description" content="Gazipaşa, Selinus Sahili · Türkçe / Русский / English">
+  <meta property="og:image" content="https://safal207.github.io/halk-bufe-selinus/assets/hero.webp">
+  <link rel="icon" href="assets/halk-bufe-icon.png" type="image/png">
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="assets/qr.js" defer></script>
+  <script type="module" src="app.js"></script>
+  <title>Halk Büfe Selinus · Dijital Menü</title>
+</head>
+<body>
+  <header class="top"><div class="wrap top-inner">
+    <a class="brand" href="./" aria-label="Halk Büfe Selinus">
+      <img src="assets/halk-bufe-wordmark.webp" width="528" height="204" alt="">
+    </a>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Koyu tema" aria-pressed="false" hidden>
+        <svg class="icon theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 14.4A8.9 8.9 0 0 1 9.6 3.2a9 9 0 1 0 11.2 11.2Z"/></svg>
+        <svg class="icon theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/></svg>
+      </button>
+      <label class="language"><span id="language-icon" aria-hidden="true"></span>
+        <select id="language" aria-label="Dil / Язык / Language">
+          <option value="tr">TR</option><option value="ru">RU</option><option value="en">EN</option>
+        </select>
+      </label>
+      <button class="header-cart" id="header-cart" type="button"></button>
+    </div>
+  </div></header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow hero-kicker" id="hero-kicker"></div>
+        <h1 id="hero-title"></h1>
+        <p id="hero-text"></p>
+        <div class="hero-actions">
+          <a href="#menu" class="primary hero-cta" id="hero-cta"></a>
+          <a href="guide.html" class="guide-link" id="guide-link"></a>
+        </div>
+      </div>
+      <div class="hero-media"><img src="assets/hero.webp" width="1050" height="700" fetchpriority="high" alt="">
+        <span class="hero-caption" id="hero-caption"></span>
+      </div>
+    </section>
+    <noscript>Menüyü görüntülemek için JavaScript'i etkinleştirin. / Включите JavaScript, чтобы открыть меню. / Enable JavaScript to see the menu.</noscript>
+
+    <section class="catalog" id="menu" aria-labelledby="menu-title">
+      <div class="section-head">
+        <div><div class="eyebrow" id="menu-kicker"></div><h2 id="menu-title" tabindex="-1"></h2></div>
+        <div class="menu-tools"><div class="menu-view" id="menu-view"></div><label class="search" id="search-box"><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" autocomplete="off"></label></div>
+      </div>
+      <nav class="category-strip" id="categories"></nav>
+      <div id="results" class="results"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="wrap footer-inner">
+    <div><strong>Halk Büfe Selinus</strong><p id="footer-text"></p></div>
+    <a id="location" href="https://www.google.com/maps/search/?api=1&amp;query=Halk+B%C3%BCfe+Selinus+Gazipa%C5%9Fa" target="_blank" rel="noopener"></a>
+  </div></footer>
+
+  <aside class="mobile-cart" id="mobile-cart" hidden><button type="button" class="primary" id="mobile-cart-button"></button></aside>
+  <div class="toast-message" id="toast-message" role="status"></div>
+  <dialog id="cart" aria-labelledby="cart-title">
+    <div class="drawer">
+      <header class="drawer-head"><div><div class="eyebrow" id="cart-kicker"></div><h2 id="cart-title"></h2></div><button class="icon-button close" type="button" data-close="cart"></button></header>
+      <div id="cart-body" class="drawer-body"></div>
+      <footer id="cart-footer" class="drawer-footer"></footer>
+    </div>
+  </dialog>
+  <dialog id="item-dialog" aria-labelledby="item-title">
+    <div class="drawer detail-drawer">
+      <header class="drawer-head"><div><div class="eyebrow" id="item-category"></div><h2 id="item-title"></h2></div><button class="icon-button close" type="button" data-close="item-dialog"></button></header>
+      <div class="drawer-body" id="item-body"></div>
+      <footer class="drawer-footer" id="item-footer"></footer>
+    </div>
+  </dialog>
+</body>
+</html>

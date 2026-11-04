@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f5ed">
+  <meta name="description" content="Halk Büfe Selinus · Üç adımda kendi tepsini hazırla.">
+  <link rel="icon" href="assets/halk-bufe-icon.png" type="image/png">
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
+  <script type="module" src="guide.js"></script>
+  <title>Halk Büfe Selinus · Menü Rehberi</title>
+</head>
+<body>
+  <header class="top"><div class="wrap top-inner">
+    <a class="brand" id="brand-link" href="./" aria-label="Halk Büfe Selinus">
+      <img src="assets/halk-bufe-wordmark.webp" width="528" height="204" alt="">
+    </a>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Koyu tema" aria-pressed="false" hidden>
+        <svg class="icon theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 14.4A8.9 8.9 0 0 1 9.6 3.2a9 9 0 1 0 11.2 11.2Z"/></svg>
+        <svg class="icon theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/></svg>
+      </button>
+      <label class="language">
+        <select id="language" aria-label="Dil / Язык / Language">
+          <option value="tr">TR</option><option value="ru">RU</option><option value="en">EN</option>
+        </select>
+      </label>
+      <a href="./#menu" id="menu-link" class="guide-menu"></a>
+    </div>
+  </div></header>
+  <main class="wrap guide-page">
+    <section class="guide-banner" aria-labelledby="guide-title">
+      <div class="guide-banner-copy">
+        <div class="eyebrow" id="guide-kicker"></div>
+        <h1 id="guide-title"></h1>
+        <p id="guide-intro"></p>
+      </div>
+      <ol class="checkpoints" id="checkpoints"></ol>
+    </section>
+    <section class="quest" aria-labelledby="quest-title">
+      <div class="quest-heading">
+        <div class="eyebrow" id="quest-step"></div>
+        <h2 id="quest-title" tabindex="-1"></h2>
+        <p id="quest-note"></p>
+      </div>
+      <div id="quest-content"></div>
+      <div class="quest-actions" id="quest-actions"></div>
+      <p class="quest-error" id="quest-error" role="status"></p>
+    </section>
+  </main>
+</body>
+</html>
