@@ -1,6 +1,7 @@
 import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=kids-meal-1';
-import {copy} from './copy.js?v=mobile-social-1';
+import {copy} from './copy.js?v=cart-20261105';
+import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
 import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
 import {nutritionLabels,nutritionMarkup,nutritionSearchText,nutritionSummary} from './nutrition.js?v=nutrition-20261105';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=kids-meal-1';
@@ -191,7 +192,7 @@ function persistBasket() {
 }
 function update(id, delta, isOffer = false) {
   refreshBasket();
-  if (isOffer && (appliedOffer || recommend()?.id !== id)) {
+  if (isOffer && (appliedOffer || recommend()?.item.id !== id)) {
     renderCart();
     return false;
   }
@@ -204,17 +205,12 @@ function update(id, delta, isOffer = false) {
   if (qty > 0) basket[id] = qty;
   else delete basket[id];
   if (isOffer) appliedOffer = id;
-  else if (appliedOffer === id) appliedOffer = null;
+  else if (appliedOffer === id && qty <= 0) appliedOffer = null;
   persistBasket();
   return true;
 }
 function recommend() {
-  const items = getLines().map(({item}) => item);
-  const has = group => items.some(item => group.includes(item.category));
-  if (!has(['drinks']) && has(['gozleme','toast','breakfast','dessert'])) return byId.get('cay');
-  if (!basket.patates && !has(['kids']) && items.some(item => item.category === 'burger' && item.id !== 'patates')) return byId.get('patates');
-  if (items.every(item => item.category === 'drinks')) return byId.get('revani');
-  return null;
+  return recommendFor(getLines(),menu);
 }
 function cartControls(item, qty) {
   return `<div class="quantity">
@@ -227,15 +223,16 @@ function cartThumb(item) {
   return `<img class="dish-thumb" src="assets/${item.photo}.webp" loading="lazy" width="52" height="52" alt="">`;
 }
 function renderOffer() {
-  const extra = appliedOffer ? byId.get(appliedOffer) : recommend();
+  const suggestion = appliedOffer ? null : recommend();
+  const extra = appliedOffer ? byId.get(appliedOffer) : suggestion?.item;
   if (!extra) return '';
-  const controls = appliedOffer
-    ? `<button class="offer-undo" type="button" data-action="offer-undo">${t('offerUndo')}</button>`
-    : `<button class="offer-add" type="button" data-add="${extra.id}" data-offer aria-label="${t('offerAdd')} ${money(extra.price)} · ${extra.name[lang]}">${icon('plus')}${money(extra.price)}</button>`;
-  return `<section class="offer">
-    <img class="offer-photo" src="assets/${extra.photo}.webp" width="76" height="76" alt="">
-    <div class="offer-copy"><div class="eyebrow">${t(appliedOffer ? 'offerApplied' : 'offer')}</div>
-    <b>${extra.name[lang]}</b></div>${controls}</section>`;
+  if (appliedOffer) return `<section class="offer-confirmation" aria-label="${t('offerApplied')}"><div><b>${t('offerApplied')} · ${extra.name[lang]}</b><small>${t('offerInTotal')}</small></div><button class="offer-undo" type="button" data-action="offer-undo">${t('offerUndo')}</button></section>`;
+  return `<section class="offer" aria-label="${t('offer')}">
+    <img class="offer-photo" src="assets/${extra.photo}.webp" width="88" height="88" alt="">
+    <div class="offer-copy"><div class="eyebrow">${t('offer')}</div>
+    <b>${extra.name[lang]}</b><small>${t(suggestion.reason)}</small></div>
+    <button class="offer-add" type="button" data-add="${extra.id}" data-offer aria-label="${t('offerAdd')} ${money(extra.price)} · ${extra.name[lang]}">${icon('plus')}${money(extra.price)}</button>
+    <p class="offer-total">${t('offerTotal')} <strong>${money(suggestion.combinedTotal)}</strong></p></section>`;
 }
 function renderCart() {
   const qty = count();
@@ -243,8 +240,8 @@ function renderCart() {
   $('header-cart').innerHTML = icon('bag') + `<span class="header-cart-label">${t('cart')}</span><span class="counter">${qty}</span>`;
   $('mobile-cart').hidden = !qty;
   $('mobile-cart-button').innerHTML = `<span class="cart-summary">${icon('bag')}${t('cart')} · ${qty}</span><strong>${money(total())}</strong>`;
-  $('cart-title').textContent = t(cashierView ? 'cashierTitle' : 'cart');
-  $('cart-kicker').textContent = t(cashierView ? 'cashierKicker' : 'cartKicker');
+  $('cart-title').textContent = t(cashierView ? 'cashierTitle' : qty ? 'cartTitle' : 'cart');
+  $('cart-kicker').textContent = t(cashierView ? 'cashierKicker' : qty ? 'cartReadyKicker' : 'cartKicker');
   if (cashierView) {
     renderCashier();
     return;
@@ -255,13 +252,13 @@ function renderCart() {
     return;
   }
   const lines = getLines().map(({item,qty}) =>
-    `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<div><b>${item.name[lang]}</b><small>${money(item.price)} × ${qty} · ${money(item.price * qty)}</small></div></div>${cartControls(item,qty)}</li>`).join('');
-  $('cart-body').innerHTML = `<ul class="cart-list">${lines}</ul>${renderOffer()}
+    `<li class="cart-line cart-edit-line">${cartThumb(item)}<div class="cart-line-copy"><b>${item.name[lang]}</b>${qty > 1 ? `<small>${money(item.price)} × ${qty}</small>` : ''}</div><strong class="cart-line-total">${money(item.price * qty)}</strong>${cartControls(item,qty)}${includedSides(item) ? `<small class="cart-sides">${t(includedSides(item))}</small>` : ''}</li>`).join('');
+  $('cart-body').innerHTML = `<ul class="cart-list">${lines}</ul>
     <fieldset class="serve"><legend>${t('mode')}</legend>
       ${['here','takeaway'].map(option => `<label><input type="radio" name="mode" value="${option}" ${mode === option ? 'checked' : ''}><span>${t(option)}</span></label>`).join('')}
-    </fieldset>`;
+    </fieldset>${renderOffer()}`;
   $('cart-footer').innerHTML = `<div class="total"><span>${t('subtotal')}</span><strong id="cart-total">${money(total())}</strong></div>
-    <button type="button" class="primary" data-action="cashier">${icon('qr')}${t('cashier')}</button><p class="handoff-note">${t('checkoutNote')}</p>`;
+    <button type="button" class="primary cart-checkout" data-action="cashier"><span>${t('cashier')}</span><span>${money(total())}${icon('arrow')}</span></button><p class="handoff-note">${t('checkoutNote')}</p>`;
 }
 function orderText() {
   const service = mode === 'takeaway' ? 'Paket' : 'Burada';
@@ -550,11 +547,14 @@ document.addEventListener('click', async event => {
       focusMenu();
       $('search-toggle').focus({preventScroll:true});
       break;
-    case 'offer-undo':
+    case 'offer-undo': {
       refreshBasket();
-      if (appliedOffer && update(appliedOffer,-1)) $('cart-body').querySelector('[data-offer]')?.focus({preventScroll:true});
+      const undoId = appliedOffer;
+      appliedOffer = null;
+      if (undoId && update(undoId,-1)) ($('cart-body').querySelector('[data-offer]') ?? $('cart-footer').querySelector('button'))?.focus({preventScroll:true});
       else renderCart();
       break;
+    }
     case 'menu': $('cart').close(); showMenuStart(); break;
     case 'cashier':
     case 'edit':
