@@ -430,3 +430,61 @@ dialog::backdrop { background: #091d18aa; }
   .social-like[aria-pressed="true"] .icon { animation: heart-pop .22s ease-out; }
   @keyframes heart-pop { 50% { transform: scale(1.18); } }
 }
+
+/* Nutrition stays one tap away; the food and order controls retain their space. */
+:root { --paper: #faf7f0; --white: #fffefa; --line: #ded9cc; --image-bg: #efe4d0; }
+:root[data-theme="dark"] { --paper: #151e19; --white: #232e27; --ink: #f5f0e5; --muted: #c4cdbf; --line: #46574a; --image-bg: #313b32; }
+.theme-toggle { width: auto; min-width: 44px; padding: 0 12px; }
+.theme-label { font-size: 12px; font-weight: 750; }
+.theme-toggle[data-theme="light"] .theme-sun,
+.theme-toggle[data-theme="dark"] .theme-moon { display: none; }
+.category-strip { scrollbar-width: none; overscroll-behavior-inline: contain; }
+.category-strip::-webkit-scrollbar { display: none; }
+.category:hover:not([aria-pressed="true"]) { background: var(--hover-bg); }
+.nutrition-entry { position: absolute; top: 8px; left: 8px; z-index: 1; display: inline-flex; justify-content: center; align-items: center; gap: 4px; min-height: 44px; max-width: calc(100% - 16px); padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--pine); font-size: 11px; font-weight: 750; box-shadow: 0 2px 9px #00000016; }
+.nutrition-entry .icon { width: 16px; height: 16px; }
+.nutrition-entry:hover { background: var(--selected-bg); }
+.nutrition-entry:focus-visible { outline-offset: 2px; }
+.nutrition-entry-label { font-weight: 500; }
+.nutrition-panel { margin: 12px 0 2px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); overflow-wrap: anywhere; }
+.nutrition-panel > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 12px; cursor: pointer; list-style: none; min-height: 60px; padding: 12px; color: var(--ink); font-weight: 800; font-size: 14px; }
+.nutrition-panel > summary::-webkit-details-marker { display: none; }
+.nutrition-panel > summary::after { content: '+'; margin-left: auto; font-size: 22px; color: var(--pine); }
+.nutrition-panel[open] > summary::after { content: '−'; }
+.nutrition-panel > summary:focus-visible { outline-offset: -4px; }
+.nutrition-energy { display: block; width: 100%; color: var(--pine); font-size: 12px; font-weight: 650; order: 1; }
+.nutrition-content { display: grid; gap: 14px; padding: 0 12px 14px; font-size: 13px; line-height: 1.5; }
+.nutrition-content h3 { margin: 0 0 3px; font-size: 13px; font-weight: 800; color: var(--pine); }
+.nutrition-content p { margin: 0; }
+.nutrition-portion { color: var(--pine); font-weight: 650; }
+.nutrition-origin { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+.nutrition-note { border-top: 1px solid var(--line); padding-top: 10px; font-size: 11px; color: var(--muted); }
+.nutrition-basis { font-size: 11px; color: var(--muted); }
+.nutrition-basis summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.nutrition-basis p { padding-top: 3px; }
+.nutrition-sources { font-size: 11px; color: var(--muted); }
+.nutrition-sources a { display: inline-flex; align-items: center; min-height: 44px; text-underline-offset: 3px; }
+:root[data-theme="dark"] .hero { background: #2d362c; color: var(--ink); }
+:root[data-theme="dark"] .hero p,
+:root[data-theme="dark"] .hero-price span { color: #d9d5c6; }
+:root[data-theme="dark"] .hero .hero-dish,
+:root[data-theme="dark"] .hero-cta { color: #f5f0e5; }
+:root[data-theme="dark"] .hero-kicker,
+:root[data-theme="dark"] .hero-kids { color: #e8c58c; }
+:root[data-theme="dark"] .hero .hero-order { background: #f0c180; border-color: #f0c180; color: #302719; }
+:root[data-theme="dark"] .hero .hero-order:hover { background: #ffdb9e; }
+:root[data-theme="dark"] .hero :focus-visible { outline-color: #f0c180; }
+@media (max-width:767px) {
+  .theme-label { display: none; }
+  .theme-toggle { width: 44px; padding: 0; }
+}
+@media (max-width:620px) {
+  .featured .nutrition-entry { padding: 5px 7px; font-size: 10px; gap: 3px; }
+  .featured .nutrition-entry-label { display: none; }
+  .featured .nutrition-entry .icon { width: 14px; height: 14px; }
+  .nutrition-content { font-size: 13px; }
+  .menu-feed .nutrition-entry { max-width: calc(100% - 16px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .category, .primary, .secondary, .social-like, .nutrition-entry { transition: background-color .16s ease, color .16s ease; }
+}

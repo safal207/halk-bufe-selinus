@@ -2,10 +2,12 @@ import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=kids-meal-1';
 import {copy} from './copy.js?v=mobile-social-1';
 import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
+import {nutritionLabels,nutritionMarkup,nutritionSearchText,nutritionSummary} from './nutrition.js?v=nutrition-20261105';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=kids-meal-1';
 
 const social = createSocialStore(menu.map(item => item.id));
 const icons = {
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.2"/>',
   heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
   eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
@@ -80,6 +82,7 @@ function rowHtml(item) {
 function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
   return `<article class="feature" data-dish="${item.id}" data-photo="${item.photo}">
+    <button class="nutrition-entry" type="button" data-nutrition="${item.id}" aria-haspopup="dialog" aria-controls="item-dialog" aria-label="${nutritionLabels[lang].title} · ${item.name[lang]}" title="${nutritionLabels[lang].title}">${icon('info')}<span>${nutritionSummary(item,lang)}</span><span class="nutrition-entry-label">${nutritionSummary(item,lang) === nutritionLabels[lang].details ? '' : ` · ${nutritionLabels[lang].details}`}</span></button>
     <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
     <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div>${socialBar(item,!inFeed)}</div></article>`;
 }
@@ -96,7 +99,7 @@ function renderMenu() {
   const query = normalize($('search').value.trim());
   const matching = categories.flatMap(group => menu.filter(item => item.category === group.id))
     .filter(item => (category === 'all' || (category === 'liked' ? social.liked(item.id) : item.category === category))
-      && (!query || [...Object.values(item.name),...Object.values(item.description ?? {})].some(text => normalize(text).includes(query))));
+      && (!query || [...Object.values(item.name),...Object.values(item.description ?? {}),nutritionSearchText(item)].some(text => normalize(text).includes(query))));
   const empty = `<div class="empty" role="status"><p>${t(category === 'liked' && !query ? 'noLikes' : 'noResults')}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
   if (view !== 'list') {
     const inFeed = view === 'feed';
@@ -127,6 +130,8 @@ function renderLanguage() {
   $('hero-text').textContent = heroMeal.description[lang];
   $('hero-price').textContent = money(heroMeal.price);
   $('hero-photo').alt = `${heroMeal.name[lang]}. ${heroMeal.description[lang]}`;
+  $('hero-nutrition').innerHTML = icon('info') + nutritionSummary(heroMeal,lang) + ` · ${nutritionLabels[lang].details}`;
+  $('hero-nutrition').setAttribute('aria-label',`${nutritionLabels[lang].title} · ${heroMeal.name[lang]}`);
   $('hero-order').innerHTML = icon('plus') + t('heroAdd');
   $('hero-order').setAttribute('aria-label', `${t('add')} · ${heroMeal.name[lang]} · ${money(heroMeal.price)}`);
   $('hero-kids').innerHTML = icon('star') + t('heroKids') + icon('arrow');
@@ -304,7 +309,7 @@ function openCart() {
   renderCart();
   if (!$('cart').open) $('cart').showModal();
 }
-function openItem(id) {
+function openItem(id, showNutrition = false) {
   const item = byId.get(id);
   if (!item) return;
   pauseViewTimers();
@@ -317,10 +322,17 @@ function openItem(id) {
     ${item.description ? `<p class="detail-text dish-description">${item.description[lang]}</p>` : ''}
     ${item.price === null ? `<span class="detail-price unknown">${t('ask')}</span>` : ''}
     ${item.price === null ? `<p class="detail-text">${t('priceNote')}</p>` : ''}
+    ${nutritionMarkup(item,lang,{open:showNutrition})}
     `;
   $('item-footer').innerHTML = `${socialBar(item)}
     ${item.price === null ? '' : `<button type="button" class="primary" data-add="${item.id}" data-detail>${icon('plus')}${t('add')} · ${money(item.price)}</button>`}`;
   if (!$('item-dialog').open) $('item-dialog').showModal();
+  $('item-body').scrollTop = 0;
+  if (showNutrition) requestAnimationFrame(() => {
+    const panel = $('item-body').querySelector('.nutrition-panel');
+    panel.scrollIntoView({block:'start'});
+    panel.querySelector('summary').focus({preventScroll:true});
+  });
 }
 function showCopyFallback(container, value) {
   const field = document.createElement('textarea');
@@ -507,6 +519,7 @@ document.addEventListener('click', async event => {
     }
   }
   if (data.item) openItem(data.item);
+  if (data.nutrition) openItem(data.nutrition,true);
   if (data.share) { pauseViewTimers(); openShare(byId.get(data.share),lang); }
   if (data.close) $(data.close).close();
   const isOffer = 'offer' in data;

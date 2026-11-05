@@ -17,10 +17,10 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://safal207.github.io/halk-bufe-selinus/assets/share/menu-preview.jpg">
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
-  <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css?v=mobile-social-1">
+  <script src="theme.js?v=nutrition-20261105"></script>
+  <link rel="stylesheet" href="style.css?v=nutrition-20261105">
   <script src="assets/qr.js" defer></script>
-  <script type="module" src="app.js?v=mobile-social-1"></script>
+  <script type="module" src="app.js?v=nutrition-20261105"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -32,6 +32,7 @@
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Koyu tema" aria-pressed="false" hidden>
         <svg class="icon theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 14.4A8.9 8.9 0 0 1 9.6 3.2a9 9 0 1 0 11.2 11.2Z"/></svg>
         <svg class="icon theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/></svg>
+        <span class="theme-label" aria-hidden="true"></span>
       </button>
       <label class="language"><span id="language-icon" aria-hidden="true"></span>
         <select id="language" aria-label="Dil / Язык / Language">
@@ -57,6 +58,7 @@
         <button type="button" class="hero-kids" id="hero-kids" data-action="kids-menu"></button>
       </div>
       <div class="hero-media"><img id="hero-photo" src="assets/hero-family.webp" srcset="assets/hero-family-640.webp 640w, assets/hero-family.webp 1280w" sizes="(max-width: 620px) calc(100vw - 32px), (max-width: 1244px) 55vw, 650px" width="1280" height="853" fetchpriority="high" alt="">
+        <button type="button" class="nutrition-entry hero-nutrition" id="hero-nutrition" data-nutrition="tavuk-sis" aria-haspopup="dialog" aria-controls="item-dialog"></button>
         <span class="hero-caption" id="hero-caption"></span>
       </div>
     </section>
