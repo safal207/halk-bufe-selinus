@@ -19,11 +19,27 @@
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
   <script src="theme.js?v=nutrition-20261105"></script>
   <link rel="stylesheet" href="style.css?v=nutrition-20261105">
+  <link rel="stylesheet" href="launch.css?v=launch-20261105">
   <script src="assets/qr.js" defer></script>
-  <script type="module" src="app.js?v=nutrition-20261105"></script>
+  <script src="launch.js?v=launch-20261105" defer></script>
+  <script type="module" src="app.js?v=launch-20261105"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
+  <div class="launch-screen" id="launch-screen">
+    <div class="launch-inner">
+      <img class="launch-brand" src="assets/halk-bufe-logo.svg" width="520" height="174" alt="Halk Büfe Selinus">
+      <div class="launch-art" aria-hidden="true">
+        <div class="launch-meal"><img src="assets/hero-family.webp" srcset="assets/hero-family-640.webp 640w, assets/hero-family.webp 1280w" sizes="(max-width: 620px) calc(100vw - 32px), (max-width: 1244px) 55vw, 650px" width="1280" height="853" decoding="async" alt=""></div>
+        <span class="launch-dish-name" id="launch-dish-name">Tavuk şiş</span>
+        <div class="launch-cup"><i class="launch-steam"></i><i class="launch-steam"></i><div class="launch-cup-body"><div class="launch-cup-mark"><img src="assets/halk-bufe-logo.svg" width="520" height="174" alt=""></div></div><div class="launch-cup-lid"></div></div>
+      </div>
+      <div class="launch-copy"><p class="launch-title" id="launch-title">Birlikte daha lezzetli.</p><p id="launch-status" role="status">Menü hazırlanıyor…</p></div>
+      <div class="launch-track" aria-hidden="true"></div>
+    </div>
+  </div>
+  <script data-launch-watchdog>window.halkLaunchWatchdog = setTimeout(() => document.getElementById('launch-screen')?.remove(),2800);</script>
+  <noscript><style>.launch-screen{display:none}</style></noscript>
   <header class="top"><div class="wrap top-inner">
     <a class="brand" href="./" aria-label="Halk Büfe Selinus">
       <img src="assets/halk-bufe-logo.svg" width="520" height="174" alt="">

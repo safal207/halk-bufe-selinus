@@ -583,3 +583,5 @@ if (landing.searchParams.get('cart') === '1' && count()) {
   history.replaceState(null,'',landing);
   openCart();
 } else showDishFromHash();
+window.halkMenuReady = true;
+window.dispatchEvent(new Event('halk:menu-ready'));
