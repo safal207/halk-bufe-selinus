@@ -26,6 +26,11 @@ test('brand exits as soon as menu and hero are ready, with no minimum wait or fo
 test('a cached ready menu does not wait for an event that already happened',()=>{
   const s=setup({cached:true,ready:true});s.tick(160);assert.equal(s.screen.removed,true);
 });
+test('a time-based replacement waits for the current hero instead of an earlier cached image',()=>{
+  const s=setup({cached:true});s.hero.complete=false;s.window.emit('halk:menu-ready');
+  s.tick(160);assert.equal(s.screen.removed,false);
+  s.hero.emit('load');s.tick(160);assert.equal(s.screen.removed,true);
+});
 test('an image error releases the loader and reduced motion skips the fade',()=>{
   const s=setup({ready:true,reduced:true});s.hero.emit('error');assert.equal(s.screen.removed,true);assert.equal(s.timers.size,0);
 });

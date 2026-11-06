@@ -1,5 +1,9 @@
 export const copy = {
   tr: {
+    daypartLabel:'Günün zamanı', daypartAuto:'Otomatik · Gazipaşa', morningChoice:'Sabah', dayChoice:'Gündüz', eveningChoice:'Akşam', daypartPreview:'Ön izleme',
+    morningLight:'Sabah ışığı', dayLight:'Gün ışığı', eveningLight:'Akşam ışığı',
+    morningTitle:'Güne lezzetle başla.', dayTitle:'Lezzetli bir öğle molası.', eveningTitle:'Akşama lezzet kat.',
+    morningDescription:'Güne keyifli bir kahvaltıyla başla.', singlePortion:'Bir porsiyon',
     cartTitle:'Siparişin', cartReadyKicker:'KASAYA GÖSTERMEN YETERLİ',
     cartChickenSides:'Pilav, patates kızartması ve kırmızı lahana dahil.', cartKidsSides:'Pilav, patates kızartması, kırmızı lahana ve salatalık dahil.',
     offerTea:'Yemeğin yanına bir bardak çay.', offerFries:'Burgerin yanına patates kızartması.', offerDessert:'İçeceğinin yanına tatlı bir eşlikçi.', offerTotal:'Eklersen toplam:', offerInTotal:'Sipariş toplamına dahil.',
@@ -26,6 +30,10 @@ export const copy = {
     qrAlt: 'Kasaya gösterilecek sipariş QR kodu', qtyLimit: 'Ürün başına en fazla 99 adet.',
   },
   ru: {
+    daypartLabel:'Время дня', daypartAuto:'Авто · Газипаша', morningChoice:'Утро', dayChoice:'День', eveningChoice:'Вечер', daypartPreview:'Предпросмотр',
+    morningLight:'Утренний свет', dayLight:'Дневной свет', eveningLight:'Вечерний свет',
+    morningTitle:'Начните утро вкусно.', dayTitle:'Время вкусного обеда.', eveningTitle:'Вечер со вкусом.',
+    morningDescription:'Завтрак для неспешного начала дня.', singlePortion:'Одна порция',
     cartTitle:'Ваш заказ', cartReadyKicker:'ОСТАЛОСЬ ПОКАЗАТЬ НА КАССЕ',
     cartChickenSides:'Рис, фри и красная капуста включены.', cartKidsSides:'Рис, фри, красная капуста и огурцы включены.',
     offerTea:'Стаканчик чая к вашему блюду.', offerFries:'Картофель фри к бургеру.', offerDessert:'Сладкая пара к вашему напитку.', offerTotal:'С добавлением будет:', offerInTotal:'Включено в сумму заказа.',
@@ -52,6 +60,10 @@ export const copy = {
     qrAlt: 'QR-код заказа для кассира', qtyLimit: 'До 99 штук на позицию.',
   },
   en: {
+    daypartLabel:'Time of day', daypartAuto:'Auto · Gazipaşa', morningChoice:'Morning', dayChoice:'Daytime', eveningChoice:'Evening', daypartPreview:'Preview',
+    morningLight:'Morning light', dayLight:'Daylight', eveningLight:'Evening light',
+    morningTitle:'A delicious start.', dayTitle:'Make time for lunch.', eveningTitle:'A delicious evening.',
+    morningDescription:'Breakfast for a relaxed start to your day.', singlePortion:'One serving',
     cartTitle:'Your order', cartReadyKicker:'JUST SHOW IT AT THE COUNTER',
     cartChickenSides:'Rice, fries and red cabbage included.', cartKidsSides:'Rice, fries, red cabbage and cucumber included.',
     offerTea:'A glass of tea to go with your food.', offerFries:'A side of fries for your burger.', offerDessert:'A sweet pairing for your drink.', offerTotal:'Total if added:', offerInTotal:'Included in your order total.',
@@ -78,6 +90,10 @@ export const copy = {
     qrAlt: 'Order QR code for the counter', qtyLimit: 'Up to 99 per item.',
   },
   de: {
+    daypartLabel:'Tageszeit', daypartAuto:'Auto · Gazipaşa', morningChoice:'Morgen', dayChoice:'Tagsüber', eveningChoice:'Abend', daypartPreview:'Vorschau',
+    morningLight:'Morgenlicht', dayLight:'Tageslicht', eveningLight:'Abendlicht',
+    morningTitle:'Gut in den Tag.', dayTitle:'Zeit für eine Genusspause.', eveningTitle:'Genuss am Abend.',
+    morningDescription:'Frühstück für einen entspannten Start in den Tag.', singlePortion:'Eine Portion',
     cartTitle:'Deine Auswahl', cartReadyKicker:'EINFACH AN DER KASSE ZEIGEN',
     cartChickenSides:'Reis, Pommes und Rotkohl sind inklusive.', cartKidsSides:'Reis, Pommes, Rotkohl und Gurken sind inklusive.',
     offerTea:'Ein Glas Tee zu deinem Essen.', offerFries:'Eine Portion Pommes zu deinem Burger.', offerDessert:'Eine süße Ergänzung zu deinem Getränk.', offerTotal:'Gesamt mit Ergänzung:', offerInTotal:'Im Gesamtpreis enthalten.',

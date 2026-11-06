@@ -1,0 +1,33 @@
+{
+  "mode": "built-in image_gen edit",
+  "date": "2026-11-06",
+  "briefs": [
+    {
+      "period": "morning",
+      "reference": "assets/catalog/kahvalti.webp",
+      "prompt": "Use case: lighting-weather. Asset type: a restaurant mobile website hero photograph, 1536x1024 landscape, 3:2. Edit the provided breakfast plate photo into a mouth-watering natural early-morning food photograph. Preserve exactly the food identity and portions: sliced rustic bread, white cheese and pale yellow cheese, green and black olives, sliced tomatoes and cucumber on the same ceramic plate. Do not add eggs, meat, drinks or any new food. Keep the plate fully inside the frame, filling about 85 percent of the image; a slightly elevated close view. Soft low morning sunlight from the left, gentle elongated shadows, a fresh warm cream and terracotta tabletop, real textures, subtle natural steam-free freshness, realistic smartphone food photography with restrained color. No text, no logo, no watermark, no collage. Change the lighting and photographic setting, preserve the recognizable dish.",
+      "outputs": [
+        "assets/daypart/morning-640.webp",
+        "assets/daypart/morning-1280.webp"
+      ]
+    },
+    {
+      "period": "day",
+      "reference": "assets/campaign/tavuk-sis-meal.webp",
+      "prompt": "Use case: lighting-weather. Asset type: a restaurant mobile website hero photograph, 1536x1024 landscape, 3:2. Edit the provided Turkish chicken skewer meal photo for bright natural midday light. Preserve exactly two chicken skewers with juicy charred chicken, the mound of white rice, golden French fries and shredded red cabbage on the same white ceramic plate. No missing sides, no extra ingredients, no garnish, no drinks. Keep the complete plate filling about 85 percent of the frame at a slightly elevated close food-photography angle. Clear soft midday sunlight, clean gentle shadows, warm terracotta tabletop, appetizing crisp texture and realistic natural food colors. Premium but believable food advertising, no oversaturation or artificial glossy coating. No text, no logo, no watermark, no collage. Lighting is clearly daytime.",
+      "outputs": [
+        "assets/daypart/day-640.webp",
+        "assets/daypart/day-1280.webp"
+      ]
+    },
+    {
+      "period": "evening",
+      "reference": "assets/campaign/tavuk-izgara-meal.webp",
+      "prompt": "Use case: lighting-weather. Asset type: a restaurant mobile website hero photograph, 1536x1024 landscape, 3:2. Edit the provided grilled chicken meal photo into a cozy evening food photograph. Preserve exactly the grilled chicken breast fillets with grill marks, mound of white rice, golden French fries and shredded red cabbage on the same white ceramic plate. Do not add or remove any food or drinks. The full plate fills about 85 percent of the image in a slightly elevated close view. Warm amber restaurant lighting from the left, soft deeper shadows, a dark warm terracotta tabletop and quietly blurred deep warm background. Keep the food brightly readable, chicken juicy and golden, cabbage naturally purple, rice white; natural professional food photography, not orange-tinted food or a dark unreadable photo. No candle objects, no text, no logo, no watermark, no collage. Clearly evening atmosphere.",
+      "outputs": [
+        "assets/daypart/evening-640.webp",
+        "assets/daypart/evening-1280.webp"
+      ]
+    }
+  ]
+}

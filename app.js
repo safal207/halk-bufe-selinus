@@ -1,6 +1,7 @@
 import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=kids-meal-1';
-import {copy} from './copy.js?v=cart-20261105';
+import {copy} from './copy.js?v=daypart-20261106';
+import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
 import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
 import {nutritionLabels,nutritionMarkup,nutritionSearchText,nutritionSummary} from './nutrition.js?v=nutrition-20261105';
@@ -46,6 +47,8 @@ let itemOpen = null;
 let toastTimeout;
 let cashierView = false;
 let appliedOffer = null;
+let lightChoice = daypartChoice(new URLSearchParams(location.search).get('time'));
+let activeDaypart = daypartFor(new Date(),lightChoice);
 const t = key => copy[lang][key];
 const money = n => `${n} ₺`;
 const normalize = str => str.toLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ı','i').replaceAll('ß','ss');
@@ -122,19 +125,14 @@ function renderLanguage() {
   $('language').value = lang;
   $('language').setAttribute('aria-label',t('language'));
   for (const [id,key] of Object.entries({
-    'hero-title':'heroTitle','hero-caption':'heroCaption','hero-portion':'heroPortion','menu-kicker':'menuKicker',
+    'hero-caption':'heroCaption','menu-kicker':'menuKicker',
     'menu-title':'menuTitle','menu-photo-note':'photoNote','footer-text':'footer',
   })) $(id).textContent = t(key);
   $('hero-kicker').innerHTML = icon('pin') + t('heroKicker');
-  const heroMeal = byId.get('tavuk-sis');
-  $('hero-dish').textContent = heroMeal.name[lang];
-  $('hero-text').textContent = heroMeal.description[lang];
-  $('hero-price').textContent = money(heroMeal.price);
-  $('hero-photo').alt = `${heroMeal.name[lang]}. ${heroMeal.description[lang]}`;
-  $('hero-nutrition').innerHTML = icon('info') + nutritionSummary(heroMeal,lang) + ` · ${nutritionLabels[lang].details}`;
-  $('hero-nutrition').setAttribute('aria-label',`${nutritionLabels[lang].title} · ${heroMeal.name[lang]}`);
-  $('hero-order').innerHTML = icon('plus') + t('heroAdd');
-  $('hero-order').setAttribute('aria-label', `${t('add')} · ${heroMeal.name[lang]} · ${money(heroMeal.price)}`);
+  $('daypart-label').textContent = t('daypartLabel');
+  $('daypart-select').innerHTML = [['auto','daypartAuto'],...Object.keys(dayparts).map(key=>[key,key+'Choice'])].map(([value,key])=>`<option value="${value}">${t(key)}</option>`).join('');
+  $('daypart-select').value = lightChoice;
+  renderHero();
   $('hero-kids').innerHTML = icon('star') + t('heroKids') + icon('arrow');
   $('hero-cta').innerHTML = t('heroCta') + icon('arrow');
   $('guide-link').textContent = t('guide');
@@ -157,6 +155,35 @@ function renderLanguage() {
   renderCategories();
   renderMenu();
   renderCart();
+}
+function renderHero() {
+  const meal = byId.get(activeDaypart.dishId);
+  const description = meal.description?.[lang] ?? t('morningDescription');
+  document.querySelector('.hero').dataset.daypart = activeDaypart.id;
+  $('hero-title').textContent = t(activeDaypart.title);
+  $('hero-dish').textContent = meal.name[lang];
+  $('hero-text').textContent = description;
+  $('hero-price').textContent = money(meal.price);
+  $('hero-portion').textContent = t(activeDaypart.id === 'morning' ? 'singlePortion' : 'heroPortion');
+  $('daypart-status').textContent = `${t(activeDaypart.light)} · ${activeDaypart.range}${lightChoice === 'auto' ? '' : ' · '+t('daypartPreview')}`;
+  const photo = $('hero-photo');
+  photo.alt = `${meal.name[lang]}. ${description}`;
+  photo.dataset.dishName = meal.name[lang];
+  for (const img of [photo,document.querySelector('.launch-meal img')].filter(Boolean)) {
+    if (img.dataset.daypart !== activeDaypart.id) {
+      img.srcset = `${daypartPhoto(activeDaypart,640)} 640w, ${daypartPhoto(activeDaypart)} 1280w`;
+      img.src = daypartPhoto(activeDaypart);
+      img.dataset.daypart = activeDaypart.id;
+    }
+  }
+  const launchName = $('launch-dish-name');
+  if (launchName) launchName.textContent = meal.name[lang];
+  $('hero-nutrition').dataset.nutrition = meal.id;
+  $('hero-nutrition').innerHTML = icon('info') + nutritionSummary(meal,lang) + ` · ${nutritionLabels[lang].details}`;
+  $('hero-nutrition').setAttribute('aria-label',`${nutritionLabels[lang].title} · ${meal.name[lang]}`);
+  $('hero-order').dataset.add = meal.id;
+  $('hero-order').innerHTML = icon('plus') + t('heroAdd');
+  $('hero-order').setAttribute('aria-label',`${t('add')} · ${meal.name[lang]} · ${money(meal.price)}`);
 }
 function closeSearch() {
   $('search').value = '';
@@ -568,6 +595,20 @@ document.addEventListener('click', async event => {
   }
 });
 
+const daypartClock = createDaypartClock({choice:lightChoice,onChange(period) {
+  activeDaypart = period;
+  renderHero();
+}});
+$('daypart-select').addEventListener('change',() => {
+  lightChoice = daypartChoice($('daypart-select').value);
+  const url = new URL(location.href);
+  if (lightChoice === 'auto') url.searchParams.delete('time');
+  else url.searchParams.set('time',lightChoice);
+  history.replaceState(null,'',url);
+  daypartClock.select(lightChoice);
+});
+document.addEventListener('visibilitychange',() => { if (!document.hidden) daypartClock.refresh(); });
+window.addEventListener('pageshow',() => daypartClock.refresh());
 renderLanguage();
 const updateLayout = () => document.documentElement.style.setProperty('--menu-stack', `${document.querySelector('.top').offsetHeight + $('menu-toolbar').offsetHeight}px`);
 if ('ResizeObserver' in window) {

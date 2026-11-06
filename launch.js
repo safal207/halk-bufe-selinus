@@ -11,8 +11,8 @@
   try { savedLanguage = localStorage.getItem('halk-bufe-selinus:v1:lang'); } catch {}
   const lang = [new URLSearchParams(location.search).get('lang'),savedLanguage,document.documentElement.lang].find(value => Object.hasOwn(labels,value)) ?? 'tr';
   screen.lang = lang;
-  for (const [id,key] of [['launch-title','title'],['launch-status','status'],['launch-dish-name','dish']]) document.getElementById(id).textContent = labels[lang][key];
   const hero = document.getElementById('hero-photo');
+  for (const [id,key] of [['launch-title','title'],['launch-status','status'],['launch-dish-name','dish']]) document.getElementById(id).textContent = key === 'dish' && hero?.dataset?.dishName ? hero.dataset.dishName : labels[lang][key];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let appReady = window.halkMenuReady === true;
   let visualReady = !hero || hero.complete;
@@ -39,7 +39,7 @@
     else { screen.classList.add('is-leaving'); fadeTimer = setTimeout(() => screen.remove(),160); }
   }
   function maybeDismiss() { if (appReady && visualReady) dismiss(); }
-  function onReady() { appReady = true; maybeDismiss(); }
+  function onReady() { appReady = true; visualReady = !hero || hero.complete; maybeDismiss(); }
   function onVisual() { visualReady = true; maybeDismiss(); }
   function onPageHide() { dismiss(true); }
   function onPageShow(event) { if (event.persisted) dismiss(true); }
