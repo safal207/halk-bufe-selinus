@@ -1,6 +1,7 @@
 import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=kids-meal-1';
-import {copy} from './copy.js?v=daypart-20261106';
+import {copy} from './copy.js?v=discover-20261107';
+import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
 import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
 import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
@@ -32,6 +33,7 @@ const icons = {
   pin: '<path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/>',
   share: '<path d="m21 3-7 18-4-7-7-4L21 3ZM10 14 21 3"/>',
   qr: '<path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h3v3h3v3h-6m6-6v1"/>',
+  shuffle: '<path d="M4 7h3c4 0 6 10 10 10h3m-3-3 3 3-3 3M4 17h3c1.2 0 2.2-.9 3.1-2.2M14 9.2C15 7.9 16 7 17 7h3m-3-3 3 3-3 3"/>',
 };
 const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
 const $ = id => document.getElementById(id);
@@ -49,6 +51,9 @@ let cashierView = false;
 let appliedOffer = null;
 let lightChoice = daypartChoice(new URLSearchParams(location.search).get('time'));
 let activeDaypart = daypartFor(new Date(),lightChoice);
+let collection = collectionChoice(new URLSearchParams(location.search).get('collection'));
+let collectionStep = 0;
+let displayedItems = [];
 const t = key => copy[lang][key];
 const money = n => `${n} ₺`;
 const normalize = str => str.toLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ı','i').replaceAll('ß','ss');
@@ -97,14 +102,46 @@ function renderCategories() {
   $('categories').innerHTML = [all,liked,...categories].map(row =>
     `<button class="category" data-category="${row.id}" aria-pressed="${row.id === category}" type="button">${icon(row.icon)}${row.name[lang]}${row.id === 'liked' ? `<span class="category-count">${social.likedCount()}</span>` : ''}</button>`).join('');
 }
+function renderDiscover() {
+  $('discover-title').textContent = t('discoverTitle');
+  $('discover-hint').textContent = t('discoverHint');
+  $('discover-strip').setAttribute('aria-label',t('discoverTitle'));
+  $('discover-strip').innerHTML = collections.map(item => `<button class="discover-card" type="button" data-collection="${item.id}" aria-pressed="${item.id === collection}">
+    <img src="assets/${item.image}.webp" width="60" height="60" loading="lazy" alt=""><span><b>${t(item.title)}</b><small>${t(item.hint)}</small></span></button>`).join('');
+  $('discover-next').innerHTML = icon('shuffle') + t('discoverMore');
+  $('discover-next').setAttribute('aria-label',t('discoverMoreAria'));
+  $('discover-clear').textContent = t('discoverClear');
+}
+function setCollection(value) {
+  collection = collectionChoice(value);
+  collectionStep = 0;
+  const url = new URL(location.href);
+  if (collection === 'all') url.searchParams.delete('collection');
+  else url.searchParams.set('collection',collection);
+  history.replaceState(null,'',url);
+}
+function updateDiscoverState(items) {
+  const active = collection !== 'all';
+  $('categories').hidden = active;
+  $('discover-active').hidden = !active;
+  if (!active) return;
+  const chosen = collections.find(item => item.id === collection);
+  $('discover-current').textContent = t(chosen.title);
+  $('discover-count').textContent = `${collection === 'for-you' && social.likedCount() ? t('discoverBecause')+' · ' : ''}${t('discoverCount')}: ${items.length}`;
+  $('discover-next').disabled = items.length < 2;
+}
 function renderMenu() {
   $('menu-social-note').hidden = category !== 'liked';
   stopViewObservation();
   const query = normalize($('search').value.trim());
-  const matching = categories.flatMap(group => menu.filter(item => item.category === group.id))
+  const ordered = categories.flatMap(group => menu.filter(item => item.category === group.id));
+  const matching = rotateItems(collectionItems(ordered,collection,id=>social.liked(id))
     .filter(item => (category === 'all' || (category === 'liked' ? social.liked(item.id) : item.category === category))
-      && (!query || [...Object.values(item.name),...Object.values(item.description ?? {}),nutritionSearchText(item)].some(text => normalize(text).includes(query))));
-  const empty = `<div class="empty" role="status"><p>${t(category === 'liked' && !query ? 'noLikes' : 'noResults')}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
+      && (!query || [...Object.values(item.name),...Object.values(item.description ?? {}),nutritionSearchText(item)].some(text => normalize(text).includes(query)))),collectionStep);
+  displayedItems = matching;
+  updateDiscoverState(matching);
+  const emptyKey = collection === 'for-you' && !query ? (social.likedCount() ? 'discoverNoMore' : 'discoverNoLikes') : (category === 'liked' && !query ? 'noLikes' : 'noResults');
+  const empty = `<div class="empty" role="status"><p>${t(emptyKey)}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
   if (view !== 'list') {
     const inFeed = view === 'feed';
     $('results').innerHTML = matching.length
@@ -113,7 +150,8 @@ function renderMenu() {
     observeVisibleDishes();
     return;
   }
-  const groups = categories.map(row => {
+  const groupOrder = collection !== 'all' || collectionStep ? [...new Set(matching.map(item => item.category))].map(id => categories.find(row => row.id === id)) : categories;
+  const groups = groupOrder.map(row => {
     const items = matching.filter(item => item.category === row.id);
     return items.length ? `<section class="group"><h3 class="group-title">${icon(row.icon)}${row.name[lang]} <small>${items.length}</small></h3><ul class="menu-list">${items.map(rowHtml).join('')}</ul></section>` : '';
   }).join('');
@@ -153,6 +191,7 @@ function renderLanguage() {
     close.setAttribute('aria-label',t('close'));
   }
   renderCategories();
+  renderDiscover();
   renderMenu();
   renderCart();
 }
@@ -200,7 +239,7 @@ function focusMenu() {
 }
 function showMenuStart() {
   $('menu-title').focus({preventScroll:true});
-  focusMenu();
+  $('menu').scrollIntoView({block:'start',behavior:'instant'});
 }
 function refreshBasket() {
   const saved = read('basket');
@@ -443,6 +482,10 @@ $('language').addEventListener('change', () => {
   renderLanguage();
 });
 $('search').addEventListener('input', () => {
+  if (collection !== 'all') {
+    setCollection('all');
+    renderDiscover();
+  }
   if (category !== 'all' && category !== 'liked') {
     category = 'all';
     renderCategories();
@@ -476,8 +519,10 @@ $('mobile-cart-button').addEventListener('click',openCart);
 $('hero-cta').addEventListener('click',event => {
   event.preventDefault();
   category = 'all';
+  setCollection('all');
   closeSearch();
   renderCategories();
+  renderDiscover();
   renderMenu();
   showMenuStart();
 });
@@ -497,9 +542,12 @@ for (const id of ['cart','item-dialog']) $(id).addEventListener('click',event =>
 window.addEventListener('hashchange',showDishFromHash);
 window.addEventListener('storage',event => {
   if (event.key === socialKey || event.key === null) {
+    const tracksLikes = category === 'liked' || collection === 'for-you';
+    const before = tracksLikes ? menu.filter(item=>social.liked(item.id)).map(item=>item.id).join('|') : '';
     social.refresh();
     refreshSocial();
-    if (category === 'liked') renderMenu();
+    const after = tracksLikes ? menu.filter(item=>social.liked(item.id)).map(item=>item.id).join('|') : '';
+    if (tracksLikes && before !== after) renderMenu();
   }
   if (event.key === basketKey || event.key === null) {
     basket = readBasket();
@@ -515,8 +563,21 @@ document.addEventListener('click', async event => {
   const button = event.target.closest('button');
   if (!button) return;
   const data = button.dataset;
+  if (data.collection) {
+    const next = collection === data.collection ? 'all' : data.collection;
+    setCollection(next);
+    category = 'all';
+    closeSearch();
+    renderCategories();
+    renderDiscover();
+    renderMenu();
+    focusMenu();
+    (collection === 'all' ? $('categories').querySelector('[data-category="all"]') : $('discover-next').disabled ? $('discover-clear') : $('discover-next')).focus({preventScroll:true});
+  }
   if (data.category) {
     category = data.category;
+    setCollection('all');
+    renderDiscover();
     closeSearch();
     for (const chip of $('categories').querySelectorAll('button')) chip.setAttribute('aria-pressed',chip === button);
     renderMenu();
@@ -535,9 +596,9 @@ document.addEventListener('click', async event => {
     const result = social.toggleLike(data.like);
     if (result) {
       refreshSocial();
-      if (category === 'liked' && !result.liked) {
+      if ((category === 'liked' || collection === 'for-you') && !result.liked) {
         renderMenu();
-        if (!$('item-dialog').open) ($('results').querySelector('[data-like]') ?? $('categories').querySelector('[data-category="liked"]')).focus({preventScroll:true});
+        if (!$('item-dialog').open) ($('results').querySelector(`[data-like="${data.like}"]`) ?? $('results').querySelector('[data-like]') ?? (collection === 'for-you' ? $('discover-clear') : $('categories').querySelector('[data-category="liked"]'))).focus({preventScroll:true});
       }
       notify(t(!result.saved ? 'localOnly' : result.liked ? 'likedAdded' : 'likedRemoved'));
     }
@@ -560,19 +621,40 @@ document.addEventListener('click', async event => {
   switch (data.action) {
     case 'kids-menu':
       category = 'kids';
+      setCollection('all');
       closeSearch();
       renderCategories();
+      renderDiscover();
       renderMenu();
       focusMenu();
       $('categories').querySelector('[data-category="kids"]').focus({preventScroll:true});
       break;
     case 'reset-menu':
       category = 'all';
+      setCollection('all');
       closeSearch();
       renderCategories();
+      renderDiscover();
       renderMenu();
       focusMenu();
       $('search-toggle').focus({preventScroll:true});
+      break;
+    case 'discover-more':
+      collectionStep++;
+      renderMenu();
+      $('discover-live').textContent = `${t('discoverUpdated')}: ${displayedItems[0]?.name[lang] ?? ''}`;
+      focusMenu();
+      $('discover-next').focus({preventScroll:true});
+      break;
+    case 'discover-clear':
+      category = 'all';
+      setCollection('all');
+      closeSearch();
+      renderCategories();
+      renderDiscover();
+      renderMenu();
+      focusMenu();
+      $('categories').querySelector('[data-category="all"]').focus({preventScroll:true});
       break;
     case 'offer-undo': {
       refreshBasket();

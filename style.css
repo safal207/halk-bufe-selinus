@@ -125,6 +125,28 @@ h2 { font-size: clamp(31px, 4.2vw, 52px); line-height: 1; letter-spacing: -.04em
 .catalog { margin-top: 39px; padding-bottom: 39px; scroll-margin-top: 83px; }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; }
 .section-head .eyebrow { margin-bottom: 8px; }
+.discover { margin: 14px 0 10px; }
+.discover-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.discover-heading h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+.discover-heading span { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.discover-strip { display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-inline: contain; padding: 9px 2px 7px; margin-inline: -2px; scroll-padding-inline: 2px; scrollbar-width: thin; }
+.discover-card { flex: 0 0 166px; display: grid; grid-template-columns: 58px minmax(0,1fr); align-items: center; gap: 8px; min-width: 0; min-height: 74px; padding: 7px; border: 1px solid var(--line); border-radius: 15px; background: var(--white); text-align: left; color: var(--ink); }
+.discover-card:hover { background: var(--hover-bg); }
+.discover-card[aria-pressed="true"] { border-color: var(--pine); background: var(--selected-bg); }
+.discover-card img { display: block; width: 58px; height: 58px; border-radius: 10px; object-fit: cover; background: var(--image-bg); }
+.discover-card span { min-width: 0; }
+.discover-card b { display: block; color: var(--pine); font-size: 14px; line-height: 1.15; overflow-wrap: anywhere; }
+.discover-card small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.2; overflow-wrap: anywhere; }
+.discover-active { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 4px 0 6px; }
+.discover-active-text { flex: 1 1 0; min-width: 0; }
+.discover-active-text strong, .discover-active-text small { display: block; overflow-wrap: anywhere; line-height: 1.2; }
+.discover-active-text strong { font-size: 13px; color: var(--pine); }
+.discover-active-text small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.discover-next, .discover-clear { display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: none; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); color: var(--pine); padding: 4px 9px; font-size: 12px; font-weight: 750; }
+.discover-next { background: var(--selected-bg); border-color: var(--selected-border); }
+.discover-next .icon { width: 16px; height: 16px; }
+.discover-next:disabled { opacity: .5; cursor: default; }
+.discover-clear:hover, .discover-next:not(:disabled):hover { background: var(--hover-bg); }
 .menu-photo-note { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
 .search { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; border: 1px solid var(--line); background: var(--white); border-radius: 14px; color: var(--pine); }
 .search:focus-within { outline: 2px solid var(--focus); outline-offset: 1px; }
@@ -393,6 +415,11 @@ dialog::backdrop { background: #091d18aa; }
 #item-title { font: 800 clamp(21px,2.3vw,28px)/1.16 system-ui,sans-serif; overflow-wrap: anywhere; }
 #item-footer { gap: 4px; padding-top: 5px; }
 @media (max-width:620px) {
+  .discover { margin: 10px 0 6px; }
+  .discover-heading h3 { font-size: 15px; }
+  .discover-card { flex-basis: 158px; }
+  .discover-active-text strong { font-size: 12px; }
+  .discover-next, .discover-clear { padding-inline: 7px; }
   body:has(.mobile-cart:not([hidden])) { --dock-space: 74px; }
   .wrap { width: calc(100% - 24px); }
   .hero { margin-top: 10px; border-radius: 18px; }

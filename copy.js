@@ -1,5 +1,8 @@
 export const copy = {
   tr: {
+    discoverTitle:'Şimdi ne istersin?', discoverHint:'Kaydırarak keşfet →', discoverMore:'Değiştir', discoverMoreAria:'Bu seçkide başka yemekler göster', discoverClear:'Tüm menü', discoverCount:'Ürün', discoverBecause:'Beğenilerine göre', discoverUpdated:'Seçki yenilendi',
+    discoverFamily:'Ailece', discoverFamilyHint:'Çocuk ve ana yemekler', discoverForYou:'Senin için', discoverForYouHint:'Beğenilerine göre', discoverHearty:'Doyurucu', discoverHeartyHint:'Ana yemek ve burger', discoverTea:'Çay keyfi', discoverTeaHint:'Çay ve gözleme', discoverSweet:'Tatlılar', discoverSweetHint:'Tatlı bir mola',
+    discoverNoLikes:'Sana özel öneriler için menüdeki bir kalbe dokun.', discoverNoMore:'Beğendiklerine benzer başka ürün yok. Tüm menüyü keşfet.',
     daypartLabel:'Günün zamanı', daypartAuto:'Otomatik · Gazipaşa', morningChoice:'Sabah', dayChoice:'Gündüz', eveningChoice:'Akşam', daypartPreview:'Ön izleme',
     morningLight:'Sabah ışığı', dayLight:'Gün ışığı', eveningLight:'Akşam ışığı',
     morningTitle:'Güne lezzetle başla.', dayTitle:'Lezzetli bir öğle molası.', eveningTitle:'Akşama lezzet kat.',
@@ -30,6 +33,9 @@ export const copy = {
     qrAlt: 'Kasaya gösterilecek sipariş QR kodu', qtyLimit: 'Ürün başına en fazla 99 adet.',
   },
   ru: {
+    discoverTitle:'Что хочется сейчас?', discoverHint:'Листайте →', discoverMore:'Другое', discoverMoreAria:'Показать другие блюда в подборке', discoverClear:'Всё меню', discoverCount:'Блюд', discoverBecause:'По вашим сердечкам', discoverUpdated:'Подборка обновлена',
+    discoverFamily:'С семьёй', discoverFamilyHint:'Горячее и детское', discoverForYou:'Для вас', discoverForYouHint:'По вашим сердечкам', discoverHearty:'Сытно', discoverHeartyHint:'Горячее и бургеры', discoverTea:'К чаю', discoverTeaHint:'Чай и лепёшки', discoverSweet:'Сладкое', discoverSweetHint:'Время десерта',
+    discoverNoLikes:'Поставьте сердечко блюду в меню — и здесь появятся похожие.', discoverNoMore:'В отмеченных категориях пока нет других блюд. Посмотрите всё меню.',
     daypartLabel:'Время дня', daypartAuto:'Авто · Газипаша', morningChoice:'Утро', dayChoice:'День', eveningChoice:'Вечер', daypartPreview:'Предпросмотр',
     morningLight:'Утренний свет', dayLight:'Дневной свет', eveningLight:'Вечерний свет',
     morningTitle:'Начните утро вкусно.', dayTitle:'Время вкусного обеда.', eveningTitle:'Вечер со вкусом.',
@@ -60,6 +66,9 @@ export const copy = {
     qrAlt: 'QR-код заказа для кассира', qtyLimit: 'До 99 штук на позицию.',
   },
   en: {
+    discoverTitle:'What are you in the mood for?', discoverHint:'Swipe to explore →', discoverMore:'More', discoverMoreAria:'Show other dishes in this collection', discoverClear:'Full menu', discoverCount:'Dishes', discoverBecause:'Based on your likes', discoverUpdated:'Collection updated',
+    discoverFamily:'With family', discoverFamilyHint:'Mains and kids’ meals', discoverForYou:'For you', discoverForYouHint:'Based on your likes', discoverHearty:'A hearty meal', discoverHeartyHint:'Mains and burgers', discoverTea:'Tea time', discoverTeaHint:'Tea and flatbreads', discoverSweet:'Something sweet', discoverSweetHint:'Time for dessert',
+    discoverNoLikes:'Tap a heart on a dish in the menu to find similar dishes here.', discoverNoMore:'There are no other dishes in your liked categories yet. Explore the full menu.',
     daypartLabel:'Time of day', daypartAuto:'Auto · Gazipaşa', morningChoice:'Morning', dayChoice:'Daytime', eveningChoice:'Evening', daypartPreview:'Preview',
     morningLight:'Morning light', dayLight:'Daylight', eveningLight:'Evening light',
     morningTitle:'A delicious start.', dayTitle:'Make time for lunch.', eveningTitle:'A delicious evening.',
@@ -90,6 +99,9 @@ export const copy = {
     qrAlt: 'Order QR code for the counter', qtyLimit: 'Up to 99 per item.',
   },
   de: {
+    discoverTitle:'Worauf hast du Lust?', discoverHint:'Wischen und entdecken →', discoverMore:'Andere', discoverMoreAria:'Andere Gerichte in dieser Auswahl zeigen', discoverClear:'Alle Gerichte', discoverCount:'Gerichte', discoverBecause:'Nach deinen Favoriten', discoverUpdated:'Auswahl aktualisiert',
+    discoverFamily:'Mit der Familie', discoverFamilyHint:'Haupt- und Kindermenüs', discoverForYou:'Für dich', discoverForYouHint:'Nach deinen Favoriten', discoverHearty:'Herzhaft', discoverHeartyHint:'Hauptgerichte und Burger', discoverTea:'Zum Tee', discoverTeaHint:'Tee und Fladenbrot', discoverSweet:'Etwas Süßes', discoverSweetHint:'Zeit für Dessert',
+    discoverNoLikes:'Tippe in der Speisekarte auf ein Herz, um ähnliche Gerichte zu sehen.', discoverNoMore:'In deinen Lieblingskategorien gibt es gerade keine weiteren Gerichte. Entdecke die ganze Karte.',
     daypartLabel:'Tageszeit', daypartAuto:'Auto · Gazipaşa', morningChoice:'Morgen', dayChoice:'Tagsüber', eveningChoice:'Abend', daypartPreview:'Vorschau',
     morningLight:'Morgenlicht', dayLight:'Tageslicht', eveningLight:'Abendlicht',
     morningTitle:'Gut in den Tag.', dayTitle:'Zeit für eine Genusspause.', eveningTitle:'Genuss am Abend.',

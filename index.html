@@ -18,11 +18,11 @@
   <meta name="twitter:image" content="https://safal207.github.io/halk-bufe-selinus/assets/share/menu-preview.jpg">
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
   <script src="theme.js?v=nutrition-20261105"></script>
-  <link rel="stylesheet" href="style.css?v=daypart-20261106">
+  <link rel="stylesheet" href="style.css?v=discover-20261107">
   <link rel="stylesheet" href="launch.css?v=launch-20261105">
   <script src="assets/qr.js" defer></script>
   <script src="launch.js?v=daypart-20261106" defer></script>
-  <script type="module" src="app.js?v=daypart-20261106"></script>
+  <script type="module" src="app.js?v=discover-20261107"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -85,10 +85,20 @@
       <div class="section-head">
         <div><div class="eyebrow" id="menu-kicker"></div><h2 id="menu-title" tabindex="-1"></h2></div>
       </div>
+      <section class="discover" aria-labelledby="discover-title">
+        <div class="discover-heading"><h3 id="discover-title"></h3><span id="discover-hint"></span></div>
+        <div class="discover-strip" id="discover-strip" role="group"></div>
+      </section>
       <div class="menu-toolbar" id="menu-toolbar">
         <div class="menu-tools"><div class="menu-view" id="menu-view"></div><button class="icon-button search-toggle" id="search-toggle" type="button" aria-controls="search-box" aria-expanded="false"></button></div>
         <div class="search" id="search-box" hidden><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" autocomplete="off"><button class="icon-button search-clear" id="search-clear" type="button"></button></div>
         <nav class="category-strip" id="categories"></nav>
+        <div class="discover-active" id="discover-active" hidden>
+          <div class="discover-active-text"><strong id="discover-current"></strong><small id="discover-count" role="status" aria-live="polite"></small></div>
+          <button type="button" class="discover-next" id="discover-next" data-action="discover-more"></button>
+          <button type="button" class="discover-clear" id="discover-clear" data-action="discover-clear"></button>
+        </div>
+        <span class="visually-hidden" id="discover-live" role="status" aria-live="polite"></span>
       </div>
       <p class="menu-photo-note" id="menu-photo-note"></p>
       <p id="menu-social-note" class="menu-social-note" hidden></p>
