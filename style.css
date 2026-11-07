@@ -558,3 +558,12 @@ dialog::backdrop { background: #091d18aa; }
 @media (prefers-reduced-motion: no-preference) {
   .category, .primary, .secondary, .social-like, .nutrition-entry { transition: background-color .16s ease, color .16s ease; }
 }
+
+/* Pasta photo optical tuning: preserve the existing serving illustrations. */
+/* Gentle menu-only tonal lift; no dish substitution, crop, or added ingredients. */
+img[src$="campaign/creamy-pasta.webp"] {
+  filter: brightness(1.055) contrast(1.075) saturate(1.035);
+}
+img[src$="catalog/tavuklu-makarna.webp"] {
+  filter: brightness(1.045) contrast(1.075) saturate(1.055);
+}
