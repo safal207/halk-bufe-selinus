@@ -1,12 +1,12 @@
 import {openShare} from './share.js?v=story-share-1';
-import {categories, menu} from './menu.js?v=kids-meal-1';
+import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
 import {copy} from './copy.js?v=discover-20261107';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
 import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
 import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
 import {nutritionLabels,nutritionMarkup,nutritionSearchText,nutritionSummary} from './nutrition.js?v=nutrition-20261105';
-import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=kids-meal-1';
+import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=pasta-retouch-20261107';
 
 const social = createSocialStore(menu.map(item => item.id));
 const icons = {
