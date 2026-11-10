@@ -664,7 +664,7 @@ document.addEventListener('click', async event => {
         burst.className = 'feed-heart-burst';
         burst.textContent = '♥';
         burst.setAttribute('aria-hidden','true');
-        button.closest('.feature')?.append(burst);
+        button.closest('.feature-media')?.append(burst);
         setTimeout(() => burst.remove(),650);
       }
       notify(t(persisted ? 'likedAdded' : 'localOnly'));
