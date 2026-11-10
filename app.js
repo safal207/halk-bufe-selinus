@@ -252,7 +252,11 @@ function renderLanguage() {
   renderHero();
   $('hero-kids').innerHTML = icon('star') + t('heroKids') + icon('arrow');
   $('hero-cta').innerHTML = t('heroCta') + icon('arrow');
-  $('guide-link').textContent = t('guide');
+  $('hero-guide-title').textContent = t('guide');
+  $('hero-guide-note').textContent = t('guideQuick');
+  $('hero-guide').href = `guide.html?lang=${lang}`;
+  $('hero-guide').setAttribute('aria-label', `${t('guide')} · ${t('guideQuick')}`);
+  $('guide-link').innerHTML = `<span>${t('guide')}</span><span class="guide-footer-arrow" aria-hidden="true">→</span>`;
   $('guide-link').href = `guide.html?lang=${lang}`;
   $('location').innerHTML = icon('pin') + t('map');
   $('menu-view').setAttribute('aria-label',t('view'));
