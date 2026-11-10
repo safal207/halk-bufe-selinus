@@ -22,7 +22,7 @@ let generation = 0;
 let previewUrl = null;
 
 export function shareUrl(item,lang) {
-  return new URL(`dish/${lang}/${item.id}/`,publicMenu).href;
+  return new URL(`dish/${lang}/${item.id}/?v=rich-20261110`,publicMenu).href;
 }
 function linesFor(context,text,width) {
   const result = [];
