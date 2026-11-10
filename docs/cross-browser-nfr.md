@@ -45,6 +45,11 @@ E2E_BROWSER=webkit npm run test:e2e
 E2E_BROWSER=msedge npm run test:e2e
 ```
 
+## Regression guard added after live inspection
+The amber perimeter is implemented in the **separate** `mirror-glow.css`, linked after `style.css` in `index.html`. Checking the base stylesheet alone gives a false negative. A generic card shadow is also not proof of the LED ring.
+
+The automated browser check now requires a **linked and loaded** LED stylesheet, the root amber variable, a rendered `::after` pseudo-element with nonempty colored `box-shadow` and `pointer-events:none`. The Node source-level test prevents accidentally dropping this file. The dedicated CSS file was also observed at its public GitHub Pages URL; this does not establish a hands-on physical-device visual PASS.
+
 ## Evidence & limitations
 A green GitHub quality workflow confirms these automated checks were executed on the tested commit, *not* that every physical device / OS configuration works. A Microsoft Edge Linux browser is not Windows Edge; WebKit Linux is not iPhone Safari. After a green PR, check the actual published Pages site and perform physical-phone spot checks before declaring full device QA PASS. Do not claim browser runs passed based on a syntax check or a successful Pages deployment alone. Third-party preview caching and native Web Share targets are external dependencies.
 
