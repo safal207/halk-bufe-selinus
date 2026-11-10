@@ -7,6 +7,14 @@
 - Feed has a position indicator, mobile scroll snapping, an always-visible vertical reaction rail over the **right edge of each dish photo** in both Feed and Photos views, and double-tap-to-like on the food photo. Single tap still opens the dish; keyboard activation is immediate.
 - TR, RU, EN and DE are supported. Reduced-motion preference disables the heart animation.
 
+## Immersive one-card feed (2026-11-10)
+- The Feed view has an **independent vertical scroll area**; it no longer makes the entire HTML page snap.
+- A card fills the feed viewport, with a large uncropped food image, centered design, and a short title/price/order footer. The social rail stays over the right side of the photo.
+- Each swipe uses mandatory scroll snapping with `scroll-snap-stop: always`; wheel/trackpad input accumulates deliberately and has an 850ms cooldown to avoid skipping multiple items.
+- At the first/last card, outward wheel gestures return to regular page scroll. ArrowUp/ArrowDown and PageUp/PageDown work when the feed is focused.
+- On mobile the feed uses `svh` to avoid height jumping when the browser address bar expands or collapses, and reserves space for sticky menu controls and the cart dock.
+- The Photos grid, List view, basket and existing social state remain unchanged.
+
 ## Metric integrity
 - This is a **static GitHub Pages** site. There are no global or other-visitors' likes/views. Never advertise local values as public popularity.
 - Likes and bookmarks live in `localStorage` under the existing `halk-bufe-selinus:v1:social` key (old likes/views are preserved).
@@ -16,7 +24,7 @@
 - Sharing opens the existing story-card / share sheet; it is not evidence that someone placed an order.
 
 ## Acceptance checklist
-1. On 320px and 360px phones and a desktop, confirm the vertical right-side rail overlays the **photo** (not text) in Feed and Photos. It contains like / local view count / bookmark / share; all buttons remain at least 44px tall and usable, including on short screens.
+1. On 320px, 360px, and 390px phones and desktop, verify one card fits the feed viewport; scroll snaps to precisely one item per swipe/wheel burst, not the page. Check 568px/667px/800px screen heights, address-bar collapse, scroll at either end, and keyboard arrows. Then confirm the vertical right-side rail overlays the **photo** (not text) in Feed and Photos. It contains like / local view count / bookmark / share; all buttons remain at least 44px tall and usable, including on short screens.
 2. Test Feed, Photos, List, search, categories, and basket without horizontal clipping.
 3. Swipe down the feed; verify item progress changes and that visible photos count only once per tab session.
 4. Double-tap a photo in Feed: it likes without opening the detail. Single tap opens detail, keyboard Enter opens immediately.
