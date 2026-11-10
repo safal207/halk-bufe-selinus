@@ -849,3 +849,60 @@ img[src$="catalog/tavuklu-makarna.webp"] {
 @media (prefers-reduced-motion:reduce) {
   .menu-feed { scroll-behavior: auto; }
 }
+
+/* Clean social controls: no pill, glass, border or backdrop on food photos. */
+.social-actions.social-rail,
+.menu-feed .social-actions.social-rail {
+  background: transparent;
+  border: 0;
+  border-top: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 0;
+  width: 52px;
+  gap: 3px;
+}
+.social-rail .social-like,
+.social-rail .social-bookmark,
+.social-rail .social-share,
+.social-rail .social-views { background: transparent; border: 0; }
+.social-rail .social-like .icon,
+.social-rail .social-bookmark .icon,
+.social-rail .social-share .icon,
+.social-rail .social-views .icon {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 90%)) drop-shadow(0 0 5px rgb(0 0 0 / 55%));
+}
+.social-rail .social-like b,
+.social-rail .social-views b {
+  text-shadow: 0 1px 4px rgb(0 0 0 / 95%), 0 0 7px rgb(0 0 0 / 80%);
+}
+.social-rail .social-like:hover,
+.social-rail .social-bookmark:hover,
+.social-rail .social-share:hover { background: rgb(0 0 0 / 22%); border-radius: 50%; }
+.social-rail button:focus-visible { background: rgb(0 0 0 / 40%); outline: 3px solid #ffe1a4; outline-offset: -2px; }
+@media (prefers-reduced-transparency: reduce) {
+  .social-actions.social-rail { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* Full dish details readable before sharing, without crowding the action row. */
+.share-dish-details {
+  margin: 8px 0 14px;
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--selected-bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  max-height: min(28svh,200px);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+.share-dish-details p { margin: 0 0 8px; line-height: 1.43; font-size: 12px; }
+.share-dish-details p:last-child { margin-bottom: 0; }
+.share-dish-details .share-ingredients { font-weight: 650; }
+.share-dish-details .share-disclaimer { font-size: 11px; color: var(--muted); }
+.share-dish-details .share-cta { color: var(--pine); font-weight: 800; }
+@media (max-height:680px) { .share-dish-details { max-height: 110px; } }
+@media (max-width:620px) and (max-height:500px) {
+  .share-body .share-dish-details { grid-column: 2; max-height: 105px; margin: 3px 0; }
+}
