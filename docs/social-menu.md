@@ -15,6 +15,13 @@
 - On mobile the feed uses `svh` to avoid height jumping when the browser address bar expands or collapses, and reserves space for sticky menu controls and the cart dock.
 - The Photos grid, List view, basket and existing social state remain unchanged.
 
+## Transparent social actions & rich sharing (2026-11-10)
+- Social buttons stay on the photo at the right, but the rail itself has **no pill background, border or backdrop blur**. Individual white icons and numbers use a dark drop shadow for legibility over light and dark foods, with keyboard focus outlines and unchanged ≥44px hit targets.
+- Share modal now shows the full available dish description, ingredients from the nutrition editorial record, provenance/caveat, and a CTA; copy action copies the entire description plus direct dish link, not only a URL.
+- Native share sends `title`, full `text`, and the deep `url`, with **no image attachment** so mobile apps are less likely to discard the text. "Save story" separately exports the image with a compact ingredient teaser.
+- All 176 locale-specific HTML OG/Twitter preview pages regenerated with rich descriptions, photos and direct-to-dish links. New share URLs use a `?v=rich-20261110` variant to limit reuse of cached old social snippets. Platforms may still truncate snippets.
+- For unverified recipe assumptions, visible text says **sample recipe**. Confirm full recipes and allergens with café staff before describing them as certain.
+
 ## Metric integrity
 - This is a **static GitHub Pages** site. There are no global or other-visitors' likes/views. Never advertise local values as public popularity.
 - Likes and bookmarks live in `localStorage` under the existing `halk-bufe-selinus:v1:social` key (old likes/views are preserved).
@@ -30,7 +37,7 @@
 4. Double-tap a photo in Feed: it likes without opening the detail. Single tap opens detail, keyboard Enter opens immediately.
 5. Like one dish and bookmark another. Verify the two filters are independent, and toggles work from the list and detail.
 6. Reload and open a second tab: likes and bookmarks persist and refresh; previously counted views stay unchanged in the same session.
-7. Share a dish and verify the URL/story resolves to the selected dish; no automatic checkout or order submission.
+7. Share a dish and verify the URL/story resolves to the selected dish; full localized description, main ingredients/assumptions, caveat, price and CTA appear in the copy/share sheet and server-side OG descriptions. Test WhatsApp/Telegram URL cards where practical; previews may be truncated by the platform. No automatic checkout or order submission.
 8. Switch TR / RU / EN / DE, light/dark theme, and test `prefers-reduced-motion`.
 9. Test with blocked browser storage and with slow images (no accidental view until actually loaded).
 

@@ -26,8 +26,8 @@ test('accessible feed navigation is scoped and asset URLs refreshed',()=>{
  assert.match(app,/scrollTo\(\{top:/);
  assert.match(css,/scroll-snap-stop/);
  assert.match(app,/tabindex="0" role="region"/);
- assert.match(html,/app\.js\?v=immersive-feed-20261110/);
- assert.match(html,/style\.css\?v=immersive-feed-20261110/);
+ assert.match(html,/app\.js\?v=transparent-share-20261110/);
+ assert.match(html,/style\.css\?v=transparent-share-20261110/);
 });
 test('a wheel gesture steps once despite repeated wheel events, keyboard can step back',()=>{
  const start = app.indexOf('function configureFeedNavigation()');

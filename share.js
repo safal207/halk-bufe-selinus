@@ -1,11 +1,13 @@
 import {copy} from './copy.js?v=simple-menu-1';
+import {nutritionFor} from './nutrition.js?v=nutrition-20261105';
+import {composeShare} from './share-content.js?v=full-description-20261110';
 
 const publicMenu = 'https://safal207.github.io/halk-bufe-selinus/';
 const words = {
-  tr:{title:'Paylaş',loading:'Hikâye hazırlanıyor…',save:'Hikâyeyi kaydet',send:'Gönder',sendLink:'Bağlantıyı gönder',link:'Bağlantıyı kopyala',hint:'Instagram için görseli hikâyene ekle; bağlantıyı bağlantı çıkartmasıyla ekleyebilirsin.',failed:'Paylaşım açılamadı. Görseli kaydedebilir veya bağlantıyı kopyalayabilirsin.'},
-  ru:{title:'Поделиться',loading:'Готовим сторис…',save:'Сохранить сторис',send:'Отправить',sendLink:'Отправить ссылку',link:'Скопировать ссылку',hint:'Для Instagram: добавьте сохранённую карточку в сторис, а ссылку — стикером.',failed:'Не удалось открыть отправку. Сохраните карточку или скопируйте ссылку.'},
-  en:{title:'Share',loading:'Preparing your story…',save:'Save story',send:'Send',sendLink:'Send link',link:'Copy link',hint:'For Instagram: add the saved card to your story, then add the link with a link sticker.',failed:'Sharing could not open. Save the card or copy the link instead.'},
-  de:{title:'Teilen',loading:'Story wird vorbereitet…',save:'Story speichern',send:'Senden',sendLink:'Link senden',link:'Link kopieren',hint:'Für Instagram: Füge die gespeicherte Karte zur Story hinzu und den Link als Link-Sticker.',failed:'Teilen konnte nicht geöffnet werden. Speichere die Karte oder kopiere den Link.'}
+  tr:{title:'Paylaş',loading:'Hikâye hazırlanıyor…',save:'Hikâyeyi kaydet',send:'Gönder',sendLink:'Bağlantıyı gönder',link:'Açıklama ve bağlantıyı kopyala',hint:'Instagram için görseli hikâyene ekle; bağlantıyı bağlantı çıkartmasıyla ekleyebilirsin.',failed:'Paylaşım açılamadı. Görseli kaydedebilir veya bağlantıyı kopyalayabilirsin.'},
+  ru:{title:'Поделиться',loading:'Готовим сторис…',save:'Сохранить сторис',send:'Отправить',sendLink:'Отправить ссылку',link:'Копировать описание и ссылку',hint:'Для Instagram: добавьте сохранённую карточку в сторис, а ссылку — стикером.',failed:'Не удалось открыть отправку. Сохраните карточку или скопируйте ссылку.'},
+  en:{title:'Share',loading:'Preparing your story…',save:'Save story',send:'Send',sendLink:'Send link',link:'Copy details and link',hint:'For Instagram: add the saved card to your story, then add the link with a link sticker.',failed:'Sharing could not open. Save the card or copy the link instead.'},
+  de:{title:'Teilen',loading:'Story wird vorbereitet…',save:'Story speichern',send:'Senden',sendLink:'Link senden',link:'Beschreibung & Link kopieren',hint:'Für Instagram: Füge die gespeicherte Karte zur Story hinzu und den Link als Link-Sticker.',failed:'Teilen konnte nicht geöffnet werden. Speichere die Karte oder kopiere den Link.'}
 };
 const shapes = {
   send:'<path d="m21 3-7 18-4-7-7-4L21 3ZM10 14 21 3"/>',
@@ -20,7 +22,7 @@ let generation = 0;
 let previewUrl = null;
 
 export function shareUrl(item,lang) {
-  return new URL(`dish/${lang}/${item.id}/`,publicMenu).href;
+  return new URL(`dish/${lang}/${item.id}/?v=rich-20261110`,publicMenu).href;
 }
 function linesFor(context,text,width) {
   const result = [];
@@ -60,6 +62,7 @@ function storyQR(context,url,x,y) {
   for (let row=0;row<count;row++) for(let col=0;col<count;col++) if(code.isDark(row,col)) context.fillRect(x+(col+4)*unit,y+(row+4)*unit,unit,unit);
 }
 async function storyCard(item,lang) {
+  const details=composeShare(item,lang,nutritionFor(item),copy[lang].ask);
   const photo = await imageLoad(`assets/${item.photo}.webp`);
   const brand = await imageLoad('assets/halk-bufe-logo.svg');
   const canvas = document.createElement('canvas'); canvas.width=1080; canvas.height=1920;
@@ -76,7 +79,10 @@ async function storyCard(item,lang) {
   c.fillStyle='#183f35';
   let y=textBlock(c,item.name[lang],64,1164,952,76,3,true);
   if(lang!=='tr') {c.fillStyle='#7a644e';y=textBlock(c,item.name.tr,64,y+12,952,31,2);}
-  if(item.description) {c.fillStyle='#5b6254';textBlock(c,item.description[lang],64,y+22,952,32,2);}
+  c.save();c.beginPath();c.rect(64,y+14,950,Math.max(0,1590-y));c.clip();
+  if(details.description) {c.fillStyle='#5b6254';y=textBlock(c,details.description,64,y+17,952,30,2);}
+  if(details.ingredientsLine) {c.fillStyle='#39594c';textBlock(c,details.ingredientsLine,64,y+12,952,27,3);}
+  c.restore();
   const price = item.price===null ? copy[lang].ask : `${item.price} ₺`;
   roundRect(c,64,1650,620,120,32,'#9b3025');c.fillStyle='#fff9eb';
   textBlock(c,price,96,1672,555,item.price===null?36:74,2,true);
@@ -97,15 +103,22 @@ function canSendFile(file) {
 export function openShare(item,lang) {
   if(!item) return;
   const token=++generation; clearPreview();
-  active={item,lang,file:null}; const labels=words[lang];
+  const details=composeShare(item,lang,nutritionFor(item),copy[lang].ask);
+  active={item,lang,file:null,details}; const labels=words[lang];
   $('share-title').textContent=labels.title;
   $('share-close').innerHTML=svg('close');$('share-close').setAttribute('aria-label',copy[lang].close);
   $('story-preview').hidden=true;$('story-preview').alt=`${item.name[lang]} · ${item.price===null?copy[lang].ask:`${item.price} ₺`}`;
   $('story-stage').setAttribute('aria-busy','true');
   $('story-loading').hidden=false;$('story-loading').textContent=labels.loading;
-  $('share-dish-name').textContent=item.name[lang];
-  $('share-send').hidden=!navigator.share;$('share-send').disabled=true;
-  $('share-send').innerHTML=`<span>${svg('send')}</span>${labels.send}`;
+  $('share-dish-name').textContent=details.headline;
+  $('share-description').textContent=details.description;
+  $('share-description').hidden=!details.description;
+  $('share-ingredients').textContent=details.ingredientsLine;
+  $('share-ingredients').hidden=!details.ingredientsLine;
+  $('share-disclaimer').textContent=details.note;
+  $('share-cta').textContent=details.cta;
+  $('share-send').hidden=!navigator.share;$('share-send').disabled=false;
+  $('share-send').innerHTML=`<span>${svg('send')}</span>${labels.sendLink}`;
   $('share-save').disabled=true;$('share-save').innerHTML=`<span class="story-action">${svg('save')}</span>${labels.save}`;
   $('share-copy').innerHTML=`<span>${svg('link')}</span>${labels.link}`;
   $('share-hint').textContent=labels.hint;$('share-status').textContent='';
@@ -117,9 +130,9 @@ export function openShare(item,lang) {
       if(token!==generation) return;
       active.file=file;previewUrl=URL.createObjectURL(file);$('story-preview').src=previewUrl;$('story-preview').hidden=false;
       $('story-loading').hidden=true;$('share-save').disabled=false;
-      $('share-send').innerHTML=`<span>${svg('send')}</span>${canSendFile(file)?labels.send:labels.sendLink}`;
-    }).catch(()=>{if(token===generation) {$('story-loading').textContent=copy[lang].sharePhotoUnavailable;$('share-send').innerHTML=`<span>${svg('send')}</span>${labels.sendLink}`;}})
-    .finally(()=>{clearTimeout(timer);if(token===generation){$('story-stage').setAttribute('aria-busy','false');$('share-send').disabled=false;}});
+      // The share action sends rich text + URL; saving the image is a separate choice.
+    }).catch(()=>{if(token===generation) {$('story-loading').textContent=copy[lang].sharePhotoUnavailable;}})
+    .finally(()=>{clearTimeout(timer);if(token===generation) $('story-stage').setAttribute('aria-busy','false');});
 }
 $('share-close').addEventListener('click',()=>$('share-dialog').close());
 $('share-dialog').addEventListener('click',event=>{if(event.target===$('share-dialog')) $('share-dialog').close();});
@@ -131,19 +144,19 @@ $('share-save').addEventListener('click',()=>{
 $('share-copy').addEventListener('click',async()=>{
   if(!active) return;
   const current=active,url=shareUrl(current.item,current.lang);
-  try {await navigator.clipboard.writeText(url);if(active===current) $('share-status').textContent=copy[current.lang].copied;}
+  const body=`${current.details.details}\n${url}`;
+  try {await navigator.clipboard.writeText(body);if(active===current) $('share-status').textContent=copy[current.lang].copied;}
   catch {
     if(active!==current) return;
     document.querySelector('#share-dialog .copy-field')?.remove();
-    const field=document.createElement('textarea');field.className='copy-field';field.readOnly=true;field.value=url;
+    const field=document.createElement('textarea');field.className='copy-field';field.readOnly=true;field.value=body;
     field.setAttribute('aria-label',copy[current.lang].selectCopy);$('share-status').after(field);field.focus();field.select();
   }
 });
 $('share-send').addEventListener('click',async()=>{
   if(!active || !navigator.share) return;
-  const current=active;const {item,lang,file}=current;
-  const data={title:item.name[lang],text:`${item.name[lang]} · ${item.price===null?copy[lang].ask:`${item.price} ₺`}`,url:shareUrl(item,lang)};
-  if(canSendFile(file)) data.files=[file];
+  const current=active;const {item,lang,details}=current;
+  const data={title:details.headline,text:details.details,url:shareUrl(item,lang)};
   $('share-send').disabled=true;
   try {await navigator.share(data);}catch(error){if(error.name!=='AbortError' && active===current) $('share-status').textContent=words[lang].failed;}
   finally{if(active===current) $('share-send').disabled=false;}
