@@ -1,16 +1,17 @@
 import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
-import {copy} from './copy.js?v=discover-20261107';
+import {copy} from './copy.js?v=social-20261110';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
 import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
-import {createSocialStore,socialKey} from './social.js?v=mobile-social-1';
+import {createSocialStore,socialKey} from './social.js?v=tiktok-social-20261110';
 import {nutritionLabels,nutritionMarkup,nutritionSearchText,nutritionSummary} from './nutrition.js?v=nutrition-20261105';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=pasta-retouch-20261107';
 
 const social = createSocialStore(menu.map(item => item.id));
 const icons = {
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.2"/>',
+  bookmark: '<path d="M5 3h14v18l-7-5-7 5V3Z"/>',
   heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
   eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M19 5l-1.5 1.5m-11 11L5 19"/>',
@@ -54,6 +55,7 @@ let activeDaypart = daypartFor(new Date(),lightChoice);
 let collection = collectionChoice(new URLSearchParams(location.search).get('collection'));
 let collectionStep = 0;
 let displayedItems = [];
+let pendingPhotoTap = null;
 const t = key => copy[lang][key];
 const money = n => `${n} ₺`;
 const normalize = str => str.toLowerCase().normalize('NFD').replace(/\p{M}/gu,'').replaceAll('ı','i').replaceAll('ß','ss');
@@ -76,31 +78,37 @@ function titleButton(item, thumbnail = false) {
     <span>${name}${item.description ? `<small class="serving-note">${item.description[lang]}</small>` : ''}<span class="row-price ${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span></span>` : name;
   return `<button class="item-open" type="button" data-item="${item.id}">${content}</button>`;
 }
-function likeButton(item) {
-  return `<button class="social-like" type="button" data-like="${item.id}" aria-pressed="${social.liked(item.id)}" aria-label="${t(social.liked(item.id) ? 'unlike' : 'like')} · ${item.name[lang]}" title="${t(social.liked(item.id) ? 'liked' : 'like')}">${icon('heart')}</button>`;
+function likeButton(item, feed = false) {
+  const liked = social.liked(item.id);
+  return `<button class="social-like" type="button" data-like="${item.id}" aria-pressed="${liked}" aria-label="${t(liked ? 'unlike' : 'like')} · ${item.name[lang]}" title="${feed ? t('myLikeHelp') : t(liked ? 'liked' : 'like')}">${icon('heart')}${feed ? `<b data-like-count="${item.id}">${liked ? 1 : 0}</b>` : ''}</button>`;
+}
+function bookmarkButton(item) {
+  const bookmarked = social.bookmarked(item.id);
+  return `<button class="social-bookmark" type="button" data-bookmark="${item.id}" aria-pressed="${bookmarked}" aria-label="${t(bookmarked ? 'removeBookmark' : 'bookmark')} · ${item.name[lang]}" title="${t(bookmarked ? 'removeBookmark' : 'bookmark')}">${icon('bookmark')}</button>`;
 }
 function viewCount(item, compact = false) {
   return `<span class="social-views" title="${t('viewHelp')}" aria-label="${t('myViews')}: ${social.views(item.id)}" data-view-label="${item.id}">${icon('eye')}<span class="views-label">${t(compact ? 'mine' : 'myViews')}</span><b data-view-count="${item.id}">${social.views(item.id)}</b></span>`;
 }
-function socialBar(item, compact = false) {
-  return `<div class="social-actions${compact ? ' social-compact' : ''}">${likeButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
+function socialBar(item, compact = false, feed = false) {
+  return `<div class="social-actions${compact ? ' social-compact' : ''}${feed ? ' social-feed' : ''}">${likeButton(item,true)}${bookmarkButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
 }
 function rowHtml(item) {
-  return `<li class="menu-row">${titleButton(item,true)}<div class="row-actions">${likeButton(item)}${item.price === null ? '' : addButton(item)}</div></li>`;
+  return `<li class="menu-row">${titleButton(item,true)}<div class="row-actions">${likeButton(item)}${bookmarkButton(item)}${item.price === null ? '' : addButton(item)}</div></li>`;
 }
 function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
   return `<article class="feature" data-dish="${item.id}" data-photo="${item.photo}">
     <button class="nutrition-entry" type="button" data-nutrition="${item.id}" aria-haspopup="dialog" aria-controls="item-dialog" aria-label="${nutritionLabels[lang].title} · ${item.name[lang]}" title="${nutritionLabels[lang].title}">${icon('info')}<span>${nutritionSummary(item,lang)}</span><span class="nutrition-entry-label">${nutritionSummary(item,lang) === nutritionLabels[lang].details ? '' : ` · ${nutritionLabels[lang].details}`}</span></button>
     <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
-    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div>${socialBar(item,!inFeed)}</div></article>`;
+    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div>${socialBar(item,!inFeed,inFeed)}</div></article>`;
 }
 function renderCategories() {
   $('categories').setAttribute('aria-label',t('categories'));
   const all = {id:'all', name:{[lang]:t('all')}, icon:'grid'};
   const liked = {id:'liked',name:{[lang]:t('likedFilter')},icon:'heart'};
-  $('categories').innerHTML = [all,liked,...categories].map(row =>
-    `<button class="category" data-category="${row.id}" aria-pressed="${row.id === category}" type="button">${icon(row.icon)}${row.name[lang]}${row.id === 'liked' ? `<span class="category-count">${social.likedCount()}</span>` : ''}</button>`).join('');
+  const bookmarked = {id:'bookmarked',name:{[lang]:t('savedFilter')},icon:'bookmark'};
+  $('categories').innerHTML = [all,liked,bookmarked,...categories].map(row =>
+    `<button class="category" data-category="${row.id}" aria-pressed="${row.id === category}" type="button">${icon(row.icon)}${row.name[lang]}${row.id === 'liked' ? `<span class="category-count" data-like-total>${social.likedCount()}</span>` : row.id === 'bookmarked' ? `<span class="category-count" data-bookmark-total>${social.bookmarkedCount()}</span>` : ''}</button>`).join('');
 }
 function renderDiscover() {
   $('discover-title').textContent = t('discoverTitle');
@@ -131,21 +139,23 @@ function updateDiscoverState(items) {
   $('discover-next').disabled = items.length < 2;
 }
 function renderMenu() {
-  $('menu-social-note').hidden = category !== 'liked';
+  $('menu-social-note').hidden = view === 'list' && category !== 'liked' && category !== 'bookmarked';
+  document.documentElement.classList.toggle('feed-mode', view === 'feed');
+  if (pendingPhotoTap) { clearTimeout(pendingPhotoTap.timer); pendingPhotoTap = null; }
   stopViewObservation();
   const query = normalize($('search').value.trim());
   const ordered = categories.flatMap(group => menu.filter(item => item.category === group.id));
   const matching = rotateItems(collectionItems(ordered,collection,id=>social.liked(id))
-    .filter(item => (category === 'all' || (category === 'liked' ? social.liked(item.id) : item.category === category))
+    .filter(item => (category === 'all' || (category === 'liked' ? social.liked(item.id) : category === 'bookmarked' ? social.bookmarked(item.id) : item.category === category))
       && (!query || [...Object.values(item.name),...Object.values(item.description ?? {}),nutritionSearchText(item)].some(text => normalize(text).includes(query)))),collectionStep);
   displayedItems = matching;
   updateDiscoverState(matching);
-  const emptyKey = collection === 'for-you' && !query ? (social.likedCount() ? 'discoverNoMore' : 'discoverNoLikes') : (category === 'liked' && !query ? 'noLikes' : 'noResults');
+  const emptyKey = collection === 'for-you' && !query ? (social.likedCount() ? 'discoverNoMore' : 'discoverNoLikes') : (category === 'liked' && !query ? 'noLikes' : category === 'bookmarked' && !query ? 'noBookmarks' : 'noResults');
   const empty = `<div class="empty" role="status"><p>${t(emptyKey)}</p><button class="secondary" type="button" data-action="reset-menu">${t('resetSearch')}</button></div>`;
   if (view !== 'list') {
     const inFeed = view === 'feed';
     $('results').innerHTML = matching.length
-      ? `<div class="${inFeed ? 'menu-feed' : 'featured'}">${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
+      ? `${inFeed ? `<div class="feed-hint"><span>${t('feedHint')}</span><strong data-feed-progress aria-label="${t('feedProgress')}">1 / ${matching.length}</strong></div>` : ''}<div class="${inFeed ? 'menu-feed' : 'featured'}">${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
       : empty;
     observeVisibleDishes();
     return;
@@ -424,12 +434,23 @@ function refreshSocial() {
     const item = byId.get(button.dataset.like);
     button.setAttribute('aria-pressed',social.liked(item.id));
     button.setAttribute('aria-label',`${t(social.liked(item.id) ? 'unlike' : 'like')} · ${item.name[lang]}`);
-    button.title = t(social.liked(item.id) ? 'liked' : 'like');
+    button.title = button.querySelector('[data-like-count]') ? t('myLikeHelp') : t(social.liked(item.id) ? 'liked' : 'like');
   }
+  for (const button of document.querySelectorAll('[data-bookmark]')) {
+    const item = byId.get(button.dataset.bookmark);
+    if (!item) continue;
+    const bookmarked = social.bookmarked(item.id);
+    button.setAttribute('aria-pressed',bookmarked);
+    button.setAttribute('aria-label',`${t(bookmarked ? 'removeBookmark' : 'bookmark')} · ${item.name[lang]}`);
+    button.title = t(bookmarked ? 'removeBookmark' : 'bookmark');
+  }
+  for (const count of document.querySelectorAll('[data-like-count]')) count.textContent = social.liked(count.dataset.likeCount) ? '1' : '0';
   for (const counter of document.querySelectorAll('[data-view-count]')) counter.textContent = social.views(counter.dataset.viewCount);
   for (const label of document.querySelectorAll('[data-view-label]')) label.setAttribute('aria-label',`${t('myViews')}: ${social.views(label.dataset.viewLabel)}`);
   const likedCount = $('categories').querySelector('[data-category="liked"] .category-count');
   if (likedCount) likedCount.textContent = social.likedCount();
+  const savedCount = $('categories').querySelector('[data-bookmark-total]');
+  if (savedCount) savedCount.textContent = social.bookmarkedCount();
 }
 let viewObserver;
 const visibleDishes = new Map();
@@ -458,7 +479,13 @@ function observeVisibleDishes() {
   viewObserver ??= new IntersectionObserver(entries => {
     for (const entry of entries) {
       const id = entry.target.closest('[data-dish]').dataset.dish;
-      if (entry.isIntersecting && entry.intersectionRatio >= .6) visibleDishes.set(id,entry.target);
+      if (entry.isIntersecting && entry.intersectionRatio >= .6) {
+        visibleDishes.set(id,entry.target);
+        if (view === 'feed') {
+          const meter = $('results').querySelector('[data-feed-progress]');
+          if (meter) meter.textContent = `${displayedItems.findIndex(item => item.id === id) + 1} / ${displayedItems.length}`;
+        }
+      }
       else {visibleDishes.delete(id);clearTimeout(viewTimers.get(id));viewTimers.delete(id);}
     }
     scheduleVisibleViews();
@@ -542,8 +569,8 @@ for (const id of ['cart','item-dialog']) $(id).addEventListener('click',event =>
 window.addEventListener('hashchange',showDishFromHash);
 window.addEventListener('storage',event => {
   if (event.key === socialKey || event.key === null) {
-    const tracksLikes = category === 'liked' || collection === 'for-you';
-    const before = tracksLikes ? menu.filter(item=>social.liked(item.id)).map(item=>item.id).join('|') : '';
+    const tracksLikes = category === 'liked' || category === 'bookmarked' || collection === 'for-you';
+    const before = tracksLikes ? menu.filter(item=>category === 'bookmarked' ? social.bookmarked(item.id) : social.liked(item.id)).map(item=>item.id).join('|') : '';
     social.refresh();
     refreshSocial();
     const after = tracksLikes ? menu.filter(item=>social.liked(item.id)).map(item=>item.id).join('|') : '';
@@ -563,6 +590,10 @@ document.addEventListener('click', async event => {
   const button = event.target.closest('button');
   if (!button) return;
   const data = button.dataset;
+  if (pendingPhotoTap && !(data.item === pendingPhotoTap.id && button.classList.contains('feature-open'))) {
+    clearTimeout(pendingPhotoTap.timer);
+    pendingPhotoTap = null;
+  }
   if (data.collection) {
     const next = collection === data.collection ? 'all' : data.collection;
     setCollection(next);
@@ -602,6 +633,45 @@ document.addEventListener('click', async event => {
       }
       notify(t(!result.saved ? 'localOnly' : result.liked ? 'likedAdded' : 'likedRemoved'));
     }
+  }
+  if (data.bookmark) {
+    const result = social.toggleBookmark(data.bookmark);
+    if (result) {
+      refreshSocial();
+      if (category === 'bookmarked' && !result.bookmarked) {
+        renderMenu();
+        ($('results').querySelector('[data-bookmark]') ?? $('categories').querySelector('[data-category="bookmarked"]'))?.focus({preventScroll:true});
+      }
+      notify(t(!result.persisted ? 'localOnly' : result.bookmarked ? 'bookmarkedAdded' : 'bookmarkedRemoved'));
+    }
+  }
+  // Defer a pointer tap in the feed so a second tap can like without opening the item.
+  // Keyboard activation remains immediate and the heart never toggles an existing like off.
+  if (data.item && button.classList.contains('feature-open') && view === 'feed' && event.detail > 0) {
+    const now = Date.now();
+    if (pendingPhotoTap?.id === data.item && now - pendingPhotoTap.time < 320) {
+      clearTimeout(pendingPhotoTap.timer);
+      pendingPhotoTap = null;
+      let persisted = true;
+      if (!social.liked(data.item)) {
+        persisted = social.toggleLike(data.item).saved;
+        refreshSocial();
+        const burst = document.createElement('span');
+        burst.className = 'feed-heart-burst';
+        burst.textContent = '♥';
+        burst.setAttribute('aria-hidden','true');
+        button.closest('.feature')?.append(burst);
+        setTimeout(() => burst.remove(),650);
+      }
+      notify(t(persisted ? 'likedAdded' : 'localOnly'));
+      return;
+    }
+    if (pendingPhotoTap) clearTimeout(pendingPhotoTap.timer);
+    pendingPhotoTap = {id:data.item,time:now,timer:setTimeout(() => {
+      pendingPhotoTap = null;
+      openItem(data.item);
+    },320)};
+    return;
   }
   if (data.item) openItem(data.item);
   if (data.nutrition) openItem(data.nutrition,true);

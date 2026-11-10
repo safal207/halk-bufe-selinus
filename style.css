@@ -567,3 +567,65 @@ img[src$="campaign/creamy-pasta.webp"] {
 img[src$="catalog/tavuklu-makarna.webp"] {
   filter: brightness(1.045) contrast(1.075) saturate(1.055);
 }
+
+
+/* Social discovery · 2026-11-10. Counts reflect this browser, never invented site-wide totals. */
+.social-bookmark {
+  display: inline-grid; place-items: center; flex: none;
+  width: 44px; height: 44px; border: 0; border-radius: 12px;
+  padding: 0; background: transparent; color: var(--pine);
+}
+.social-bookmark:hover { background: var(--selected-bg); }
+.social-bookmark[aria-pressed="true"] { color: var(--like-ink); }
+.social-bookmark[aria-pressed="true"] .icon { fill: currentColor; }
+.social-actions .social-like { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.social-actions .social-like b { font-size: 10px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
+.feed-hint {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; max-width: 580px; margin: 4px auto 10px; color: var(--muted);
+  font-size: 12px; line-height: 1.4;
+}
+.feed-hint strong {
+  flex: none; padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--white); font-size: 11px; font-variant-numeric: tabular-nums; color: var(--pine);
+}
+.menu-feed .feature { position: relative; }
+.feed-heart-burst {
+  position: absolute; z-index: 3; top: 26%; left: 50%;
+  transform: translate(-50%,-50%); color: #fff; font-size: 98px; line-height: 1;
+  text-shadow: 0 3px 18px rgb(121 19 50 / 55%);
+  pointer-events: none; animation: feed-like-burst .65s ease-out both;
+}
+@keyframes feed-like-burst {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.5); }
+  35% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%,-65%) scale(1.3); }
+}
+@media (max-width:620px) {
+  html.feed-mode { scroll-snap-type: y proximity; scroll-padding-top: calc(var(--menu-stack,164px) + 8px); }
+  .menu-feed .feature { scroll-snap-align: start; }
+  .menu-feed .social-feed { justify-content: space-between; }
+  .menu-feed .social-feed .social-views { min-width: 48px; }
+  .feed-hint { font-size: 11px; padding-inline: 3px; }
+  .feed-hint strong { font-size: 10px; }
+}
+@media (max-width:620px) and (min-height:780px) {
+  .menu-feed .social-feed {
+    position: absolute; z-index: 2; top: 16%; right: 9px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    width: 53px; min-height: 0; gap: 2px; margin: 0; padding: 5px 3px;
+    border: 1px solid var(--line); border-radius: 20px;
+    background: var(--white); box-shadow: 0 5px 24px rgb(0 0 0 / 12%);
+  }
+  .menu-feed .social-feed .social-views { flex-direction: column; gap: 0; min-width: 0; }
+  .menu-feed .social-feed .social-views .views-label { font-size: 9px; }
+  .menu-feed .social-feed .social-like, .menu-feed .social-feed .social-bookmark, .menu-feed .social-feed .social-share { height: 44px; width: 44px; }
+  .menu-feed .social-feed .social-like .icon { width: 22px; height: 22px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .feed-heart-burst { animation: none; }
+}
+
+@media (max-width:380px) {
+  .row-actions .social-like, .row-actions .social-bookmark { width: 36px; height: 40px; }
+}
