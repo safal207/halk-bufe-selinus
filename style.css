@@ -684,7 +684,7 @@ img[src$="catalog/tavuklu-makarna.webp"] {
   .featured .feature-media .nutrition-entry span { display: none; }
   .menu-feed .feature-media,
   .menu-feed .feature[data-photo^="branding/"] .feature-media {
-    flex: 1; height: 0; min-height: 180px; aspect-ratio: auto;
+    flex: 1; height: 0; min-height: 205px; aspect-ratio: auto;
   }
   .menu-feed .feature-media > .feature-open,
   .menu-feed .feature[data-photo^="branding/"] .feature-media > .feature-open {
@@ -698,6 +698,7 @@ img[src$="catalog/tavuklu-makarna.webp"] {
   .social-rail .social-share, .social-rail .social-views { width: 46px; }
 }
 @media (max-width:620px) and (max-height:500px) {
+  .menu-feed .feature { min-height: 335px; }
   .menu-feed .feature-media,
   .menu-feed .feature[data-photo^="branding/"] .feature-media { flex: none; height: 210px; min-height: 210px; }
 }
