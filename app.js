@@ -256,6 +256,9 @@ function renderLanguage() {
   $('hero-guide-note').textContent = t('guideQuick');
   $('hero-guide').href = `guide.html?lang=${lang}`;
   $('hero-guide').setAttribute('aria-label', `${t('guide')} · ${t('guideQuick')}`);
+  $('menu-guide-label').textContent = t('guide');
+  $('menu-guide').href = `guide.html?lang=${lang}`;
+  $('menu-guide').setAttribute('aria-label', `${t('guide')} · ${t('guideQuick')}`);
   $('guide-link').innerHTML = `<span>${t('guide')}</span><span class="guide-footer-arrow" aria-hidden="true">→</span>`;
   $('guide-link').href = `guide.html?lang=${lang}`;
   $('location').innerHTML = icon('pin') + t('map');
