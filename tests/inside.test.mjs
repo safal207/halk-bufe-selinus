@@ -49,7 +49,7 @@ test('slide control updates composition split and has a keyboard-accessible labe
   const map=new Map();
   const ids=['inside-slider','inside-stage','inside-title','inside-photo','inside-visual-label','inside-image-label',
     'inside-slider-label','inside-chips','inside-more','inside-description','inside-note','inside-full','inside-dialog'];
-  for(const id of ids)map.set(id,{style:{setProperty(k,v){this[k]=v;}},value:'50',
+  for(const id of ids)map.set(id,{dataset:{},style:{setProperty(k,v){this[k]=v;}},value:'50',
     setAttribute(k,v){this[k]=v;},focus(){this.focused=true;},addEventListener(k,fn){this['on'+k]=fn;}});
   const dialog=map.get('inside-dialog');dialog.open=false;dialog.showModal=()=>{dialog.open=true;};
   globalThis.document={getElementById:id=>map.get(id)};
