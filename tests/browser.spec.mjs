@@ -143,3 +143,17 @@ test('non-functional: quick interactive startup, no JS exceptions, reduced-motio
   expect(animations.transition).toBe('0s');
   console.log('NFR',JSON.stringify({browser:process.env.E2E_BROWSER,loadMs:load,cls}));
 });
+
+test('Microsoft/Chromium high-contrast mode keeps borders visible and removes decorative glow',async({page})=>{
+  test.skip(!['chromium','msedge'].includes(process.env.E2E_BROWSER || 'chromium'),'Forced-colors smoke is scoped to Chromium/Edge');
+  await page.emulateMedia({forcedColors:'active'});
+  await openMenu(page);
+  const result=await page.locator('.menu-feed > .feature').first().evaluate(el=>({
+    shadow:getComputedStyle(el).boxShadow,
+    border:getComputedStyle(el).borderTopWidth,
+    deco:getComputedStyle(el,'::after').display
+  }));
+  expect(result.shadow).toBe('none');
+  expect(Number.parseFloat(result.border)).toBeGreaterThanOrEqual(2);
+  expect(result.deco).toBe('none');
+});
