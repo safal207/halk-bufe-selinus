@@ -186,3 +186,31 @@ test('Microsoft/Chromium high-contrast mode keeps borders visible and removes de
   expect(Number.parseFloat(result.border)).toBeGreaterThanOrEqual(2);
   expect(result.deco).toBe('none');
 });
+
+
+test('quick guide: compelling arrow is clickable at 320px and opens the real 3-step chooser',async({page})=>{
+  await page.setViewportSize({width:320,height:568});
+  await openMenu(page);
+  const cta=page.locator('#hero-guide');
+  await expect(cta).toBeVisible();
+  await expect(cta).toHaveAttribute('href','guide.html?lang=ru');
+  await expect(page.locator('#hero-guide-note')).toHaveText(/3 шага/);
+  const data=await cta.evaluate(el=>{
+    const b=el.getBoundingClientRect(),arrow=el.querySelector('.hero-guide-arrow');
+    const a=arrow.getBoundingClientRect(),style=getComputedStyle(arrow);
+    return {width:b.width,height:b.height,right:b.right,left:b.left,arrowWidth:a.width,
+      arrowFill:style.backgroundImage};
+  });
+  expect(data.height).toBeGreaterThanOrEqual(44);
+  expect(data.left).toBeGreaterThanOrEqual(-2);
+  expect(data.right).toBeLessThanOrEqual(322);
+  expect(data.arrowWidth).toBeGreaterThanOrEqual(44);
+  expect(data.arrowFill).toContain('gradient');
+  await expect(page.locator('#menu-guide')).toHaveAttribute('href','guide.html?lang=ru');
+  await cta.click();
+  await expect(page).toHaveURL(/guide\.html\?lang=ru/);
+  await expect(page.locator('#quest-content [data-route]')).toHaveCount(3);
+  await page.locator('#quest-content [data-route="quick"]').click();
+  await page.locator('[data-move="1"]').click();
+  await expect(page.locator('#quest-content [data-dish]')).toHaveCount(3);
+});
