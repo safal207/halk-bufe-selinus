@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="style.css?v=inside-reveal-20261110">
   <link rel="stylesheet" href="launch.css?v=launch-20261105">
   <link rel="stylesheet" href="mirror-glow.css?v=warm-mirror-20261110">
+  <link rel="stylesheet" href="quick-guide.css?v=quick-choice-20261110">
   <script src="assets/qr.js" defer></script>
   <script src="launch.js?v=daypart-20261106" defer></script>
   <script type="module" src="app.js?v=inside-reveal-20261110"></script>
@@ -74,6 +75,14 @@
           <a href="#menu" class="hero-cta" id="hero-cta"></a>
         </div>
         <button type="button" class="hero-kids" id="hero-kids" data-action="kids-menu"></button>
+        <a class="hero-guide" id="hero-guide" href="guide.html" aria-label="Ne yesem? · 3 adımda kolay seçim">
+          <span class="hero-guide-symbol" aria-hidden="true">✦</span>
+          <span class="hero-guide-copy">
+            <strong id="hero-guide-title">Ne yesem?</strong>
+            <small id="hero-guide-note">3 adımda kolay seçim</small>
+          </span>
+          <span class="hero-guide-arrow" aria-hidden="true">→</span>
+        </a>
       </div>
       <div class="hero-media"><img id="hero-photo" src="assets/hero-family.webp" srcset="assets/hero-family-640.webp 640w, assets/hero-family.webp 1280w" sizes="(max-width: 620px) calc(100vw - 32px), (max-width: 1244px) 55vw, 650px" width="1280" height="853" fetchpriority="high" alt="">
         <button type="button" class="nutrition-entry hero-nutrition" id="hero-nutrition" data-nutrition="tavuk-sis" aria-haspopup="dialog" aria-controls="item-dialog"></button>
@@ -85,6 +94,10 @@
     <section class="catalog" id="menu" aria-labelledby="menu-title">
       <div class="section-head">
         <div><div class="eyebrow" id="menu-kicker"></div><h2 id="menu-title" tabindex="-1"></h2></div>
+        <a id="menu-guide" class="menu-quick-guide" href="guide.html">
+          <span id="menu-guide-label">Ne yesem?</span>
+          <span class="menu-guide-arrow" aria-hidden="true">→</span>
+        </a>
       </div>
       <section class="discover" aria-labelledby="discover-title">
         <div class="discover-heading"><h3 id="discover-title"></h3><span id="discover-hint"></span></div>
