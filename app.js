@@ -1,6 +1,6 @@
 import {openShare} from './share.js?v=story-share-1';
 import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
-import {copy} from './copy.js?v=discover-20261107';
+import {copy} from './copy.js?v=social-20261110';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
 import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
@@ -90,10 +90,10 @@ function viewCount(item, compact = false) {
   return `<span class="social-views" title="${t('viewHelp')}" aria-label="${t('myViews')}: ${social.views(item.id)}" data-view-label="${item.id}">${icon('eye')}<span class="views-label">${t(compact ? 'mine' : 'myViews')}</span><b data-view-count="${item.id}">${social.views(item.id)}</b></span>`;
 }
 function socialBar(item, compact = false, feed = false) {
-  return `<div class="social-actions${compact ? ' social-compact' : ''}${feed ? ' social-feed' : ''}">${likeButton(item,feed)}${bookmarkButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
+  return `<div class="social-actions${compact ? ' social-compact' : ''}${feed ? ' social-feed' : ''}">${likeButton(item,true)}${bookmarkButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
 }
 function rowHtml(item) {
-  return `<li class="menu-row">${titleButton(item,true)}<div class="row-actions">${likeButton(item)}${item.price === null ? '' : addButton(item)}</div></li>`;
+  return `<li class="menu-row">${titleButton(item,true)}<div class="row-actions">${likeButton(item)}${bookmarkButton(item)}${item.price === null ? '' : addButton(item)}</div></li>`;
 }
 function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
