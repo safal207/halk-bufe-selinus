@@ -91,6 +91,11 @@
 .menu-view { min-height: 46px; min-width: 200px; }
 @media (max-width:620px) {
   .hero-copy { min-height: 290px; }
+  /* Text placeholders preserve vertical positions of the hero's actions. */
+  .hero #hero-title { min-height: 27px; }
+  .hero #hero-dish { min-height: 23px; }
+  .hero #hero-text { min-height: 36px; }
+  .hero .hero-price { min-height: 32px; }
   .header-actions { min-width: 195px; justify-content: flex-end; }
 }
 @media (max-width:365px) {
