@@ -1,0 +1,151 @@
+/* Halk Büfe · fast menu choice CTA: visible, inviting, and interaction-safe.
+   No looping animation; arrow moves only on hover or keyboard focus. */
+.hero-guide {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: min(100%, 385px);
+  min-height: 68px;
+  margin-top: 12px;
+  padding: 9px 12px 9px 15px;
+  border: 1px solid rgb(242 196 122 / 78%);
+  border-radius: 19px;
+  color: #fff8e9;
+  background: linear-gradient(112deg, #174c3d 0%, #0b372e 100%);
+  box-shadow: 0 0 0 1px rgb(255 250 230 / 25%), 0 5px 18px rgb(73 45 18 / 22%);
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+  isolation: isolate;
+}
+.hero-guide-symbol {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 37px;
+  height: 37px;
+  border-radius: 12px;
+  background: rgb(255 226 167 / 17%);
+  color: #f9c879;
+  font-size: 23px;
+}
+.hero-guide-copy {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.hero-guide-copy strong {
+  font-size: clamp(14px, 2.1vw, 17px);
+  line-height: 1.25;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+.hero-guide-copy small {
+  color: #f7d9a7;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.hero-guide-arrow,
+.menu-guide-arrow,
+.guide-footer-arrow {
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: linear-gradient(145deg, #ffe7ad, #f1b24b);
+  color: #153c32;
+  border-radius: 999px;
+  border: 1px solid rgb(255 250 234 / 72%);
+  font-family: system-ui, sans-serif;
+  font-weight: 900;
+  box-shadow: 0 3px 12px rgb(244 178 74 / 30%);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.hero-guide-arrow {
+  width: 46px;
+  height: 46px;
+  font-size: 29px;
+  line-height: 1;
+}
+.hero-guide:is(:hover,:focus-visible) {
+  background: linear-gradient(112deg, #205b46 0%, #0f4135 100%);
+  border-color: #fff0c0;
+  box-shadow: 0 0 0 2px rgb(255 242 210 / 40%), 0 7px 22px rgb(73 45 18 / 28%);
+}
+.hero-guide:is(:hover,:focus-visible) .hero-guide-arrow,
+.menu-quick-guide:is(:hover,:focus-visible) .menu-guide-arrow,
+.guide-link:is(:hover,:focus-visible) .guide-footer-arrow {
+  transform: translateX(3px);
+  box-shadow: 0 4px 16px rgb(244 178 74 / 48%);
+}
+.hero .hero-guide:focus-visible,
+.menu-quick-guide:focus-visible,
+.guide-link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.menu-quick-guide {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 46px;
+  max-width: 100%;
+  padding: 4px 5px 4px 14px;
+  border-radius: 999px;
+  background: var(--pine-dark);
+  color: #fff8e9;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 820;
+  border: 1px solid rgb(238 190 111 / 68%);
+  box-shadow: 0 2px 12px rgb(187 121 41 / 15%);
+  overflow-wrap: anywhere;
+}
+.menu-quick-guide:is(:hover,:focus-visible) { color: #fff; background: #185447; }
+.menu-guide-arrow {
+  width: 36px;
+  height: 36px;
+  font-size: 22px;
+}
+.guide-link .guide-footer-arrow {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+}
+:root[data-theme="dark"] .hero-guide,
+:root[data-theme="dark"] .menu-quick-guide {
+  color: #fff8e9;
+  background: linear-gradient(112deg, #173f33 0%, #0b3029 100%);
+}
+@media (max-width:620px) {
+  .hero-guide { width: 100%; max-width: 100%; min-height: 61px; margin-top: 8px; padding: 7px 9px; gap: 8px; }
+  .hero-guide-symbol { width: 32px; height: 32px; font-size: 19px; }
+  .hero-guide-arrow { width: 44px; height: 44px; font-size: 27px; }
+  .menu-quick-guide { min-height: 44px; padding-left: 11px; font-size: 12px; gap: 7px; }
+  .menu-guide-arrow { width: 34px; height: 34px; }
+}
+@media (max-width:350px) {
+  .hero-guide-copy strong { font-size: 13px; }
+  .hero-guide-copy small { font-size: 10px; }
+  .hero-guide-symbol { width: 29px; height: 29px; }
+  .menu-quick-guide { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-guide-arrow, .menu-guide-arrow, .guide-footer-arrow { transition: none; }
+}
+@media (forced-colors: active) {
+  .hero-guide,.menu-quick-guide,.guide-link {
+    background: Canvas;
+    color: LinkText;
+    border: 2px solid LinkText;
+    box-shadow: none;
+  }
+  .hero-guide-arrow,.menu-guide-arrow,.guide-footer-arrow {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+}
