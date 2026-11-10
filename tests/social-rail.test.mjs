@@ -39,6 +39,6 @@ test('four languages and cache-busted on-photo UI assets',()=>{
   for(const key of ['Ürün etkileşimleri','Действия с блюдом','Dish actions','Gerichtaktionen']) {
     assert.ok(copySource.includes(key));
   }
-  assert.match(html,/style\.css\?v=transparent-share-20261110/);
-  assert.match(html,/app\.js\?v=transparent-share-20261110/);
+  assert.match(html,/style\.css\?v=inside-reveal-20261110/);
+  assert.match(html,/app\.js\?v=inside-reveal-20261110/);
 });
