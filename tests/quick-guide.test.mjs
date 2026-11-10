@@ -14,7 +14,7 @@ test('quick choice exists above the fold and beside menu; footer remains availab
  assert.match(html,/id="hero-guide-note"/);
  assert.match(html,/id="menu-guide"/);
  assert.match(html,/id="guide-link"/);
- assert.match(html,/href="quick-guide.css\?v=quick-choice-20261110"/);
+ assert.match(html,/href="quick-guide.css\?v=footer-aligned-20261110"/);
 });
 
 test('all four languages tell the visitor about the genuine 3-step selection',()=>{

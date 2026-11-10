@@ -214,3 +214,56 @@ test('quick guide: compelling arrow is clickable at 320px and opens the real 3-s
   await page.locator('[data-move="1"]').click();
   await expect(page.locator('#quest-content [data-dish]')).toHaveCount(3);
 });
+
+test('footer actions: unified guide and map align in dark mobile TR and every language',async({page})=>{
+  const layouts=[
+    {width:320,height:568,lang:'tr',theme:'dark'},
+    {width:360,height:640,lang:'tr',theme:'dark'},
+    {width:390,height:844,lang:'ru',theme:'light'},
+    {width:414,height:896,lang:'de',theme:'dark'},
+  ];
+  for(const entry of layouts){
+    await page.setViewportSize({width:entry.width,height:entry.height});
+    await openMenu(page,`/?lang=${entry.lang}&view=feed&theme=${entry.theme}`);
+    await page.locator('[data-category="bookmarked"]').click();
+    const footer=page.locator('.footer-links');
+    await footer.scrollIntoViewIfNeeded();
+    const metrics=await footer.evaluate(parent=>{
+      const guide=parent.querySelector('#guide-link');
+      const map=parent.querySelector('#location');
+      const a=guide.getBoundingClientRect(),b=map.getBoundingClientRect(),c=parent.getBoundingClientRect();
+      const guideStyle=getComputedStyle(guide),mapStyle=getComputedStyle(map);
+      return {
+        a:{top:a.top,right:a.right,left:a.left,height:a.height,width:a.width},
+        b:{top:b.top,right:b.right,left:b.left,height:b.height,width:b.width},
+        c:{left:c.left,right:c.right},
+        pageWidth:document.documentElement.clientWidth,
+        overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+        linkTextDecoration:guideStyle.textDecorationLine,
+        guideDisplay:guideStyle.display,
+        mapDisplay:mapStyle.display,
+        guideParts:guide.querySelectorAll('.footer-action-label,.guide-footer-arrow').length,
+        mapParts:map.querySelectorAll('.footer-action-label,.footer-map-icon').length
+      };
+    });
+    expect(metrics.overflow,`horizontal overflow ${JSON.stringify(entry)}`).toBeLessThanOrEqual(3);
+    expect(Math.abs(metrics.a.top-metrics.b.top),`top aligned ${JSON.stringify(entry)}`).toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.a.height-metrics.b.height),`equal heights ${JSON.stringify(entry)}`).toBeLessThanOrEqual(1);
+    expect(metrics.a.height,`tap height ${JSON.stringify(entry)}`).toBeGreaterThanOrEqual(44);
+    expect(metrics.a.left,`CTA left ${JSON.stringify(entry)}`).toBeGreaterThanOrEqual(-2);
+    expect(metrics.b.right,`map right ${JSON.stringify(entry)}`).toBeLessThanOrEqual(entry.width+2);
+    expect(metrics.a.right).toBeLessThan(metrics.b.left);
+    expect(metrics.linkTextDecoration).toBe('none');
+    expect(metrics.guideDisplay).toBe('flex');
+    expect(metrics.mapDisplay).toBe('flex');
+    expect(metrics.guideParts).toBe(2);
+    expect(metrics.mapParts).toBe(2);
+    await expect(page.locator('#guide-link')).toHaveAttribute('href',`guide.html?lang=${entry.lang}`);
+    await expect(page.locator('#location')).toHaveAttribute('target','_blank');
+  }
+  await page.goto('/?lang=tr&view=feed&theme=dark',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('.menu-feed > .feature').first()).toBeVisible();
+  await page.locator('#guide-link').click();
+  await expect(page).toHaveURL(/guide\.html\?lang=tr/);
+  await expect(page.locator('#quest-content [data-route]')).toHaveCount(3);
+});
