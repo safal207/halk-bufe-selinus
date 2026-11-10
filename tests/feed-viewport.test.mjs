@@ -24,7 +24,7 @@ test('accessible feed navigation is scoped and asset URLs refreshed',()=>{
  assert.match(app,/feed\.addEventListener\('wheel'/);
  assert.match(app,/feed\.addEventListener\('keydown'/);
  assert.match(app,/scrollTo\(\{top:/);
- assert.match(app,/scroll-snap-stop/);
+ assert.match(css,/scroll-snap-stop/);
  assert.match(app,/tabindex="0" role="region"/);
  assert.match(html,/app\.js\?v=immersive-feed-20261110/);
  assert.match(html,/style\.css\?v=immersive-feed-20261110/);
@@ -40,11 +40,11 @@ test('a wheel gesture steps once despite repeated wheel events, keyboard can ste
   addEventListener:(name,fn)=>handlers[name]=fn,
   scrollTo({top}){this.scrollTop=top; moves.push(top);}
  };
- const get = id=> id==='results'?{querySelector:()=>progress}:null;
+ const results={querySelector:selector=>selector==='.menu-feed'?feed:progress};
+ const get = id=> id==='results'?results:null;
  const configure = new Function('$','window','getComputedStyle',
    app.slice(start,end)+'return configureFeedNavigation;')(
      get,{matchMedia:()=>({matches:true})},()=>({rowGap:'10px'}));
- get('results').querySelector = selector => selector==='.menu-feed'?feed:progress;
  configure();
  let prevented=0;
  const wheel = dy=>handlers.wheel({deltaY:dy,deltaMode:0,ctrlKey:false,preventDefault:()=>prevented++});
