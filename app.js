@@ -139,7 +139,7 @@ function updateDiscoverState(items) {
   $('discover-next').disabled = items.length < 2;
 }
 function renderMenu() {
-  $('menu-social-note').hidden = category !== 'liked' && category !== 'bookmarked';
+  $('menu-social-note').hidden = view === 'list' && category !== 'liked' && category !== 'bookmarked';
   document.documentElement.classList.toggle('feed-mode', view === 'feed');
   if (pendingPhotoTap) { clearTimeout(pendingPhotoTap.timer); pendingPhotoTap = null; }
   stopViewObservation();
@@ -434,7 +434,7 @@ function refreshSocial() {
     const item = byId.get(button.dataset.like);
     button.setAttribute('aria-pressed',social.liked(item.id));
     button.setAttribute('aria-label',`${t(social.liked(item.id) ? 'unlike' : 'like')} · ${item.name[lang]}`);
-    button.title = t(social.liked(item.id) ? 'liked' : 'like');
+    button.title = button.querySelector('[data-like-count]') ? t('myLikeHelp') : t(social.liked(item.id) ? 'liked' : 'like');
   }
   for (const button of document.querySelectorAll('[data-bookmark]')) {
     const item = byId.get(button.dataset.bookmark);
@@ -590,6 +590,10 @@ document.addEventListener('click', async event => {
   const button = event.target.closest('button');
   if (!button) return;
   const data = button.dataset;
+  if (pendingPhotoTap && !(data.item === pendingPhotoTap.id && button.classList.contains('feature-open'))) {
+    clearTimeout(pendingPhotoTap.timer);
+    pendingPhotoTap = null;
+  }
   if (data.collection) {
     const next = collection === data.collection ? 'all' : data.collection;
     setCollection(next);
@@ -634,7 +638,10 @@ document.addEventListener('click', async event => {
     const result = social.toggleBookmark(data.bookmark);
     if (result) {
       refreshSocial();
-      if (category === 'bookmarked' && !result.bookmarked) renderMenu();
+      if (category === 'bookmarked' && !result.bookmarked) {
+        renderMenu();
+        ($('results').querySelector('[data-bookmark]') ?? $('categories').querySelector('[data-category="bookmarked"]'))?.focus({preventScroll:true});
+      }
       notify(t(!result.persisted ? 'localOnly' : result.bookmarked ? 'bookmarkedAdded' : 'bookmarkedRemoved'));
     }
   }
@@ -645,8 +652,9 @@ document.addEventListener('click', async event => {
     if (pendingPhotoTap?.id === data.item && now - pendingPhotoTap.time < 320) {
       clearTimeout(pendingPhotoTap.timer);
       pendingPhotoTap = null;
+      let persisted = true;
       if (!social.liked(data.item)) {
-        social.toggleLike(data.item);
+        persisted = social.toggleLike(data.item).saved;
         refreshSocial();
         const burst = document.createElement('span');
         burst.className = 'feed-heart-burst';
@@ -655,7 +663,7 @@ document.addEventListener('click', async event => {
         button.closest('.feature')?.append(burst);
         setTimeout(() => burst.remove(),650);
       }
-      notify(t('likedAdded'));
+      notify(t(persisted ? 'likedAdded' : 'localOnly'));
       return;
     }
     if (pendingPhotoTap) clearTimeout(pendingPhotoTap.timer);
