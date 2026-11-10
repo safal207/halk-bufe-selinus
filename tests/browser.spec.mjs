@@ -46,11 +46,24 @@ test('premium mirror glow is warm, static, readable and does not obscure the soc
   const styles=await card.evaluate(el=>{
     const css=getComputedStyle(el),ring=getComputedStyle(el,'::after');
     const rail=getComputedStyle(el.querySelector('.social-rail'));
-    return {shadow:css.boxShadow,ring:ring.boxShadow,pointer:ring.pointerEvents,rail:rail.backgroundColor,
-      animation:css.animationName};
+    const linked=[...document.querySelectorAll('link[rel="stylesheet"]')]
+      .find(link=>link.href.includes('/mirror-glow.css'));
+    const loaded=!!linked && [...document.styleSheets].some(sheet=>sheet.href===linked.href);
+    const ambient=getComputedStyle(document.documentElement).getPropertyValue('--mirror-ambient').trim();
+    return {shadow:css.boxShadow,ring:ring.boxShadow,ringContent:ring.content,
+      pointer:ring.pointerEvents,rail:rail.backgroundColor,animation:css.animationName,
+      glowLinked:!!linked,glowLoaded:loaded,ambient};
   });
+  // A generic card shadow is insufficient: the separate LED stylesheet and its
+  // actual painted pseudo-element must exist on the page in every browser.
+  expect(styles.glowLinked).toBe(true);
+  expect(styles.glowLoaded).toBe(true);
+  expect(styles.ambient).toMatch(/rgba?\(/);
   expect(styles.shadow).not.toBe('none');
+  expect(styles.ring).not.toBe('');
   expect(styles.ring).not.toBe('none');
+  expect(styles.ring).toMatch(/rgb/);
+  expect(styles.ringContent).toMatch(/^["']{2}$/);
   expect(styles.pointer).toBe('none');
   expect(styles.rail).toMatch(/transparent|rgba\(0,\s*0,\s*0,\s*0\)/);
   expect(styles.animation).toBe('none');
