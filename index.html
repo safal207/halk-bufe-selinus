@@ -18,11 +18,11 @@
   <meta name="twitter:image" content="https://safal207.github.io/halk-bufe-selinus/assets/share/menu-preview.jpg">
   <link rel="icon" href="assets/halk-bufe-mark.svg" type="image/svg+xml">
   <script src="theme.js?v=nutrition-20261105"></script>
-  <link rel="stylesheet" href="style.css?v=transparent-share-20261110">
+  <link rel="stylesheet" href="style.css?v=inside-reveal-20261110">
   <link rel="stylesheet" href="launch.css?v=launch-20261105">
   <script src="assets/qr.js" defer></script>
   <script src="launch.js?v=daypart-20261106" defer></script>
-  <script type="module" src="app.js?v=transparent-share-20261110"></script>
+  <script type="module" src="app.js?v=inside-reveal-20261110"></script>
   <title>Halk Büfe Selinus · Dijital Menü</title>
 </head>
 <body>
@@ -146,6 +146,31 @@
       </div>
       <p id="share-hint" class="share-hint"></p>
       <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+  <dialog id="inside-dialog" class="inside-dialog" aria-labelledby="inside-title">
+    <div class="inside-drawer">
+      <header class="inside-head">
+        <h2 id="inside-title"></h2>
+        <button type="button" class="inside-close" data-close="inside-dialog" aria-label="Закрыть / Close">×</button>
+      </header>
+      <div class="inside-stage" id="inside-stage" style="--inside-split:50%">
+        <img id="inside-photo" class="inside-photo" alt="" loading="lazy">
+        <span class="inside-before-label" id="inside-image-label"></span>
+        <div class="inside-reveal">
+          <span class="inside-after-label" id="inside-visual-label"></span>
+          <ol id="inside-chips" class="inside-chips"></ol>
+          <span id="inside-more" class="inside-more"></span>
+        </div>
+        <div class="inside-split-line"><span class="inside-handle" aria-hidden="true">↔</span></div>
+        <label class="visually-hidden" for="inside-slider" id="inside-slider-label"></label>
+        <input id="inside-slider" class="inside-slider" type="range" min="12" max="88" step="1" value="50">
+      </div>
+      <div class="inside-content">
+        <p class="inside-description" id="inside-description"></p>
+        <p class="inside-note" id="inside-note"></p>
+        <button type="button" id="inside-full" class="inside-full"></button>
+      </div>
     </div>
   </dialog>
 </body>
