@@ -89,8 +89,9 @@ function bookmarkButton(item) {
 function viewCount(item, compact = false) {
   return `<span class="social-views" title="${t('viewHelp')}" aria-label="${t('myViews')}: ${social.views(item.id)}" data-view-label="${item.id}">${icon('eye')}<span class="views-label">${t(compact ? 'mine' : 'myViews')}</span><b data-view-count="${item.id}">${social.views(item.id)}</b></span>`;
 }
-function socialBar(item, compact = false, feed = false) {
-  return `<div class="social-actions${compact ? ' social-compact' : ''}${feed ? ' social-feed' : ''}">${likeButton(item,true)}${bookmarkButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
+function socialBar(item, compact = false, feed = false, onPhoto = false) {
+  const groupLabel = onPhoto ? ` role="group" aria-label="${t('socialActions')} · ${item.name[lang]}"` : '';
+  return `<div class="social-actions${compact ? ' social-compact' : ''}${feed ? ' social-feed' : ''}${onPhoto ? ' social-rail' : ''}"${groupLabel}>${likeButton(item,true)}${bookmarkButton(item)}${viewCount(item,compact)}<button class="social-share" type="button" data-share="${item.id}" aria-label="${t('share')} · ${item.name[lang]}" title="${t('share')}">${icon('share')}</button></div>`;
 }
 function rowHtml(item) {
   return `<li class="menu-row">${titleButton(item,true)}<div class="row-actions">${likeButton(item)}${bookmarkButton(item)}${item.price === null ? '' : addButton(item)}</div></li>`;
@@ -98,9 +99,12 @@ function rowHtml(item) {
 function featureHtml(item, inFeed = false) {
   const group = inFeed ? categories.find(row => row.id === item.category).name[lang] : '';
   return `<article class="feature" data-dish="${item.id}" data-photo="${item.photo}">
-    <button class="nutrition-entry" type="button" data-nutrition="${item.id}" aria-haspopup="dialog" aria-controls="item-dialog" aria-label="${nutritionLabels[lang].title} · ${item.name[lang]}" title="${nutritionLabels[lang].title}">${icon('info')}<span>${nutritionSummary(item,lang)}</span><span class="nutrition-entry-label">${nutritionSummary(item,lang) === nutritionLabels[lang].details ? '' : ` · ${nutritionLabels[lang].details}`}</span></button>
-    <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
-    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div>${socialBar(item,!inFeed,inFeed)}</div></article>`;
+    <div class="feature-media">
+      <button class="nutrition-entry" type="button" data-nutrition="${item.id}" aria-haspopup="dialog" aria-controls="item-dialog" aria-label="${nutritionLabels[lang].title} · ${item.name[lang]}" title="${nutritionLabels[lang].title}">${icon('info')}<span>${nutritionSummary(item,lang)}</span><span class="nutrition-entry-label">${nutritionSummary(item,lang) === nutritionLabels[lang].details ? '' : ` · ${nutritionLabels[lang].details}`}</span></button>
+      <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
+      ${socialBar(item,true,inFeed,true)}
+    </div>
+    <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
 }
 function renderCategories() {
   $('categories').setAttribute('aria-label',t('categories'));
@@ -660,7 +664,7 @@ document.addEventListener('click', async event => {
         burst.className = 'feed-heart-burst';
         burst.textContent = '♥';
         burst.setAttribute('aria-hidden','true');
-        button.closest('.feature')?.append(burst);
+        button.closest('.feature-media')?.append(burst);
         setTimeout(() => burst.remove(),650);
       }
       notify(t(persisted ? 'likedAdded' : 'localOnly'));

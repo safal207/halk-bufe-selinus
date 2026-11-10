@@ -4,7 +4,7 @@
 - Existing Feed / Photos / List / item detail and basket continue to share the same catalog.
 - Every item can be liked and bookmarked independently. Saved items have their own category.
 - Feed and photo cards show a **personal** 0/1 like indicator, counted views, bookmarks and an existing image/story share action.
-- Feed has a position indicator, mobile scroll snapping, a compact reaction rail on tall phones, and double-tap-to-like on the food photo. Single tap still opens the dish; keyboard activation is immediate.
+- Feed has a position indicator, mobile scroll snapping, an always-visible vertical reaction rail over the **right edge of each dish photo** in both Feed and Photos views, and double-tap-to-like on the food photo. Single tap still opens the dish; keyboard activation is immediate.
 - TR, RU, EN and DE are supported. Reduced-motion preference disables the heart animation.
 
 ## Metric integrity
@@ -16,14 +16,15 @@
 - Sharing opens the existing story-card / share sheet; it is not evidence that someone placed an order.
 
 ## Acceptance checklist
-1. On a 320px-wide phone, test Feed, Photos, List, search, categories, and basket without horizontal clipping.
-2. Swipe down the feed; verify item progress changes and that visible photos count only once per tab session.
-3. Double-tap a photo in Feed: it likes without opening the detail. Single tap opens detail, keyboard Enter opens immediately.
-4. Like one dish and bookmark another. Verify the two filters are independent, and toggles work from the list and detail.
-5. Reload and open a second tab: likes and bookmarks persist and refresh; previously counted views stay unchanged in the same session.
-6. Share a dish and verify the URL/story resolves to the selected dish; no automatic checkout or order submission.
-7. Switch TR / RU / EN / DE, light/dark theme, and test `prefers-reduced-motion`.
-8. Test with blocked browser storage and with slow images (no accidental view until actually loaded).
+1. On 320px and 360px phones and a desktop, confirm the vertical right-side rail overlays the **photo** (not text) in Feed and Photos. It contains like / local view count / bookmark / share; all buttons remain at least 44px tall and usable, including on short screens.
+2. Test Feed, Photos, List, search, categories, and basket without horizontal clipping.
+3. Swipe down the feed; verify item progress changes and that visible photos count only once per tab session.
+4. Double-tap a photo in Feed: it likes without opening the detail. Single tap opens detail, keyboard Enter opens immediately.
+5. Like one dish and bookmark another. Verify the two filters are independent, and toggles work from the list and detail.
+6. Reload and open a second tab: likes and bookmarks persist and refresh; previously counted views stay unchanged in the same session.
+7. Share a dish and verify the URL/story resolves to the selected dish; no automatic checkout or order submission.
+8. Switch TR / RU / EN / DE, light/dark theme, and test `prefers-reduced-motion`.
+9. Test with blocked browser storage and with slow images (no accidental view until actually loaded).
 
 ## Future shared metrics
 If the café wants aggregate likes/views across visitors, implement a backend with server-side deduplication, rate limiting, clear privacy notice, and auditable counters. Do not push fabricated counters or client-controlled totals to production.
