@@ -578,8 +578,8 @@ img[src$="catalog/tavuklu-makarna.webp"] {
 .social-bookmark:hover { background: var(--selected-bg); }
 .social-bookmark[aria-pressed="true"] { color: var(--like-ink); }
 .social-bookmark[aria-pressed="true"] .icon { fill: currentColor; }
-.social-feed .social-like { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
-.social-feed .social-like b { font-size: 10px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
+.social-actions .social-like { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.social-actions .social-like b { font-size: 10px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
 .feed-hint {
   display: flex; justify-content: space-between; align-items: center;
   gap: 10px; max-width: 580px; margin: 4px auto 10px; color: var(--muted);
@@ -624,4 +624,8 @@ img[src$="catalog/tavuklu-makarna.webp"] {
 }
 @media (prefers-reduced-motion:reduce) {
   .feed-heart-burst { animation: none; }
+}
+
+@media (max-width:380px) {
+  .row-actions .social-like, .row-actions .social-bookmark { width: 36px; height: 40px; }
 }
