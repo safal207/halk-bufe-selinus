@@ -121,9 +121,23 @@ test('non-functional: quick interactive startup, no JS exceptions, reduced-motio
   page.on('pageerror',error=>errors.push(error.message));
   await page.addInitScript(()=>{
     window.__qaCls=0;
+    window.__qaShiftLog=[];
     try {
       new PerformanceObserver(list=>{
-        for(const entry of list.getEntries())if(!entry.hadRecentInput)window.__qaCls+=entry.value;
+        for(const entry of list.getEntries())if(!entry.hadRecentInput){
+          window.__qaCls+=entry.value;
+          window.__qaShiftLog.push({
+            value:entry.value,
+            time:Math.round(entry.startTime),
+            sources:(entry.sources||[]).map(s=>({
+              node:s.node?.tagName||'',
+              id:s.node?.id||'',
+              className:typeof s.node?.className==='string'?s.node.className.slice(0,90):'',
+              before:s.previousRect?.toJSON?.()||null,
+              after:s.currentRect?.toJSON?.()||null
+            }))
+          });
+        }
       }).observe({type:'layout-shift',buffered:true});
     }catch{/* LayoutShift not implemented in every engine */}
   });
@@ -133,6 +147,8 @@ test('non-functional: quick interactive startup, no JS exceptions, reduced-motio
   expect(load,'local first-interaction budget').toBeLessThan(12000);
   expect(errors,'runtime JavaScript errors').toEqual([]);
   const cls=await page.evaluate(()=>window.__qaCls);
+  console.log('CLS TRACE',JSON.stringify(await page.evaluate(()=>window.__qaShiftLog)));
+
   expect(cls,'layout stability after menu rendered').toBeLessThanOrEqual(.25);
   await page.emulateMedia({reducedMotion:'reduce'});
   const animations=await page.locator('.menu-feed > .feature').first().evaluate(el=>({
