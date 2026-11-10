@@ -79,3 +79,23 @@
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* First-paint stability: reserve the real menu geometry before ES modules hydrate.
+   This addresses the measured CLS caused by hero text + empty catalog/footer. */
+.catalog {
+  min-height: 640px;
+  min-height: max(640px, 85svh);
+}
+.discover-strip { min-height: 90px; }
+.menu-toolbar .category-strip { min-height: 56px; }
+.menu-view { min-height: 46px; min-width: 200px; }
+@media (max-width:620px) {
+  .hero-copy { min-height: 290px; }
+  .header-actions { min-width: 195px; justify-content: flex-end; }
+}
+@media (max-width:365px) {
+  .hero-copy { min-height: 315px; }
+  .header-actions { min-width: 165px; }
+}
+/* An empty/small dynamic menu still owns the page's initial catalog space.
+   Once rendered, CSS min-height never grows past the actual catalogue content. */
