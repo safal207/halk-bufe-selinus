@@ -1,0 +1,29 @@
+# Halk Büfe · Social menu (2026-11-10)
+
+## What ships
+- Existing Feed / Photos / List / item detail and basket continue to share the same catalog.
+- Every item can be liked and bookmarked independently. Saved items have their own category.
+- Feed and photo cards show a **personal** 0/1 like indicator, counted views, bookmarks and an existing image/story share action.
+- Feed has a position indicator, mobile scroll snapping, a compact reaction rail on tall phones, and double-tap-to-like on the food photo. Single tap still opens the dish; keyboard activation is immediate.
+- TR, RU, EN and DE are supported. Reduced-motion preference disables the heart animation.
+
+## Metric integrity
+- This is a **static GitHub Pages** site. There are no global or other-visitors' likes/views. Never advertise local values as public popularity.
+- Likes and bookmarks live in `localStorage` under the existing `halk-bufe-selinus:v1:social` key (old likes/views are preserved).
+- Views count once per dish per tab session (tracked by `sessionStorage`). In the feed/photos a fully loaded photo must be at least 60% visible for >=1 second; opening a dish also records a view.
+- Missing or blocked storage falls back to in-memory state. Unknown item IDs and invalid storage values are ignored.
+- The saved/liked filters and counts synchronize across tabs using the browser `storage` event.
+- Sharing opens the existing story-card / share sheet; it is not evidence that someone placed an order.
+
+## Acceptance checklist
+1. On a 320px-wide phone, test Feed, Photos, List, search, categories, and basket without horizontal clipping.
+2. Swipe down the feed; verify item progress changes and that visible photos count only once per tab session.
+3. Double-tap a photo in Feed: it likes without opening the detail. Single tap opens detail, keyboard Enter opens immediately.
+4. Like one dish and bookmark another. Verify the two filters are independent, and toggles work from the list and detail.
+5. Reload and open a second tab: likes and bookmarks persist and refresh; previously counted views stay unchanged in the same session.
+6. Share a dish and verify the URL/story resolves to the selected dish; no automatic checkout or order submission.
+7. Switch TR / RU / EN / DE, light/dark theme, and test `prefers-reduced-motion`.
+8. Test with blocked browser storage and with slow images (no accidental view until actually loaded).
+
+## Future shared metrics
+If the café wants aggregate likes/views across visitors, implement a backend with server-side deduplication, rate limiting, clear privacy notice, and auditable counters. Do not push fabricated counters or client-controlled totals to production.
