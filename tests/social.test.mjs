@@ -48,3 +48,31 @@ test('two tabs preserve each others likes',()=>{
  a.toggleLike(ids[0]);b.toggleLike(ids[1]);a.refresh();
  assert.equal(a.likedCount(),2);
 });
+
+test('bookmarks stay separate from likes and survive a new tab',()=>{
+ const local=storage(), session=storage();
+ const first=createSocialStore(ids,{local,session});
+ assert.equal(first.bookmarkedCount(),0);
+ assert.equal(first.bookmarked(ids[0]),false);
+ assert.deepEqual(first.toggleBookmark(ids[0]),{bookmarked:true,persisted:true});
+ assert.equal(first.liked(ids[0]),false);
+ const second=createSocialStore(ids,{local,session:storage()});
+ assert.equal(second.bookmarked(ids[0]),true);
+ assert.equal(second.bookmarkedCount(),1);
+ assert.deepEqual(second.toggleBookmark(ids[0]),{bookmarked:false,persisted:true});
+ assert.equal(createSocialStore(ids,{local,session:storage()}).bookmarkedCount(),0);
+});
+test('bookmarks reject invalid data and unknown dishes',()=>{
+ const local=storage();
+ local.setItem(socialKey,JSON.stringify({bookmarks:{'tavuk-cocuk':true,'kofte-cocuk':1,other:true}}));
+ const store=createSocialStore(ids,{local,session:storage()});
+ assert.equal(store.bookmarkedCount(),1);
+ assert.equal(store.bookmarked(ids[1]),false);
+ assert.equal(store.toggleBookmark('other'),null);
+});
+test('bookmarks are retained in memory if storage is blocked',()=>{
+ const blocked={getItem(){throw new Error('denied')},setItem(){throw new Error('denied')}};
+ const store=createSocialStore(ids,{local:blocked,session:blocked});
+ assert.deepEqual(store.toggleBookmark(ids[0]),{bookmarked:true,persisted:false});
+ assert.equal(store.bookmarked(ids[0]),true);
+});
