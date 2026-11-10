@@ -1,4 +1,5 @@
 import {openShare} from './share.js?v=full-description-20261110';
+import {insideButton,openInside,setupInside} from './inside.js?v=inside-reveal-20261110';
 import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
 import {copy} from './copy.js?v=social-20261110';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
@@ -102,6 +103,7 @@ function featureHtml(item, inFeed = false) {
     <div class="feature-media">
       <button class="nutrition-entry" type="button" data-nutrition="${item.id}" aria-haspopup="dialog" aria-controls="item-dialog" aria-label="${nutritionLabels[lang].title} · ${item.name[lang]}" title="${nutritionLabels[lang].title}">${icon('info')}<span>${nutritionSummary(item,lang)}</span><span class="nutrition-entry-label">${nutritionSummary(item,lang) === nutritionLabels[lang].details ? '' : ` · ${nutritionLabels[lang].details}`}</span></button>
       <button class="feature-open" type="button" data-item="${item.id}" aria-label="${item.name[lang]}"><img src="assets/${item.photo}.webp" loading="lazy" width="280" height="170" alt=""></button>
+      ${insideButton(item,lang)}
       ${socialBar(item,true,inFeed,true)}
     </div>
     <div class="feature-info">${group ? `<div class="eyebrow feed-category">${group}</div>` : ''}${titleButton(item)}${item.description ? `<p class="dish-description">${item.description[lang]}</p>` : ''}<div class="feature-bottom"><span class="${item.price === null ? 'unknown' : 'price'}">${moneyOrAsk(item)}</span>${item.price === null ? '' : addButton(item,inFeed)}</div></div></article>`;
@@ -457,7 +459,7 @@ function openItem(id, showNutrition = false) {
   itemOpen = item;
   $('item-category').textContent = categories.find(row => row.id === item.category).name[lang];
   $('item-title').textContent = item.name[lang];
-  $('item-body').innerHTML = `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><small class="photo-note">${t('photoNote')}</small>
+  $('item-body').innerHTML = `<img class="detail-photo" id="detail-photo" src="assets/${item.photo}.webp" alt=""><div class="inside-detail-action">${insideButton(item,lang)}</div><small class="photo-note">${t('photoNote')}</small>
     ${lang === 'tr' ? '' : `<p class="detail-text" lang="tr">${item.name.tr}</p>`}
     ${item.description ? `<p class="detail-text dish-description">${item.description[lang]}</p>` : ''}
     ${item.price === null ? `<span class="detail-price unknown">${t('ask')}</span>` : ''}
@@ -630,7 +632,7 @@ $('cart').addEventListener('close',() => {
   cashierView = false;
   if (!count() && document.activeElement === document.body) $('header-cart').focus({preventScroll:true});
 });
-for (const id of ['cart','item-dialog']) $(id).addEventListener('click',event => {
+for (const id of ['cart','item-dialog','inside-dialog']) $(id).addEventListener('click',event => {
   if (event.target === $(id)) $(id).close();
 });
 window.addEventListener('hashchange',showDishFromHash);
@@ -741,7 +743,8 @@ document.addEventListener('click', async event => {
     return;
   }
   if (data.item) openItem(data.item);
-  if (data.nutrition) openItem(data.nutrition,true);
+  if (data.inside) openInside(byId.get(data.inside),lang);
+  if (data.nutrition) { if ($('inside-dialog').open) $('inside-dialog').close(); openItem(data.nutrition,true); }
   if (data.share) { pauseViewTimers(); openShare(byId.get(data.share),lang); }
   if (data.close) $(data.close).close();
   const isOffer = 'offer' in data;
@@ -828,6 +831,7 @@ $('daypart-select').addEventListener('change',() => {
 });
 document.addEventListener('visibilitychange',() => { if (!document.hidden) daypartClock.refresh(); });
 window.addEventListener('pageshow',() => daypartClock.refresh());
+setupInside();
 renderLanguage();
 const updateLayout = () => document.documentElement.style.setProperty('--menu-stack', `${document.querySelector('.top').offsetHeight + $('menu-toolbar').offsetHeight}px`);
 if ('ResizeObserver' in window) {
