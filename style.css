@@ -609,23 +609,98 @@ img[src$="catalog/tavuklu-makarna.webp"] {
   .feed-hint { font-size: 11px; padding-inline: 3px; }
   .feed-hint strong { font-size: 10px; }
 }
-@media (max-width:620px) and (min-height:780px) {
-  .menu-feed .social-feed {
-    position: absolute; z-index: 2; top: 16%; right: 9px;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    width: 53px; min-height: 0; gap: 2px; margin: 0; padding: 5px 3px;
-    border: 1px solid var(--line); border-radius: 20px;
-    background: var(--white); box-shadow: 0 5px 24px rgb(0 0 0 / 12%);
-  }
-  .menu-feed .social-feed .social-views { flex-direction: column; gap: 0; min-width: 0; }
-  .menu-feed .social-feed .social-views .views-label { font-size: 9px; }
-  .menu-feed .social-feed .social-like, .menu-feed .social-feed .social-bookmark, .menu-feed .social-feed .social-share { height: 44px; width: 44px; }
-  .menu-feed .social-feed .social-like .icon { width: 22px; height: 22px; }
-}
+/* The card-level social rail now occupies the photo at all viewport heights. */
 @media (prefers-reduced-motion:reduce) {
   .feed-heart-burst { animation: none; }
 }
 
 @media (max-width:380px) {
   .row-actions .social-like, .row-actions .social-bookmark { width: 36px; height: 40px; }
+}
+
+/* Social rail · branded, on-photo actions for both photo grid and swipe feed. */
+.feature-media {
+  position: relative; width: 100%; height: clamp(215px,18vw,270px);
+  isolation: isolate; background: var(--image-bg);
+}
+.feature-media > .feature-open,
+.menu-feed .feature-media > .feature-open,
+.menu-feed .feature[data-photo^="branding/"] .feature-media > .feature-open {
+  display: block; width: 100%; height: 100%; min-height: 0;
+  flex: none; aspect-ratio: auto;
+}
+.feature-media > .feature-open img { width: 100%; height: 100%; }
+.menu-feed .feature-media { height: auto; aspect-ratio: 4 / 3; }
+.menu-feed .feature[data-photo^="branding/"] .feature-media { aspect-ratio: 1; }
+.feature-media .nutrition-entry { z-index: 2; max-width: calc(100% - 74px); }
+.feature-media .nutrition-entry span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.social-actions.social-rail {
+  position: absolute; z-index: 3; top: 50%; right: 8px;
+  transform: translateY(-50%); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; flex: none; gap: 2px;
+  width: 56px; min-height: 0; margin: 0; padding: 5px 2px;
+  border: 1px solid rgb(255 255 255 / 32%); border-radius: 25px;
+  color: #fff; background: rgb(15 43 35 / 78%);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 22%);
+}
+.social-rail .social-like, .social-rail .social-bookmark, .social-rail .social-share {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: none; gap: 1px; width: 48px; height: 44px; min-height: 44px;
+  padding: 2px 0; border: 0; border-radius: 14px;
+  background: transparent; color: #fff;
+}
+.social-rail .social-views {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  flex: none; gap: 1px; width: 48px; min-width: 0; min-height: 44px;
+  padding: 2px 0; color: #fff; font-size: 11px; line-height: 1.1;
+}
+.social-rail .social-views .views-label { display: none; }
+.social-rail .social-views .icon,
+.social-rail .social-like .icon,
+.social-rail .social-bookmark .icon,
+.social-rail .social-share .icon { width: 21px; height: 21px; }
+.social-rail .social-like b, .social-rail .social-views b {
+  font-size: 11px; line-height: 1.1; color: inherit;
+  font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.social-rail .social-like[aria-pressed="true"] { color: #ff9bb4; }
+.social-rail .social-bookmark[aria-pressed="true"] { color: #ffe1a4; }
+.social-rail .social-like:hover,
+.social-rail .social-bookmark:hover,
+.social-rail .social-share:hover { background: rgb(255 255 255 / 16%); color: #fff; }
+.social-rail .social-like[aria-pressed="true"]:hover { color: #ff9bb4; }
+.social-rail .social-bookmark[aria-pressed="true"]:hover { color: #ffe1a4; }
+.social-rail button:focus-visible {
+  outline: 3px solid #ffe1a4; outline-offset: -2px;
+}
+.feature-media .feed-heart-burst { top: 50%; }
+@media (max-width:620px) {
+  .featured .feature-media { height: clamp(208px,60vw,256px); }
+  .featured .feature-media .nutrition-entry {
+    top: 6px; left: 6px; min-width: 36px; width: 36px; min-height: 36px;
+    padding: 0; border-radius: 50%;
+  }
+  .featured .feature-media .nutrition-entry span { display: none; }
+  .menu-feed .feature-media,
+  .menu-feed .feature[data-photo^="branding/"] .feature-media {
+    flex: 1; height: 0; min-height: 180px; aspect-ratio: auto;
+  }
+  .menu-feed .feature-media > .feature-open,
+  .menu-feed .feature[data-photo^="branding/"] .feature-media > .feature-open {
+    flex: none; height: 100%; min-height: 0; aspect-ratio: auto;
+  }
+  .menu-feed .feature-media > .feature-open img { object-fit: contain; }
+  .social-actions.social-rail {
+    top: 50%; right: 7px; width: 54px; gap: 1px; padding: 4px 2px;
+  }
+  .social-rail .social-like, .social-rail .social-bookmark,
+  .social-rail .social-share, .social-rail .social-views { width: 46px; }
+}
+@media (max-width:620px) and (max-height:500px) {
+  .menu-feed .feature-media,
+  .menu-feed .feature[data-photo^="branding/"] .feature-media { flex: none; height: 210px; min-height: 210px; }
+}
+@media (prefers-reduced-transparency:reduce) {
+  .social-actions.social-rail { -webkit-backdrop-filter: none; backdrop-filter: none; background: #12372e; }
 }
