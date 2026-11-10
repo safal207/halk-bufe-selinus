@@ -1,4 +1,4 @@
-import {openShare} from './share.js?v=story-share-1';
+import {openShare} from './share.js?v=full-description-20261110';
 import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
 import {copy} from './copy.js?v=social-20261110';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
