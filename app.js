@@ -159,9 +159,10 @@ function renderMenu() {
   if (view !== 'list') {
     const inFeed = view === 'feed';
     $('results').innerHTML = matching.length
-      ? `${inFeed ? `<div class="feed-hint"><span>${t('feedHint')}</span><strong data-feed-progress aria-label="${t('feedProgress')}">1 / ${matching.length}</strong></div>` : ''}<div class="${inFeed ? 'menu-feed' : 'featured'}">${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
+      ? `${inFeed ? `<div class="feed-hint"><span>${t('feedHint')}</span><strong data-feed-progress aria-label="${t('feedProgress')}">1 / ${matching.length}</strong></div>` : ''}<div class="${inFeed ? 'menu-feed' : 'featured'}"${inFeed ? ` tabindex="0" role="region" aria-label="${t('feedView')}"` : ''}>${matching.map(item => featureHtml(item,inFeed)).join('')}</div>`
       : empty;
     observeVisibleDishes();
+    if (inFeed) configureFeedNavigation();
     return;
   }
   const groupOrder = collection !== 'all' || collectionStep ? [...new Set(matching.map(item => item.category))].map(id => categories.find(row => row.id === id)) : categories;
@@ -171,6 +172,68 @@ function renderMenu() {
   }).join('');
   $('results').innerHTML = groups || empty;
 }
+
+/* One card per intentional gesture. Scrolling is confined to the feed, not <html>. */
+function configureFeedNavigation() {
+  const feed = $('results').querySelector('.menu-feed');
+  if (!feed) return;
+  let wheelTotal = 0, direction = 0, blockedUntil = 0;
+  let lastWheelAt = 0;
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cards = [...feed.querySelectorAll(':scope > .feature')];
+  function stepSize() {
+    const first = cards[0];
+    if (!first) return feed.clientHeight;
+    const gap = parseFloat(getComputedStyle(feed).rowGap) || 0;
+    return first.getBoundingClientRect().height + gap;
+  }
+  function currentIndex() {
+    const step = stepSize();
+    return step ? Math.max(0, Math.min(cards.length - 1, Math.round(feed.scrollTop / step))) : 0;
+  }
+  function updatePosition() {
+    const meter = $('results').querySelector('[data-feed-progress]');
+    if (meter) meter.textContent = `${currentIndex()+1} / ${cards.length}`;
+  }
+  function goOne(direction) {
+    const next = Math.max(0,Math.min(cards.length - 1,currentIndex()+direction));
+    if (next === currentIndex()) return false;
+    feed.scrollTo({top: next*stepSize(), behavior: reducedMotion() ? 'instant' : 'smooth'});
+    const meter = $('results').querySelector('[data-feed-progress]');
+    if (meter) meter.textContent = `${next+1} / ${cards.length}`;
+    return true;
+  }
+  feed.addEventListener('wheel', event => {
+    if (event.ctrlKey || !cards.length) return;
+    // At either end, let the visitor continue into the normal page.
+    if ((feed.scrollTop < 2 && event.deltaY < 0) ||
+        (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 2 && event.deltaY > 0)) return;
+    event.preventDefault();
+    const now = Date.now();
+    if (now < blockedUntil) return;
+    const sign = Math.sign(event.deltaY);
+    if (!sign) return;
+    if (sign !== direction || now-lastWheelAt>250) wheelTotal = 0;
+    direction = sign;
+    lastWheelAt = now;
+    wheelTotal += (event.deltaMode === 1 ? event.deltaY*16 : event.deltaMode === 2 ? event.deltaY*feed.clientHeight : event.deltaY);
+    if (Math.abs(wheelTotal) < 68) return;
+    wheelTotal = 0;
+    blockedUntil = now + 850;
+    goOne(sign);
+  }, {passive:false});
+  feed.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const dir = event.key === 'ArrowDown' || event.key === 'PageDown' ? 1 :
+      event.key === 'ArrowUp' || event.key === 'PageUp' ? -1 : 0;
+    if (!dir) return;
+    event.preventDefault();
+    goOne(dir);
+  });
+  feed.addEventListener('scroll',updatePosition,{passive:true});
+  updatePosition();
+}
+
 function renderLanguage() {
   document.documentElement.lang = lang;
   document.title = `Halk Büfe Selinus · ${t('menuTitle')}`;
