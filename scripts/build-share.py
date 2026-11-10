@@ -17,7 +17,14 @@ source = """
 import fs from 'node:fs';
 const read=async name=>import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(name)).toString('base64'));
 const {menu}=await read('menu.js'),{copy}=await read('copy.js');
-console.log(JSON.stringify({menu,copy}));
+const {nutritionData}=await read('nutrition-data.js'),{composeShare}=await read('share-content.js');
+const rich={};
+for(const item of menu) {
+  rich[item.id]={};
+  for(const lang of ['tr','ru','en','de'])
+    rich[item.id][lang]=composeShare(item,lang,nutritionData[item.id],copy[lang].ask);
+}
+console.log(JSON.stringify({menu,copy,rich}));
 """
 data = json.loads(subprocess.check_output(['node','--input-type=module','-e',source],cwd=DIST))
 out = DIST / 'assets/share'
@@ -54,11 +61,12 @@ for item in data['menu']:
     d.text((42,601),'Yapay zekâ görseli',font=font(16),fill='#756852')
     card.save(DIST/image_path,'JPEG',quality=86,optimize=True)
     for lang,locale in locales.items():
-        url=f"{PUBLIC}dish/{lang}/{item['id']}/"
+        url=f"{PUBLIC}dish/{lang}/{item['id']}/?v=rich-20261110"
         target=f"{PUBLIC}?lang={lang}#dish-{item['id']}"
         price=f"{item['price']} ₺" if item['price'] is not None else data['copy'][lang]['ask']
         title=f"{item['name'][lang]} · {price} · Halk Büfe Selinus"
-        description=(item.get('description',{}).get(lang,'')+' Halk Büfe Selinus · Selinus, Gazipaşa.').strip()
+        rich=data['rich'][item['id']][lang]
+        description=rich['preview']
         e=lambda value: escape(str(value),quote=True)
         html=f'''<!doctype html>
 <html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -72,7 +80,11 @@ for item in data['menu']:
 <meta name="twitter:description" content="{e(description)}"><meta name="twitter:image" content="{PUBLIC}{image_path}">
 <style>body{{font:16px/1.5 system-ui;background:#fff6e5;color:#183f35;margin:24px}}main{{max-width:580px;margin:auto}}img{{width:100%;border-radius:20px}}h1{{line-height:1.15}}a{{display:inline-block;padding:14px 24px;background:#183f35;color:white;border-radius:14px}}</style></head>
 <body><main><p>HALK BÜFE SELİNUS</p><img src="{PUBLIC}assets/{item['photo']}.webp" alt="{e(item['name'][lang])}">
-<h1>{e(item['name'][lang])}</h1><p>{e(description)}</p><h2>{e(price)}</h2><p>{e(data['copy'][lang]['photoNote'])}</p><a href="{e(target)}">{e(data['copy'][lang]['heroCta'])}</a></main>
+<h1>{e(item['name'][lang])}</h1>
+<p>{e(rich['description'])}</p><h3>{e(rich['ingredientsLine'].split(':')[0])}</h3><p>{e(rich['ingredientsLine'])}</p>
+<p><small>{e(rich['note'])}</small></p><h2>{e(price)}</h2>
+<p>{e(rich['cta'])}</p><p>{e(data['copy'][lang]['photoNote'])}</p>
+<a href="{e(target)}">{e(data['copy'][lang]['heroCta'])}</a></main>
 <script>location.replace({json.dumps(target)});</script></body></html>'''
         page=DIST/'dish'/lang/item['id']/'index.html'
         page.parent.mkdir(parents=True,exist_ok=True)
