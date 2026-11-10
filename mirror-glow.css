@@ -1,0 +1,81 @@
+/* Halk Büfe · soft warm mirror-light edge; decorative only.
+   No continuous animation, GPU-sized filters, or click interception. */
+:root {
+  --mirror-line: rgba(254, 231, 185, .78);
+  --mirror-edge: rgba(255, 246, 219, .58);
+  --mirror-ambient: rgba(236, 173, 84, .25);
+  --mirror-depth: rgba(78, 43, 22, .16);
+  --mirror-inner: rgba(248, 204, 132, .18);
+}
+:root[data-theme="dark"] {
+  --mirror-line: rgba(246, 202, 122, .52);
+  --mirror-edge: rgba(253, 228, 177, .26);
+  --mirror-ambient: rgba(236, 170, 78, .20);
+  --mirror-depth: rgba(0, 0, 0, .40);
+  --mirror-inner: rgba(250, 195, 109, .15);
+}
+/* Outer halo plus reflected light on the inner rim, just like a backlit mirror. */
+.feature {
+  border-color: var(--mirror-line);
+  box-shadow:
+    0 0 0 1px var(--mirror-edge),
+    0 0 16px 2px var(--mirror-ambient),
+    0 10px 26px var(--mirror-depth);
+}
+.feature::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px var(--mirror-edge),
+    inset 0 0 12px var(--mirror-inner),
+    inset 0 3px 4px rgba(255, 249, 233, .14);
+}
+/* Details inherit a subdued version, not a competing glowing toolbar. */
+#item-dialog, .inside-dialog {
+  border: 1px solid var(--mirror-line);
+  box-shadow:
+    0 0 0 1px var(--mirror-edge),
+    0 0 28px 4px var(--mirror-ambient),
+    0 20px 55px var(--mirror-depth);
+}
+#item-dialog::backdrop, .inside-dialog::backdrop {
+  background: rgba(13, 25, 20, .67);
+}
+/* Only pointer hover or keyboard focus accents; idle glow never animates. */
+@media (hover: hover) and (pointer: fine) {
+  .feature:hover {
+    border-color: rgba(255, 218, 150, .92);
+    box-shadow: 0 0 0 1px var(--mirror-line), 0 0 22px 3px var(--mirror-ambient), 0 12px 28px var(--mirror-depth);
+  }
+}
+.feature:focus-within { border-color: var(--focus); }
+/* Chrome/Edge/Firefox/Safari high contrast keeps a visible hard boundary. */
+@media (prefers-contrast: more) {
+  .feature, #item-dialog, .inside-dialog { border: 2px solid currentColor; box-shadow: none; }
+  .feature::after { box-shadow: none; }
+}
+@media (forced-colors: active) {
+  .feature, #item-dialog, .inside-dialog { border: 2px solid CanvasText; box-shadow: none; }
+  .feature::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feature, .feature::after, #item-dialog, .inside-dialog { animation: none; transition: none; }
+}
+/* Ultra-narrow phones: less shadow spill, unchanged 44px hit areas. */
+@media (max-width: 380px) {
+  .feature {
+    box-shadow: 0 0 0 1px var(--mirror-edge), 0 0 10px var(--mirror-ambient), 0 6px 15px var(--mirror-depth);
+  }
+}
+/* Keep the transparent right-side social actions independent of the glow. */
+.social-actions.social-rail, .menu-feed .social-actions.social-rail {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
