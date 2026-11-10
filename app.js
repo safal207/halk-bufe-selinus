@@ -259,9 +259,9 @@ function renderLanguage() {
   $('menu-guide-label').textContent = t('guide');
   $('menu-guide').href = `guide.html?lang=${lang}`;
   $('menu-guide').setAttribute('aria-label', `${t('guide')} · ${t('guideQuick')}`);
-  $('guide-link').innerHTML = `<span>${t('guide')}</span><span class="guide-footer-arrow" aria-hidden="true">→</span>`;
+  $('guide-link').innerHTML = `<span class="footer-action-label">${t('guide')}</span><span class="guide-footer-arrow" aria-hidden="true">→</span>`;
   $('guide-link').href = `guide.html?lang=${lang}`;
-  $('location').innerHTML = icon('pin') + t('map');
+  $('location').innerHTML = `<span class="footer-map-icon" aria-hidden="true">${icon('pin')}</span><span class="footer-action-label">${t('map')}</span>`;
   $('menu-view').setAttribute('aria-label',t('view'));
   $('menu-view').setAttribute('role','group');
   $('menu-view').innerHTML = Object.entries(viewLabels).map(([option,label]) => `<button type="button" data-view="${option}" aria-pressed="${option === view}">${t(label)}</button>`).join('');
