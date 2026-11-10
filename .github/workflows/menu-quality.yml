@@ -24,3 +24,37 @@ jobs:
         run: npm run check
       - name: Validate all menu, social, nutrition, share, photo reveal and UI regression contracts
         run: npm test
+  cross-browser:
+    name: Browser + NFR / ${{ matrix.engine }}
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit, msedge]
+    env:
+      CI: 'true'
+      E2E_BROWSER: ${{ matrix.engine }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright test runner
+        run: npm install --no-audit --no-fund
+      - name: Install real browser engine and operating system dependencies
+        run: npx playwright install --with-deps ${{ matrix.engine }}
+      - name: Desktop / mobile responsive, accessibility, UX and NFR checks
+        run: npm run test:e2e
+      - name: Save browser trace, screenshot and HTML report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-${{ matrix.engine }}-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
