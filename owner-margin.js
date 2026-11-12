@@ -60,7 +60,7 @@ export function analyzeMargin({menu,costCSV,receiptsCSV}) {
   const costs=parseCSV(costCSV),receipts=parseCSV(receiptsCSV);
   requireHeaders(costs,['item_id','ingredients_try','packaging_try','other_variable_try']);
   requireHeaders(receipts,['line_id','receipt_id','status','item_id','quantity','net_unit_revenue_try']);
-  const problems=[],costMap=new Map(),seenCostIds=new Set(),usedIds=new Set(),groups=new Map();
+  const problems=[],costMap=new Map(),seenCostIds=new Set(),usedIds=new Set(),groups=new Map(),voidReceipts=new Set();
   let ignored=0,invalid=0;
 
   for(const [idx,row] of costs.data.entries()){
@@ -84,7 +84,8 @@ export function analyzeMargin({menu,costCSV,receiptsCSV}) {
       invalid++;problems.push('Receipts row '+(idx+2)+': duplicate line_id');continue;
     }
     usedIds.add(line_id);
-    if(status==='pending'||status==='void'){ignored++;continue;}
+    if(status==='void'){voidReceipts.add(receipt_id);ignored++;continue;}
+    if(status==='pending'){ignored++;continue;}
     const key=JSON.stringify([receipt_id,item_id]);
     const group=groups.get(key)||{receipt_id,item_id,paidQty:0,refundedQty:0,paidCents:0,refundCents:0};
     if(status==='paid'){
@@ -98,6 +99,11 @@ export function analyzeMargin({menu,costCSV,receiptsCSV}) {
   let revenueCents=0,contributionCents=0,coveredRevenueCents=0;
   let netUnits=0,refundedLines=0,missingCosts=new Set(),badRefundGroups=0;
   for(const g of groups.values()){
+    if(voidReceipts.has(g.receipt_id)){
+      invalid++;
+      problems.push('Receipt '+g.receipt_id+': conflicting void and paid/refunded rows; excluded entire receipt');
+      continue;
+    }
     if(g.refundedQty>g.paidQty||g.refundCents>g.paidCents){
       badRefundGroups++;
       problems.push('Receipt '+g.receipt_id+': refund exceeds paid quantity or net revenue for '+g.item_id);
