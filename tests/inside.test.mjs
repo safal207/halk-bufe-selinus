@@ -40,7 +40,7 @@ test('reveal is wired to feed photo and detail without losing social actions',()
   assert.match(css,/\.inside-reveal\s*\{[^}]*clip-path:\s*inset\(0 0 0 var\(--inside-split\)\)/);
   assert.match(css,/\.feature-media \.inside-trigger/);
   assert.match(css,/\.featured \.feature-media \.inside-trigger span\s*\{\s*display:\s*none/);
-  assert.match(html,/app\.js\?v=inside-reveal-20261110/);
+  assert.match(html,/app\.js\?v=counter-funnel-20261112/);
   assert.match(html,/style\.css\?v=inside-reveal-20261110/);
 });
 

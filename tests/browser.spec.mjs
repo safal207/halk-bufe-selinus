@@ -267,3 +267,34 @@ test('footer actions: unified guide and map align in dark mobile TR and every la
   await expect(page).toHaveURL(/guide\.html\?lang=tr/);
   await expect(page.locator('#quest-content [data-route]')).toHaveCount(3);
 });
+
+
+test('counter handoff: draft code is not a payment, persists until edited and changes with service mode',async({page})=>{
+  await page.setViewportSize({width:360,height:640});
+  await page.addInitScript(()=>{
+    window.__funnelEvents=[];
+    window.addEventListener('halk:funnel',event=>window.__funnelEvents.push(event.detail));
+  });
+  await openMenu(page,'/?lang=ru&view=feed&utm_source=qr&utm_medium=qr');
+  await page.locator('.hero-order').click();
+  await page.locator('#header-cart').click();
+  await page.locator('.cart-checkout').click();
+  const reference=page.locator('.draft-reference strong');
+  await expect(reference).toHaveText(/^HB-[0-9A-F]{8}-[0-9A-F]{8}$/);
+  await expect(page.locator('.draft-reference small')).toContainText('Не оплачено');
+  const original=await reference.textContent();
+  await page.locator('[data-action="edit"]').click();
+  await page.locator('.cart-checkout').click();
+  await expect(reference).toHaveText(original);
+  await page.locator('[data-action="edit"]').click();
+  await page.locator('input[name="mode"][value="takeaway"]').check();
+  await page.locator('.cart-checkout').click();
+  const revised=await reference.textContent();
+  expect(revised).not.toBe(original);
+  const events=await page.evaluate(()=>window.__funnelEvents);
+  expect(events.some(event=>event.event==='menu_view'&&event.source==='qr')).toBe(true);
+  expect(events.some(event=>event.event==='add_to_cart')).toBe(true);
+  expect(events.some(event=>event.event==='begin_checkout')).toBe(true);
+  expect(events.some(event=>event.event==='draft_ready'&&event.order_reference===revised)).toBe(true);
+  expect(events.some(event=>event.event==='purchase'||event.event==='payment_confirmed')).toBe(false);
+});

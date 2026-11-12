@@ -1,15 +1,20 @@
 import {openShare} from './share.js?v=full-description-20261110';
 import {insideButton,openInside,setupInside} from './inside.js?v=inside-reveal-20261110';
 import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
-import {copy} from './copy.js?v=social-20261110';
+import {copy} from './copy.js?v=counter-funnel-20261112';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
 import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
 import {createSocialStore,socialKey} from './social.js?v=tiktok-social-20261110';
 import {nutritionLabels,nutritionMarkup,nutritionSearchText,nutritionSummary} from './nutrition.js?v=nutrition-20261105';
 import {basketKey, byId, getLanguage, read, readBasket, save} from './basket.js?v=pasta-retouch-20261107';
+import {createDraftManager} from './order-draft.js?v=funnel-20261112';
+import {createFunnelEmitter} from './funnel-events.js?v=funnel-20261112';
 
 const social = createSocialStore(menu.map(item => item.id));
+const drafts = createDraftManager();
+const funnel = createFunnelEmitter({url:location.href});
+let preparedDraft = null;
 const icons = {
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.2"/>',
   bookmark: '<path d="M5 3h14v18l-7-5-7 5V3Z"/>',
@@ -332,9 +337,13 @@ function refreshBasket() {
   if (basketSaved && saved !== null && saved !== JSON.stringify(basket)) {
     basket = readBasket();
     appliedOffer = null;
+    drafts.invalidate();
+    preparedDraft = null;
   }
 }
 function persistBasket() {
+  drafts.invalidate();
+  preparedDraft = null;
   basketSaved = save('basket', JSON.stringify(basket));
   if (!count()) {
     cashierView = false;
@@ -359,6 +368,10 @@ function update(id, delta, isOffer = false) {
   if (isOffer) appliedOffer = id;
   else if (appliedOffer === id && qty <= 0) appliedOffer = null;
   persistBasket();
+  funnel.emit(delta > 0 ? 'add_to_cart' : 'remove_from_cart',{
+    item_id:id,quantity:Math.abs(delta),amount_try:Math.abs(delta)*byId.get(id).price
+  });
+  if (isOffer) funnel.emit('offer_accept',{item_id:id,amount_try:byId.get(id).price});
   return true;
 }
 function recommend() {
@@ -414,7 +427,8 @@ function renderCart() {
 }
 function orderText() {
   const service = mode === 'takeaway' ? 'Paket' : 'Burada';
-  return ['Halk Büfe Selinus', service, ...getLines().map(({item,qty}) => `${qty} × ${item.name.tr} — ${money(item.price * qty)}`),
+  return ['Halk Büfe Selinus', ...(preparedDraft ? [`Taslak kodu / Draft: ${preparedDraft.id}`] : []),
+    'Ödeme alınmadı / NOT PAID', service, ...getLines().map(({item,qty}) => `${qty} × ${item.name.tr} — ${money(item.price * qty)}`),
     `Toplam: ${money(total())}`].join('\n');
 }
 function drawQR(canvas, content) {
@@ -435,7 +449,12 @@ function drawQR(canvas, content) {
   }
 }
 function renderCashier() {
+  const nextDraft = drafts.prepare(getLines(),mode);
+  if (nextDraft?.id && nextDraft.id !== preparedDraft?.id)
+    funnel.emit('draft_ready',{order_reference:nextDraft.id,amount_try:total()});
+  preparedDraft = nextDraft;
   $('cart-body').innerHTML = `<p class="cashier-note">${t('cashierNote')}</p>
+    <div class="draft-reference" role="status"><span>${t('draftLabel')}</span><strong>${preparedDraft?.id ?? t('draftUnavailable')}</strong><small>${t('draftNotPaid')}</small></div>
     <p class="serve-summary" lang="tr">${mode === 'takeaway' ? 'Paket' : 'Burada'}</p>
     <ul class="cart-list cashier-list" lang="tr">${getLines().map(({item,qty}) =>
       `<li class="cart-line"><div class="cart-item">${cartThumb(item)}<b>${qty} × ${item.name.tr}</b></div><span class="price">${money(item.price * qty)}</span></li>`).join('')}</ul>
@@ -461,6 +480,7 @@ function openCart() {
 function openItem(id, showNutrition = false) {
   const item = byId.get(id);
   if (!item) return;
+  funnel.emit('view_item',{item_id:id});
   pauseViewTimers();
   if (social.recordView(id)) refreshSocial();
   itemOpen = item;
@@ -632,6 +652,8 @@ $('hero-cta').addEventListener('click',event => {
 $('cart').addEventListener('change',event => {
   if (event.target.name === 'mode') {
     mode = event.target.value;
+    drafts.invalidate();
+    preparedDraft = null;
     save('mode', mode);
   }
 });
@@ -653,6 +675,8 @@ window.addEventListener('storage',event => {
     if (tracksLikes && before !== after) renderMenu();
   }
   if (event.key === basketKey || event.key === null) {
+    drafts.invalidate();
+    preparedDraft = null;
     basket = readBasket();
     basketSaved = true;
     appliedOffer = null;
@@ -661,6 +685,11 @@ window.addEventListener('storage',event => {
     }
     renderCart();
   }
+});
+document.addEventListener('click',event => {
+  const link=event.target.closest('a');
+  if (link && ['hero-guide','menu-guide','guide-link'].includes(link.id))
+    funnel.emit('guide_start',{lang});
 });
 document.addEventListener('click', async event => {
   const button = event.target.closest('button');
@@ -815,6 +844,7 @@ document.addEventListener('click', async event => {
     case 'cashier':
     case 'edit':
       cashierView = data.action === 'cashier';
+      if (cashierView) funnel.emit('begin_checkout',{amount_try:total()});
       renderCart();
       $('cart-body').scrollTop = 0;
       $('cart').querySelector('.close').focus();
@@ -840,6 +870,7 @@ document.addEventListener('visibilitychange',() => { if (!document.hidden) daypa
 window.addEventListener('pageshow',() => daypartClock.refresh());
 setupInside();
 renderLanguage();
+funnel.emit('menu_view',{view,lang});
 const updateLayout = () => document.documentElement.style.setProperty('--menu-stack', `${document.querySelector('.top').offsetHeight + $('menu-toolbar').offsetHeight}px`);
 if ('ResizeObserver' in window) {
   const layoutObserver = new ResizeObserver(updateLayout);
