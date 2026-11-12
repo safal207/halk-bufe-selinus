@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123e34">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="robots" content="noindex,nofollow">
+<title>Halk Büfe Selinus · Local margin workbench</title>
+<link rel="icon" href="../assets/halk-bufe-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="dashboard.css?v=owner-20261112">
+<script type="module" src="dashboard.js?v=owner-20261112"></script>
+</head>
+<body>
+<header class="head">
+  <div class="wrap heading">
+    <a href="../?lang=tr&view=feed" class="brand" aria-label="Halk Büfe Selinus menu">
+      <img src="../assets/halk-bufe-mark.svg" alt="" width="46" height="46">
+      <span>HALK BÜFE <small>SELİNUS</small></span>
+    </a>
+    <div class="head-actions">
+      <label for="language" id="language-label">Dil</label>
+      <select id="language">
+        <option value="tr">Türkçe</option><option value="ru">Русский</option>
+        <option value="en">English</option><option value="de">Deutsch</option>
+      </select>
+      <a id="menu-link" href="../?lang=tr&view=feed">Menü</a>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+<section class="intro">
+  <p class="eyebrow" id="eyebrow">YEREL KAR ANALİZİ</p>
+  <h1 id="title">Satış ve katkı payı</h1>
+  <p id="description">POS kayıtları ve maliyetleri yalnızca bu tarayıcıda karşılaştırın.</p>
+  <div class="privacy-note" role="note">
+    <strong id="privacy-title">Bu bir giriş korumalı yönetici paneli değildir.</strong>
+    <span id="privacy-text">Dosyalar sunucuya gönderilmez veya tarayıcıda kalıcı kaydedilmez. Yalnızca güvenilir bir cihazda kullanın. Sayfa yeniden yüklenince veriler silinir.</span>
+  </div>
+</section>
+<section class="uploads" aria-label="Data import">
+  <div class="upload-card">
+    <div class="step">01</div>
+    <h2 id="cost-title">Ürün maliyeti</h2>
+    <p id="cost-help">Her menü ürünü için doğrulanmış değişken maliyetler (TRY).</p>
+    <label for="cost-file" class="choose" id="cost-picker">Maliyet CSV dosyasını seç</label>
+    <input type="file" id="cost-file" accept=".csv,text/csv,text/plain">
+    <p id="cost-file-status" class="file-status" aria-live="polite">Dosya seçilmedi</p>
+    <button id="cost-template" type="button" class="download">Boş şablonu indir</button>
+  </div>
+  <div class="upload-card">
+    <div class="step">02</div>
+    <h2 id="sales-title">Kasadan doğrulanmış fişler</h2>
+    <p id="sales-help">Yalnızca gerçek POS kayıtları. Hazırlanan sepetler satış değildir.</p>
+    <label for="sales-file" class="choose" id="sales-picker">POS CSV dosyasını seç</label>
+    <input type="file" id="sales-file" accept=".csv,text/csv,text/plain">
+    <p id="sales-file-status" class="file-status" aria-live="polite">Dosya seçilmedi</p>
+    <button id="sales-template" type="button" class="download">Boş şablonu indir</button>
+  </div>
+</section>
+<section class="results" aria-labelledby="results-title">
+  <div class="result-head">
+    <div><p class="eyebrow" id="results-eyebrow">DOĞRULANABİLİR METRİKLER</p><h2 id="results-title">Satış analizi</h2></div>
+    <button id="reset-data" type="button" class="reset">Verileri temizle</button>
+  </div>
+  <div class="kpis" aria-live="polite">
+    <div class="kpi"><span id="kpi-orders-label">Net ödenmiş fişler</span><strong id="kpi-orders">—</strong></div>
+    <div class="kpi"><span id="kpi-revenue-label">Net satış (TRY)</span><strong id="kpi-revenue">—</strong></div>
+    <div class="kpi"><span id="kpi-contribution-label">Katkı payı (TRY)</span><strong id="kpi-contribution">—</strong></div>
+    <div class="kpi"><span id="kpi-margin-label">Katkı oranı</span><strong id="kpi-margin">—</strong></div>
+  </div>
+  <p id="result-note" role="status" aria-live="polite">Hesaplama için iki CSV dosyasını seçin. Bu değerler gerçek satış değildir.</p>
+  <div id="warnings" class="warnings" hidden><h3 id="warnings-title">Kontrol gerektiren veriler</h3><ul id="warning-items"></ul></div>
+  <div class="table-scroll" id="table-container" hidden>
+    <table>
+      <caption id="table-caption">Ürüne göre katkı payı</caption>
+      <thead><tr>
+        <th scope="col" id="th-item">Ürün</th><th scope="col" id="th-units">Net adet</th>
+        <th scope="col" id="th-revenue">Net satış</th><th scope="col" id="th-contribution">Katkı payı</th><th scope="col" id="th-margin">Katkı oranı</th>
+      </tr></thead>
+      <tbody id="sku-rows"></tbody>
+    </table>
+  </div>
+</section>
+<p class="footnote" id="footer-note">Katkı payı net kâr değildir. Vergiler, sabit giderler ve belgelenmeyen maliyetler dahil değildir. Ödemeler yalnızca ithal edilen POS kayıtları için kabul edilir.</p>
+</main>
+</body>
+</html>
