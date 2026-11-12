@@ -309,8 +309,8 @@ test('local owner workbench: valid POS upload calculates contribution without ne
   page.on('request',request=>{
     if(!request.url().startsWith('http://127.0.0.1:4173/'))outbound.push(request.url());
   });
-  const costs='item_id,ingredients_try,packaging_try,other_variable_try\\nhamburger,80.00,3.00,2.00\\ncay,2.00,0.00,1.00\\n';
-  const receipts='line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\\nL1,R1,paid,hamburger,2,250.00\\nL2,R1,paid,cay,1,10.00\\nL3,R1,refunded,hamburger,1,250.00\\nL4,R2,pending,cay,3,10.00\\n';
+  const costs='item_id,ingredients_try,packaging_try,other_variable_try\nhamburger,80.00,3.00,2.00\ncay,2.00,0.00,1.00\n';
+  const receipts='line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\nL1,R1,paid,hamburger,2,250.00\nL2,R1,paid,cay,1,10.00\nL3,R1,refunded,hamburger,1,250.00\nL4,R2,pending,cay,3,10.00\n';
   await page.locator('#cost-file').setInputFiles({name:'private-cost.csv',mimeType:'text/csv',buffer:Buffer.from(costs)});
   await page.locator('#sales-file').setInputFiles({name:'private-receipts.csv',mimeType:'text/csv',buffer:Buffer.from(receipts)});
   await expect(page.locator('#kpi-orders')).toHaveText('1');
@@ -336,10 +336,10 @@ test('local owner workbench: valid POS upload calculates contribution without ne
 test('owner profit guard: unknown item costs suppress overall profit and show warning',async({page})=>{
   await page.goto('/owner/?lang=en',{waitUntil:'domcontentloaded'});
   await page.locator('#cost-file').setInputFiles({name:'partial.csv',mimeType:'text/csv',buffer:Buffer.from(
-    'item_id,ingredients_try,packaging_try,other_variable_try\\nhamburger,80.00,3.00,2.00\\n'
+    'item_id,ingredients_try,packaging_try,other_variable_try\nhamburger,80.00,3.00,2.00\n'
   )});
   await page.locator('#sales-file').setInputFiles({name:'paid.csv',mimeType:'text/csv',buffer:Buffer.from(
-    'line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\\nL1,R1,paid,hamburger,1,250.00\\nL2,R1,paid,cay,1,10.00\\n'
+    'line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\nL1,R1,paid,hamburger,1,250.00\nL2,R1,paid,cay,1,10.00\n'
   )});
   await expect(page.locator('#kpi-revenue')).toContainText('260,00');
   await expect(page.locator('#kpi-contribution')).toHaveText('—');
