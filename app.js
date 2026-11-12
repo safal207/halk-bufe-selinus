@@ -1,7 +1,7 @@
 import {openShare} from './share.js?v=full-description-20261110';
 import {insideButton,openInside,setupInside} from './inside.js?v=inside-reveal-20261110';
 import {categories, menu} from './menu.js?v=pasta-retouch-20261107';
-import {copy} from './copy.js?v=social-20261110';
+import {copy} from './copy.js?v=counter-funnel-20261112';
 import {collections,collectionChoice,collectionItems,rotateItems} from './discover.js?v=discover-20261107';
 import {dayparts,daypartChoice,daypartFor,daypartPhoto,createDaypartClock} from './daypart.js?v=daypart-20261106';
 import {includedSides,recommendFor} from './cart-offer.js?v=cart-20261105';
