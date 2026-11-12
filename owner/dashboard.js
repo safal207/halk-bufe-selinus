@@ -160,7 +160,7 @@ async function load(input,type){
 }
 function template(type) {
   const header=type==='cost'
-    ?'item_id,ingredients_try,packaging_try,other_variable_try\n'
+    ?'item_id,ingredients_try,packaging_try,other_variable_try\n'+menu.map(item=>item.id+',,,\n').join('')
     :'line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\n';
   const blob=new Blob(['\uFEFF'+header],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
