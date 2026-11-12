@@ -347,3 +347,18 @@ test('owner profit guard: unknown item costs suppress overall profit and show wa
   await expect(page.locator('#warning-items')).toContainText('Missing verified costs for: cay');
   await expect(page.locator('#sku-rows tr')).toHaveCount(2);
 });
+
+test('owner incomplete POS guard: duplicate transaction prevents misleading revenue total',async({page})=>{
+  await page.goto('/owner/?lang=ru',{waitUntil:'domcontentloaded'});
+  await page.locator('#cost-file').setInputFiles({name:'cost.csv',mimeType:'text/csv',buffer:Buffer.from(
+    'item_id,ingredients_try,packaging_try,other_variable_try\nhamburger,80.00,3.00,2.00\n'
+  )});
+  await page.locator('#sales-file').setInputFiles({name:'bad.csv',mimeType:'text/csv',buffer:Buffer.from(
+    'line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\nL1,R1,paid,hamburger,1,250.00\nL1,R2,paid,hamburger,1,250.00\n'
+  )});
+  await expect(page.locator('#kpi-revenue')).toHaveText('—');
+  await expect(page.locator('#kpi-orders')).toHaveText('—');
+  await expect(page.locator('#kpi-contribution')).toHaveText('—');
+  await expect(page.locator('#result-note')).toContainText('Ошибки в чеках');
+  await expect(page.locator('#warning-items')).toContainText('duplicate line_id');
+});
