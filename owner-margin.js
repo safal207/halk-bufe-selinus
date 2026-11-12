@@ -47,7 +47,7 @@ export function cents(value) {
   if(typeof value!=='string'||!/^(?:0|[1-9]\d{0,9})(?:\.\d{1,2})?$/.test(value))return null;
   const [whole,fraction='']=value.split('.');
   const n=Number(whole)*100+Number(fraction.padEnd(2,'0'));
-  return Number.isSafeInteger(n)?n:null;
+  return Number.isSafeInteger(n)&&n<=100_000_000?n:null; // Max 1,000,000 TRY per unit, bounds sums safely.
 }
 function qty(value) {
   return /^[1-9]\d{0,3}$/.test(value)&&Number(value)<=999?Number(value):null;
@@ -60,13 +60,14 @@ export function analyzeMargin({menu,costCSV,receiptsCSV}) {
   const costs=parseCSV(costCSV),receipts=parseCSV(receiptsCSV);
   requireHeaders(costs,['item_id','ingredients_try','packaging_try','other_variable_try']);
   requireHeaders(receipts,['line_id','receipt_id','status','item_id','quantity','net_unit_revenue_try']);
-  const problems=[],costMap=new Map(),usedIds=new Set(),groups=new Map();
+  const problems=[],costMap=new Map(),seenCostIds=new Set(),usedIds=new Set(),groups=new Map();
   let ignored=0,invalid=0;
 
   for(const [idx,row] of costs.data.entries()){
     const id=row.item_id;
     if(!idPattern.test(id||'')||!byId.has(id)){problems.push('Costs row '+(idx+2)+': unknown item_id');continue;}
-    if(costMap.has(id)){problems.push('Costs row '+(idx+2)+': duplicate item_id');costMap.delete(id);continue;}
+    if(seenCostIds.has(id)){problems.push('Costs row '+(idx+2)+': duplicate item_id');costMap.delete(id);continue;}
+    seenCostIds.add(id);
     const values=['ingredients_try','packaging_try','other_variable_try'].map(key=>cents(row[key]));
     if(values.some(v=>v===null)){problems.push('Costs row '+(idx+2)+': invalid or missing nonnegative cost');continue;}
     costMap.set(id,values.reduce((a,b)=>a+b,0));
