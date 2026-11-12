@@ -12,7 +12,7 @@ tr:{
   fileNone:'Dosya seçilmedi',loaded:'Yüklendi',template:'Boş CSV şablonunu indir',resultsEyebrow:'DOĞRULANABİLİR METRİKLER',
   resultsTitle:'Satış analizi',reset:'Verileri temizle',orders:'Net ödenmiş fişler',revenue:'Net satış (TRY)',contribution:'Katkı payı (TRY)',
   margin:'Katkı oranı',waiting:'Analiz için maliyet ve POS CSV dosyalarını ayrı ayrı seçin.',ready:'Yalnızca POS kayıtlarından hesaplandı. Ödemelerin doğruluğu kasaya bağlıdır.',
-  partial:'Bazı kayıtlar hatalı veya maliyet eksik: toplam katkı payı hesaplanmıyor.',error:'Dosya yüklenemedi',warnings:'Kontrol gerektiren veriler',
+  partial:'Bazı kayıtlar hatalı veya maliyet eksik: toplam katkı payı hesaplanmıyor.',incompleteSales:'Geçersiz POS kayıtları: toplam satış ve fiş sayısı da gizlendi.',error:'Dosya yüklenemedi',warnings:'Kontrol gerektiren veriler',
   table:'Ürüne göre katkı payı',item:'Ürün',units:'Net adet',unknown:'Maliyet bilinmiyor',
   footer:'Katkı payı net kâr değildir; vergiler, sabit giderler ve belgelenmeyen maliyetler dahil değildir. Bu araç POS doğrulaması yapmaz.',
   noSale:'Bu dosyalarda geçerli ödenmiş fiş bulunamadı.'
@@ -27,7 +27,7 @@ ru:{
   fileNone:'Файл не выбран',loaded:'Загружено',template:'Скачать пустой шаблон CSV',resultsEyebrow:'ПОДТВЕРЖДАЕМЫЕ ПОКАЗАТЕЛИ',
   resultsTitle:'Анализ продаж',reset:'Очистить данные',orders:'Чеки с положительным нетто',revenue:'Чистая выручка (TRY)',contribution:'Маржинальный доход (TRY)',
   margin:'Маржинальность',waiting:'Для расчёта выберите оба CSV: себестоимость и реальные чеки.',ready:'Расчёт только по импортированным чекам. Их подлинность должна подтверждать касса.',
-  partial:'Найдены ошибки или неизвестные затраты. Общий маржинальный доход скрыт.',error:'Не удалось прочитать файл',warnings:'Данные требуют проверки',
+  partial:'Найдены ошибки или неизвестные затраты. Общий маржинальный доход скрыт.',incompleteSales:'Ошибки в чеках: итоговая выручка и число оплат тоже скрыты.',error:'Не удалось прочитать файл',warnings:'Данные требуют проверки',
   table:'Маржинальный доход по позициям',item:'Позиция',units:'Нетто, шт.',unknown:'Нет подтверждённых затрат',
   footer:'Маржинальный доход — не чистая прибыль: налоги, постоянные расходы и другие затраты не учтены. Этот инструмент не проверяет подлинность POS-выгрузки.',
   noSale:'В файле нет действительных оплаченных чеков.'
@@ -42,7 +42,7 @@ en:{
   fileNone:'No file selected',loaded:'Loaded',template:'Download blank CSV template',resultsEyebrow:'AUDITABLE METRICS',
   resultsTitle:'Sales analysis',reset:'Clear data',orders:'Net paid receipts',revenue:'Net revenue (TRY)',contribution:'Contribution (TRY)',
   margin:'Contribution margin',waiting:'Choose both the cost and POS CSV files to calculate.',ready:'Based on imported POS rows only; authenticity depends on the cashier system.',
-  partial:'Missing cost data or errors detected. Overall contribution is withheld.',error:'File could not be read',warnings:'Data quality warnings',
+  partial:'Missing cost data or errors detected. Overall contribution is withheld.',incompleteSales:'Invalid POS rows: total receipts and revenue are also withheld.',error:'File could not be read',warnings:'Data quality warnings',
   table:'Contribution by menu item',item:'Item',units:'Net units',unknown:'Cost unavailable',
   footer:'Contribution is not net profit; taxes, fixed overhead and other costs may not be included. This tool does not independently verify a POS export.',
   noSale:'No valid paid receipts in these files.'
@@ -57,7 +57,7 @@ de:{
   fileNone:'Keine Datei ausgewählt',loaded:'Geladen',template:'Leere CSV-Vorlage laden',resultsEyebrow:'PRÜFBARE KENNZAHLEN',
   resultsTitle:'Umsatzanalyse',reset:'Daten löschen',orders:'Netto bezahlte Belege',revenue:'Nettoumsatz (TRY)',contribution:'Deckungsbeitrag (TRY)',
   margin:'Deckungsbeitragsquote',waiting:'Für die Berechnung Kosten- und POS-CSV auswählen.',ready:'Nur aus importierten Kassendaten berechnet; Echtheit muss die Kasse bestätigen.',
-  partial:'Fehlende Kosten oder Datenfehler. Der Gesamtdeckungsbeitrag wird nicht ausgewiesen.',error:'Datei konnte nicht gelesen werden',warnings:'Datenprüfungen',
+  partial:'Fehlende Kosten oder Datenfehler. Der Gesamtdeckungsbeitrag wird nicht ausgewiesen.',incompleteSales:'Fehlerhafte POS-Zeilen: Belegzahl und Umsatz werden ebenfalls ausgeblendet.',error:'Datei konnte nicht gelesen werden',warnings:'Datenprüfungen',
   table:'Deckungsbeitrag nach Artikel',item:'Artikel',units:'Netto-Stückzahl',unknown:'Keine Kosten',
   footer:'Deckungsbeitrag ist kein Nettogewinn; Steuern, Fixkosten und weitere Ausgaben können fehlen. Dieses Tool bestätigt keine POS-Echtheit.',
   noSale:'Keine gültigen bezahlten Belege in den Dateien.'
@@ -106,13 +106,16 @@ function render(){
   let report;
   try {report=analyzeMargin({menu,costCSV,receiptsCSV:salesCSV});}
   catch(error){text('result-note',t('error')+': '+error.message);return;}
-  text('kpi-orders',report.paidReceipts);
-  text('kpi-revenue',formatTryCents(report.revenueCents));
+  const salesIncomplete=report.invalid>0||report.badRefundGroups>0;
+  if(!salesIncomplete){
+    text('kpi-orders',report.paidReceipts);
+    text('kpi-revenue',formatTryCents(report.revenueCents));
+  }
   if(report.contributionCents!==null){
     text('kpi-contribution',formatTryCents(report.contributionCents));
     text('kpi-margin',report.marginPct===null?'—':report.marginPct.toLocaleString(lang,{maximumFractionDigits:1})+'%');
   }
-  text('result-note',report.contributionCents===null?t('partial'):report.paidReceipts?t('ready'):t('noSale'));
+  text('result-note',salesIncomplete?t('incompleteSales'):report.contributionCents===null?t('partial'):report.paidReceipts?t('ready'):t('noSale'));
   if(report.problems.length) {
     $('warnings').hidden=false;
     for(const warning of report.problems.slice(0,75)){
