@@ -88,6 +88,18 @@ test('refunds never produce phantom paid orders or negative units',()=>{
   assert.equal(report.marginPct,null);
 });
 
+
+test('conflicting void and paid statuses on one POS receipt are excluded rather than overstating revenue',()=>{
+  const conflicting='line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\n'
+    +'P1,RC,paid,hamburger,1,250.00\nV1,RC,void,hamburger,1,250.00\n';
+  const result=analyzeMargin({menu,costCSV:costs,receiptsCSV:conflicting});
+  assert.equal(result.paidReceipts,0);
+  assert.equal(result.revenueCents,0);
+  assert.equal(result.contributionCents,null);
+  assert.ok(result.problems.some(x=>x.includes('conflicting void')));
+});
+
+
 test('owner workbench has no network, persistence, made-up sales or public menu entry',()=>{
   const source=readFileSync(new URL('../owner/dashboard.js',import.meta.url),'utf8');
   const html=readFileSync(new URL('../owner/index.html',import.meta.url),'utf8');
