@@ -298,3 +298,52 @@ test('counter handoff: draft code is not a payment, persists until edited and ch
   expect(events.some(event=>event.event==='draft_ready'&&event.order_reference===revised)).toBe(true);
   expect(events.some(event=>event.event==='purchase'||event.event==='payment_confirmed')).toBe(false);
 });
+
+test('local owner workbench: valid POS upload calculates contribution without network or fake checkout',async({page})=>{
+  await page.setViewportSize({width:360,height:640});
+  await page.goto('/owner/?lang=ru',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#title')).toHaveText('Продажи и маржинальный доход');
+  await expect(page.locator('#kpi-revenue')).toHaveText('—');
+  await expect(page.locator('#privacy-title')).toContainText('не защищённый');
+  const outbound=[];
+  page.on('request',request=>{
+    if(!request.url().startsWith('http://127.0.0.1:4173/'))outbound.push(request.url());
+  });
+  const costs='item_id,ingredients_try,packaging_try,other_variable_try\\nhamburger,80.00,3.00,2.00\\ncay,2.00,0.00,1.00\\n';
+  const receipts='line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\\nL1,R1,paid,hamburger,2,250.00\\nL2,R1,paid,cay,1,10.00\\nL3,R1,refunded,hamburger,1,250.00\\nL4,R2,pending,cay,3,10.00\\n';
+  await page.locator('#cost-file').setInputFiles({name:'private-cost.csv',mimeType:'text/csv',buffer:Buffer.from(costs)});
+  await page.locator('#sales-file').setInputFiles({name:'private-receipts.csv',mimeType:'text/csv',buffer:Buffer.from(receipts)});
+  await expect(page.locator('#kpi-orders')).toHaveText('1');
+  await expect(page.locator('#kpi-revenue')).toContainText('260,00');
+  await expect(page.locator('#kpi-contribution')).toContainText('172,00');
+  await expect(page.locator('#sku-rows tr')).toHaveCount(2);
+  expect(outbound).toEqual([]);
+  for(const width of [320,360,390,768,1440]){
+    await page.setViewportSize({width,height:720});
+    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+    expect(overflow,'owner overflow at '+width).toBeLessThanOrEqual(2);
+  }
+  await page.locator('#language').selectOption('tr');
+  await expect(page.locator('#title')).toHaveText('Satış ve katkı payı');
+  await expect(page.locator('#kpi-contribution')).toContainText('172,00');
+  await page.locator('#reset-data').click();
+  await expect(page.locator('#kpi-orders')).toHaveText('—');
+  await expect(page.locator('#sku-rows tr')).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('#kpi-revenue')).toHaveText('—');
+});
+
+test('owner profit guard: unknown item costs suppress overall profit and show warning',async({page})=>{
+  await page.goto('/owner/?lang=en',{waitUntil:'domcontentloaded'});
+  await page.locator('#cost-file').setInputFiles({name:'partial.csv',mimeType:'text/csv',buffer:Buffer.from(
+    'item_id,ingredients_try,packaging_try,other_variable_try\\nhamburger,80.00,3.00,2.00\\n'
+  )});
+  await page.locator('#sales-file').setInputFiles({name:'paid.csv',mimeType:'text/csv',buffer:Buffer.from(
+    'line_id,receipt_id,status,item_id,quantity,net_unit_revenue_try\\nL1,R1,paid,hamburger,1,250.00\\nL2,R1,paid,cay,1,10.00\\n'
+  )});
+  await expect(page.locator('#kpi-revenue')).toContainText('260,00');
+  await expect(page.locator('#kpi-contribution')).toHaveText('—');
+  await expect(page.locator('#warnings')).toBeVisible();
+  await expect(page.locator('#warning-items')).toContainText('Missing verified costs for: cay');
+  await expect(page.locator('#sku-rows tr')).toHaveCount(2);
+});
