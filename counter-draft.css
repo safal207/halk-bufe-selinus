@@ -1,0 +1,28 @@
+/* Prepared order reference. It must never resemble a paid receipt. */
+.draft-reference {
+  display: grid;
+  gap: 5px;
+  margin: 2px 0 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--selected-border);
+  border-radius: 14px;
+  background: var(--selected-bg);
+  color: var(--pine);
+}
+.draft-reference span {
+  font-size: 12px;
+  font-weight: 700;
+}
+.draft-reference strong {
+  font: 800 clamp(17px,4.5vw,22px)/1.25 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .04em;
+  overflow-wrap: anywhere;
+}
+.draft-reference small {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+@media (forced-colors: active) {
+  .draft-reference {border: 2px solid CanvasText; background: Canvas; color: CanvasText;}
+}
