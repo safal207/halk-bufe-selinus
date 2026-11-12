@@ -40,5 +40,5 @@ test('four languages and cache-busted on-photo UI assets',()=>{
     assert.ok(copySource.includes(key));
   }
   assert.match(html,/style\.css\?v=inside-reveal-20261110/);
-  assert.match(html,/app\.js\?v=inside-reveal-20261110/);
+  assert.match(html,/app\.js\?v=counter-funnel-20261112/);
 });
