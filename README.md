@@ -11,3 +11,9 @@ The menu uses a static, warm LED-mirror glow around food cards and ingredient de
 Quality gates are in [`.github/workflows/menu-quality.yml`](.github/workflows/menu-quality.yml): Node syntax/unit tests and Playwright end-to-end tests across Chromium, Firefox, WebKit and Microsoft Edge on Linux. Read [`docs/cross-browser-nfr.md`](docs/cross-browser-nfr.md) for viewports, accessibility and performance thresholds; tests do not replace physical Windows, macOS or iOS checks.
 
 Before publishing, review the five quality jobs for the exact commit and verify the live Pages asset `mirror-glow.css` is served. A successful code merge alone does not prove the public site has refreshed.
+
+## Owner margin workbench (local-only)
+
+The optional `/owner/?lang=ru` page imports **real POS CSV lines and actual per-SKU variable costs** into your own browser, calculates net paid receipts, net TRY sales and conditional contribution margin. It does not store or upload the files, does not authenticate an owner, and does not prove the uploaded POS data are genuine. Do not commit private costs/receipts to this public repo; use a trusted device.
+
+The cost template lists 44 item IDs with blank costs — no fabricated business metrics. A prepared order/reference from the customer menu is **not** a paid POS receipt. See [full CSV formats and safety limits](docs/owner-margin-p1.md).
