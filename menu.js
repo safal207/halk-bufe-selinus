@@ -7,6 +7,7 @@ export const categories = [
   ['toast','Tostlar','Тосты','Toast','Toast','toast'],
   ['salad','Salatalar','Салаты','Salads','Salate','leaf'],
   ['dessert','Tatlılar','Десерты','Desserts','Desserts','cake'],
+  ['cold-drinks','Soğuk içecekler','Холодные напитки','Cold drinks','Kalte Getränke','cup'],
   ['drinks','Sıcak içecekler','Напитки','Hot drinks','Heiße Getränke','cup']
 ].map(([id, tr, ru, en, de, icon]) => ({id, name:{tr,ru,en,de}, icon}));
 
@@ -52,6 +53,8 @@ const rows = [
   ['kabak','dessert',170,'Kabak tatlısı','Тыквенный десерт','Pumpkin dessert','Kürbisdessert','campaign/pumpkin-dessert'],
   ['revani','dessert',125,'Revani tatlısı','Ревани','Revani semolina cake','Revani (Grießkuchen)','campaign/revani'],
   ['gunun-tatlisi','dessert',null,'Günün tatlısı','Десерт дня','Dessert of the day','Dessert des Tages','catalog/gunun-tatlisi'],
+  ['pepsi','cold-drinks',null,'Pepsi','Pepsi','Pepsi','Pepsi','reference/drinks-fridge'],
+  ['water','cold-drinks',null,'Su','Вода','Water','Wasser','reference/drinks-fridge'],
   ['cay','drinks',10,'Çay','Турецкий чай','Turkish tea','Türkischer Tee','branding/turkish-tea'],
   ['bitki-cayi','drinks',20,'Bitki çayı','Травяной чай','Herbal tea','Kräutertee','branding/herbal-tea'],
   ['turk-kahvesi','drinks',50,'Türk kahvesi','Турецкий кофе','Turkish coffee','Türkischer Kaffee','branding/turkish-coffee'],
